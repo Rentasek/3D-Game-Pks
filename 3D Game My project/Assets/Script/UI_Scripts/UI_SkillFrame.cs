@@ -35,6 +35,7 @@ public class UI_SkillFrame : MonoBehaviour
     private void OnValidate()
     {
         live_charStats = Camera.main.GetComponent<CameraController>().player.GetComponent<CharacterStatus>();
+        currentCharacterBonusStats = Camera.main.GetComponent<CameraController>().player.GetComponent<CharacterBonusStats>();
 
         if (updateSkills) //po zupdatowaniu w Edytorze trzeba ustawiæ Interractable na Buttonach
         {
