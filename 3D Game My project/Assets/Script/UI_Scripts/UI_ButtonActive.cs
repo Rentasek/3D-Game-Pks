@@ -9,7 +9,7 @@ public class UI_ButtonActive : MonoBehaviour
     public CharacterStatus live_charStats;
     public Button currentButton;
 
-    public enum ui_Button { AttackButton, SpecialAttackButton, MouseMovementButton, MouseRotateButton, IsometricButton, ThirdPersonButton }; //implementacje z list¹ pozycji enumeratora
+    public enum ui_Button { AttackButton, SpecialAttackButton, MouseMovementButton, MouseRotateButton, IsometricButton, ThirdPersonButton, SprintButton }; //implementacje z list¹ pozycji enumeratora
     [SerializeField] ui_Button ui_button = new ui_Button();         //enumerator, tworzy nowy obiekt status bar dla ka¿dego elementu z listy 
 
 
@@ -56,6 +56,10 @@ public class UI_ButtonActive : MonoBehaviour
                 break;
             case ui_Button.ThirdPersonButton:
                 if (live_charStats.playerInputEnable) currentButton.interactable = true;
+                else currentButton.interactable = false;
+                break;
+            case ui_Button.SprintButton:
+                if (live_charStats.inputRunning) currentButton.interactable = true;
                 else currentButton.interactable = false;
                 break;
         }

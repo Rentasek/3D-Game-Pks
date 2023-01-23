@@ -70,7 +70,8 @@ public class Spell_FireBreath : MonoBehaviour
     {
         live_charStats = GetComponentInParent<CharacterStatus>();
         breath_AudioSource = GetComponentInParent<AudioSource>();//debugg jeœli nie ustawione w inspectorze
-        breath_VisualEffect= GetComponentInParent<VisualEffect>();
+        breath_VisualEffect = GetComponentInParent<VisualEffect>();
+        live_charStats.spell = GetComponent<Spell_FireBreath>();
         live_charStats.spell_MaxRadius = breath_MaxFireRadius;
         EnemyArraySelector();
     }

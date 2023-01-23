@@ -186,15 +186,31 @@ public class UI_SkillFrame : MonoBehaviour
     }
 
     public void SkillUp()
-    {        
-        skill_BonusFloat++;
-        currentCharacterBonusStats.bonus_SkillPoints--;
+    {
+        if (live_charStats.inputRunning && currentCharacterBonusStats.bonus_SkillPoints >= 10)
+        {
+            skill_BonusFloat += 10;
+            currentCharacterBonusStats.bonus_SkillPoints -= 10;
+        }
+        else
+        {
+            skill_BonusFloat++;
+            currentCharacterBonusStats.bonus_SkillPoints--;
+        } 
         SkillUpdate(); //Update klasy Bonus char
     }
     public void SkillDown()
-    {        
-        skill_BonusFloat--;
-        currentCharacterBonusStats.bonus_SkillPoints++;
+    {
+        if (live_charStats.inputRunning && skill_BonusFloat >= 10)
+        {
+            skill_BonusFloat -= 10;
+            currentCharacterBonusStats.bonus_SkillPoints += 10;
+        }
+        else
+        {
+            skill_BonusFloat--;
+            currentCharacterBonusStats.bonus_SkillPoints++;
+        }
         SkillUpdate(); //Update klasy Bonus char
     }
 
