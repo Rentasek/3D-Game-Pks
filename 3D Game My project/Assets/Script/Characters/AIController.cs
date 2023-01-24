@@ -34,7 +34,7 @@ public class AIController : MonoBehaviour
     public float sightRange, attackRange;
     public bool targetInSightRange, targetInAttackRange;*/
 
-    private void OnValidate()
+    private void OnEnable()
     {
         live_charStats= GetComponent<CharacterStatus>();
         enemiesArray = live_charStats.currentEnemiesArray;

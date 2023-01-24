@@ -23,7 +23,7 @@ public class MeeleAttack : MonoBehaviour
 
     private AudioSource audioSource;
      
-    private void OnValidate()
+    private void OnEnable()
     {
         live_charStats = GetComponentInParent<CharacterStatus>();        //automatyczny serialize dla wygody
         scrObj_CharStats = live_charStats.scrObj_CharStats;     //automatyczny serialize dla wygody    
@@ -57,7 +57,7 @@ public class MeeleAttack : MonoBehaviour
             
             audioSource.PlayOneShot(other.GetComponent<CharacterStatus>().scrObj_CharStats.damagedEnemy, 1);    //audio Play
 
-            other.GetComponent<Animator>().SetTrigger("IsHit");
+            other.GetComponent<Animator>().SetTrigger("IsHit");  //Trigger Hit Animatora
 
             other.GetComponent<CharacterStatus>().currentHP -= GetComponentInParent<CharacterStatus>().currentDamageCombo;
 

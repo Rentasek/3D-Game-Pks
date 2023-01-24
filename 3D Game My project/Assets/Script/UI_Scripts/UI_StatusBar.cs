@@ -22,7 +22,7 @@ public class UI_StatusBar : MonoBehaviour
 
 
     /// IMPLEMENTACJA
-    private void OnValidate()
+    private void OnEnable()
     {
         if (live_charStats == null) live_charStats = GetComponentInParent<CharacterStatus>();
     }

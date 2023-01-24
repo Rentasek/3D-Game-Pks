@@ -25,7 +25,7 @@ public class FieldOFView : MonoBehaviour
         StartCoroutine(FOVRoutine());
     }
 
-    private void OnValidate()
+    private void OnEnable()
     {
         live_charStats = GetComponentInParent<CharacterStatus>();
         enemiesArray = live_charStats.currentEnemiesArray;        

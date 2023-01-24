@@ -66,7 +66,7 @@ public class Spell_FireBreath : MonoBehaviour
 
 
 
-    private void OnValidate()
+    private void OnEnable()
     {
         live_charStats = GetComponentInParent<CharacterStatus>();
         breath_AudioSource = GetComponentInParent<AudioSource>();//debugg jeœli nie ustawione w inspectorze

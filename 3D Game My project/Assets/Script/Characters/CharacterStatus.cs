@@ -47,6 +47,7 @@ public class CharacterStatus : MonoBehaviour
     public bool inputLoadGame;
     public bool inputResetPosition;
     public bool inputSetBackupPosition;
+    public float inputMouseScroll;
     public bool Testing_Z_Key;
 
     [Space]
@@ -165,16 +166,13 @@ public class CharacterStatus : MonoBehaviour
     public ScrObj_charStats scrObj_CharStats;
     [CanBeNull] public MeeleAttack[] currentMeeleColliders;
     public CharacterBonusStats currentCharacterBonusStats;
-    
 
-   
-    private void OnValidate()
+
+    private void OnEnable()
     {
-
         if (isPlayer) LoadLevel();
         LoadCharStats();
-                      
-    }
+    }    
 
     private void Start()
     {

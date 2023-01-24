@@ -34,7 +34,7 @@ public class ItemResourceSphere : MonoBehaviour
     }*/
 
 
-    private void Start() //przy stworzeniu z instantiate
+    private void OnEnable() //przy stworzeniu z instantiate
     {
         SetupResourceOrb();
         Destroy(gameObject, 20f); //Destroy OBJ po 20 sek
