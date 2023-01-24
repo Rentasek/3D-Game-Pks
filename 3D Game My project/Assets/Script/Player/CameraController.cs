@@ -1,13 +1,17 @@
+using JetBrains.Annotations;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
+using System.Net.Http.Headers;
 using Unity.VisualScripting;
+using UnityEditor;
 using UnityEngine;
 using UnityEngine.Jobs;
 using UnityEngine.Scripting.APIUpdating;
 using UnityEngine.UIElements;
 using Cursor = UnityEngine.Cursor;
 
-public class CameraController : MonoBehaviour
+public partial class CameraController : MonoBehaviour
 {
 
     [SerializeField] private float mouseSensivity;
@@ -17,74 +21,55 @@ public class CameraController : MonoBehaviour
     //[SerializeField] private bool enableMouseMovement;
     [SerializeField] public CharacterStatus live_charStats;
     [SerializeField] public Player_Input player_Input;
+    [SerializeField] List<IPlayerUpdate> playerObjectsList;
 
     [SerializeField] private Vector3 standardCameraOffset;
     [SerializeField] private Vector3 isometricCameraOffset;
 
-   /* [SerializeField] private float xOffset = 0;
-    [SerializeField] private float yOffset = 2;
-    [SerializeField] private float zOffset = 4;*/
-    
+    /* [SerializeField] private float xOffset = 0;
+     [SerializeField] private float yOffset = 2;
+     [SerializeField] private float zOffset = 4;*/
+
     [SerializeField] private float timeFollowOffset = 1f;
     [SerializeField] private Vector3 currentCameraVelocity = Vector3.zero;
     [SerializeField] private Vector3 cameraReferencePoint = Vector3.zero;
+    [SerializeField, CanBeNull] private UI_StatusBar[] playerStatusBars;
+
+    [SerializeField] private float cameraDistanceYMin, cameraDistanceYMax, cameraDistanceZMin, cameraDistanceZMax;
+    [SerializeField] private Vector3 cameraDistanceIsometricMin, cameraDistanceIsometricMax;
+    /* [Range(1.5f, 6f), SerializeField] private float cameraDistanceY;
+     [Range(1f, 22.5f), SerializeField] private float cameraDistanceZ;   */
 
     private void OnValidate()
     {
-        live_charStats = player.GetComponent<CharacterStatus>();
-        player_Input = player.GetComponent<Player_Input>();
+        SearchForPlayer();
     }
 
 
     // Start is called before the first frame update
     void Start()
     {
+        SearchForPlayer();
 
-        
-        playerTransform =  player.transform;
-        SwitchCursorOptions();
-        
     }
 
 
     // Update is called once per frame  //update u¿ywaæ do input GetKeyDown, dzia³aj¹ bez laga
-    private void Update()  
+    private void Update()
     {
-
+        CameraDistance();
 
         if (Input.GetKeyDown(KeyCode.X)) SwitchCursorOptions();
         if (live_charStats.inputEnableMouseRotate) MouseRotate();
-        
+
         CameraFollowPlayer();
-
-
-
-       /* ///Przeniesione z Player_Input
-        ///
-                
-
-        //dzia³a tylko z komponentem z przypiêt¹ main.camera
-        if (Input.GetKeyDown(KeyCode.P) && live_charStats.isPlayer) live_charStats.playerInputEnable = !live_charStats.playerInputEnable;//input Switch
-
-        player_Input.InputClass();
-
-
-
-        if (!live_charStats.playerInputEnable) player_Input.IsometricInputClass();//jeœli nie ma flagi player input //isometric
-        if (live_charStats.playerInputEnable) player_Input.PlayerInputClass();//jeœli zaznaczona jest flaga playerInputEnable //3rd person
-
-        //GameSave/Load
-        if (live_charStats.inputSaveGame && live_charStats.isPlayer) { player_Input.SaveState(); live_charStats.GetComponent<CharacterMovement>().SetCharacterPosition(); } //przy save state ustawia backup pozycje 
-        if (live_charStats.inputLoadGame && live_charStats.isPlayer) { player_Input.LoadState(); live_charStats.GetComponent<CharacterMovement>().ResetCharacterPosition(); } //przy load state resetuje do backup pozycji 
-
-*/
 
     }
     private void MouseRotate()
     {
-        float mouseX = Input.GetAxis("Mouse X")*mouseSensivity*Time.deltaTime;
+        float mouseX = Input.GetAxis("Mouse X") * mouseSensivity * Time.deltaTime;
 
-        playerTransform.Rotate(Vector3.up,mouseX);
+        playerTransform.Rotate(Vector3.up, mouseX);
     }
     void CameraFollowPlayer()
     {
@@ -109,9 +94,9 @@ public class CameraController : MonoBehaviour
     public void SwitchCursorOptions()
     {
         if (live_charStats.isPlayer)
-        {     
+        {
             if (live_charStats.playerInputEnable) //jesli 3rd person view
-            {                
+            {
                 live_charStats.inputEnableMouseRotate = !live_charStats.inputEnableMouseRotate; //w³¹czanie i wy³¹czanie booleana przyciskiem on/off
 
                 if (live_charStats.inputEnableMouseRotate) Cursor.lockState = CursorLockMode.Locked; //kursor zablokwany na œrodku ekranu
@@ -121,13 +106,65 @@ public class CameraController : MonoBehaviour
             {
                 Cursor.lockState = CursorLockMode.None;
                 Cursor.visible = true;
-            } //jeœli player steruje -> lock cursora, jeœli nie cursor widoczny i zamkniêty w okienku
+            } //jeœli player steruje -> lock cursora, jeœli nie cursor widoczny
         }
-            
+
     }
 
+    void CameraDistance()
+    {
+        //Mouse Roll zmienie odleg³oœæ kamery
+        float mouseScroll = -1 * live_charStats.inputMouseScroll; //InvertScrollMouse
+        if (live_charStats.playerInputEnable)
+        {
 
+            standardCameraOffset.y = Mathf.Clamp(standardCameraOffset.y + (cameraDistanceYMax - cameraDistanceYMin) * mouseScroll, cameraDistanceYMin, cameraDistanceYMax);
+            standardCameraOffset.z = Mathf.Clamp(standardCameraOffset.z + (cameraDistanceZMax - cameraDistanceZMin) * mouseScroll, cameraDistanceZMin, cameraDistanceZMax);
+        }
+        else
+        {
+            isometricCameraOffset = isometricCameraOffset + mouseScroll * new Vector3(1f, 1f, -1f);
 
+        }
 
+    }
+    
+
+    public void SearchForPlayer()
+
+    {        
+        player = GameObject.FindGameObjectWithTag("Player");       //szuka tylko po aktywnych objectach z Tagiem Player
+        
+        if (player != null)
+        {
+            playerTransform = player.transform;
+
+            live_charStats = Camera.main.GetComponent<CameraController>().player.GetComponent<CharacterStatus>();
+            player_Input = Camera.main.GetComponent<CameraController>().player.GetComponent<Player_Input>();
+
+            //Dla wszystkich Objectów zawieraj¹cych komponent Interface -> IPlayerUpdate        
+            playerObjectsList = new List<IPlayerUpdate>(FindObjectsOfType<Object>().OfType<IPlayerUpdate>());
+            foreach (IPlayerUpdate playerUpdate in playerObjectsList)
+            {
+                playerUpdate.PlayerUpdate();
+            }
+            
+            live_charStats.isPlayer = true;
+            player.GetComponent<CharacterAnimations>().PlayerUpdate();
+
+            SwitchCursorOptions();
+
+            //Podmianka UI Status barów na aktulnego playera
+            if (playerStatusBars != null)
+            {
+                foreach (UI_StatusBar playerStatusBar in playerStatusBars)
+                {
+                    playerStatusBar.live_charStats = live_charStats;
+                }
+            }
+        } 
+        
+       
+    }
 
 }

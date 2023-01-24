@@ -6,12 +6,19 @@ using UnityEngine.AI;
 
 public class CharacterAnimations : MonoBehaviour
 {
+    
     public CharacterStatus live_charStats;
     public GameObject resourcePrefab;
 
-    private void OnValidate()
+    private void OnEnable()
     {
         live_charStats = GetComponent<CharacterStatus>();
+        if (live_charStats.currentAnimator != null)
+        {
+            ResetAllTriggers();
+            ResetInputsAndStates();
+        }
+
     }
 
 
@@ -28,6 +35,9 @@ public class CharacterAnimations : MonoBehaviour
     {
         //Movement
         MovementAnimations();
+
+        //MeeleAttack
+        if (live_charStats.inputAttacking) StartCoroutine(MeeleAttack());
 
         //Jumping
         if (live_charStats.isJumping) JumpAnimation();
@@ -48,7 +58,19 @@ public class CharacterAnimations : MonoBehaviour
 
     }
 
-
+    public void PlayerUpdate()
+    {
+        if (live_charStats.isPlayer)
+        {
+            if (live_charStats.currentAnimator != null)
+            {
+                ResetAllTriggers();
+                ResetInputsAndStates();
+            }
+            
+        }
+        
+    }
     
 
     private void MovementAnimations()
@@ -71,6 +93,29 @@ public class CharacterAnimations : MonoBehaviour
     private void Run()
     {
         live_charStats.currentAnimator.SetFloat("yAnim", 1, 0.2f, Time.deltaTime);
+    }
+
+    private IEnumerator MeeleAttack()
+    {   //warunki ustalone tak ¿eby przerwaæ coroutine
+        if (live_charStats.isAttacking || live_charStats.currentStam <= live_charStats.currentAttackStamCost)
+        {
+            //Debug.Log("CoroutineBreak");
+            yield break;
+        }
+        else
+        {
+            //jeœli nie spe³ni warunków przerwania coroutine
+            live_charStats.isAttacking = true;
+            live_charStats.currentAnimator.ResetTrigger("Jump"); //¿eby nie czeka³ z jumpem w trakcie ataku w powietrzu
+            live_charStats.currentAnimator.SetFloat("AttackCombo", live_charStats.currentComboMeele);
+            live_charStats.currentAnimator.SetTrigger("MeeleAttack");
+            live_charStats.currentStam -= live_charStats.currentAttackStamCost; //Koszt Stamy przy ataku
+            yield return new WaitForSeconds(live_charStats.currentAttackCooldown); //cooldown pomiêdzy pojedynczymi atakami
+            live_charStats.isAttacking = false;
+            live_charStats.currentComboMeele += 0.5f;   //combo do animatora
+
+            if (live_charStats.currentComboMeele > 1.0f) live_charStats.currentComboMeele = 0;  //reset combo po combo3
+        }
     }
 
 
@@ -166,7 +211,7 @@ public class CharacterAnimations : MonoBehaviour
         }
     }
 
-    private void ResetAllTriggers() //resetuje wszytkie triggery przy œmierci ¿eby nie skaka³ / uderza³ po respwanie
+    public void ResetAllTriggers() //resetuje wszytkie triggery przy œmierci ¿eby nie skaka³ / uderza³ po respwanie
     {
         foreach (var trigger in live_charStats.currentAnimator.parameters)
         {
@@ -175,15 +220,16 @@ public class CharacterAnimations : MonoBehaviour
                 live_charStats.currentAnimator.ResetTrigger(trigger.name);
             }
         }
+        live_charStats.currentAnimator.Rebind();
+        live_charStats.currentAnimator.Update(0f);
     }
-    private void ResetInputsAndStates()  //resetuje inputy i statsy przy œmierci ¿eby nie skaka³ / uderza³ po respwanie
-    {
+    public void ResetInputsAndStates()  //resetuje inputy i statsy przy œmierci ¿eby nie skaka³ / uderza³ po respwanie
+    {        
         live_charStats.inputMoving = false;
         live_charStats.inputRunning = false;
         live_charStats.inputJumping = false;
         live_charStats.inputAttacking = false;
-        live_charStats.inputCasting = false;
-
+        live_charStats.inputCasting = false;       
 
         live_charStats.isMoving = false;
         live_charStats.isJumping = false;

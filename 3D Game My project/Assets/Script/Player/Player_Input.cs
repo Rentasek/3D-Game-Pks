@@ -18,7 +18,7 @@ public class Player_Input : MonoBehaviour
 
 
     // Start is called before the first frame update
-    private void OnValidate()
+    private void OnEnable()
     {
         live_charStats = GetComponent<CharacterStatus>();        
         if (live_charStats.isPlayer)  GameObject.Find("Player_Charmander/UI_Screen/OptionsPanel");
@@ -40,6 +40,7 @@ public class Player_Input : MonoBehaviour
 
         
     }
+   
 
     public void PlayerInputClass() //wsyzstkie klasy maj¹ w sobie dodatkowe warunki do dzia³ania INPUTA
     {
@@ -109,7 +110,10 @@ public class Player_Input : MonoBehaviour
     {
         
         //MouseMoving
-        live_charStats.inputMouseCurrentMoving = Input.GetKey(KeyCode.Mouse2); 
+        live_charStats.inputMouseCurrentMoving = Input.GetKey(KeyCode.Mouse2);
+
+        //MouseScroll
+        live_charStats.inputMouseScroll = Input.GetAxis("Mouse ScrollWheel");
 
         //GameSave/Load
         live_charStats.inputSaveGame = Input.GetKeyDown(KeyCode.Alpha5);
