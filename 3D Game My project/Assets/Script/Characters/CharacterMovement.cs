@@ -87,7 +87,7 @@ public class CharacterMovement : MonoBehaviour
 
     ///////////////////////////////////// Implementacja ///////////////////////////////////////
 
-    private void OnValidate()
+    private void OnEnable()
     {        
         live_charStats = GetComponent<CharacterStatus>();        
         live_NavMeshAgent = live_charStats.currentNavMeshAgent;//live_charStats.GetComponent<NavMeshAgent>();         
@@ -120,8 +120,7 @@ public class CharacterMovement : MonoBehaviour
         }
         
 
-        //MeeleAttack
-        if (live_charStats.inputAttacking) StartCoroutine(MeeleAttack());
+        
 
         //Testing
         live_charStats.Testing_Z_Key = !live_charStats.Testing_Z_Key;  //w³¹czanie i wy³¹czanie booleana przyciskiem ON/OFF
@@ -300,11 +299,6 @@ public class CharacterMovement : MonoBehaviour
             live_charStats.isJumping = false;
     }
 
-
-
-    
-   
-
     private void Gravity()
     {
         if (!live_charStats.isGrounded)
@@ -319,29 +313,6 @@ public class CharacterMovement : MonoBehaviour
         if (live_charStats.isGrounded && live_charStats.currentMoveVector.y < 0)
         {
             live_charStats.currentMoveVector.y = 0f;
-        }
-    }  
-
-    private IEnumerator MeeleAttack()
-    {   //warunki ustalone tak ¿eby przerwaæ coroutine
-        if (live_charStats.isAttacking || live_charStats.currentStam <= live_charStats.currentAttackStamCost)
-        {
-            //Debug.Log("CoroutineBreak");
-            yield break;
-        }
-        else
-        {
-            //jeœli nie spe³ni warunków przerwania coroutine
-            live_charStats.isAttacking = true;            
-            live_charStats.currentAnimator.ResetTrigger("Jump"); //¿eby nie czeka³ z jumpem w trakcie ataku w powietrzu
-            live_charStats.currentAnimator.SetFloat("AttackCombo", live_charStats.currentComboMeele);
-            live_charStats.currentAnimator.SetTrigger("MeeleAttack");
-            live_charStats.currentStam -= live_charStats.currentAttackStamCost; //Koszt Stamy przy ataku
-            yield return new WaitForSeconds(live_charStats.currentAttackCooldown); //cooldown pomiêdzy pojedynczymi atakami
-            live_charStats.isAttacking = false;
-            live_charStats.currentComboMeele += 0.5f;   //combo do animatora
-
-            if (live_charStats.currentComboMeele > 1.0f) live_charStats.currentComboMeele = 0;  //reset combo po combo3
         }
     }
 
