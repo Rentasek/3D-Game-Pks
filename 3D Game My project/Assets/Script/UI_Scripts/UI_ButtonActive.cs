@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class UI_ButtonActive : MonoBehaviour
+public class UI_ButtonActive : MonoBehaviour, IPlayerUpdate
 {
     public CharacterStatus live_charStats;
     public Button currentButton;
@@ -14,7 +14,7 @@ public class UI_ButtonActive : MonoBehaviour
 
 
 
-    private void OnValidate()
+    private void OnEnable()
     {
         live_charStats = Camera.main.GetComponent<CameraController>().player.GetComponent<CharacterStatus>();
         currentButton = GetComponent<Button>();
@@ -26,6 +26,10 @@ public class UI_ButtonActive : MonoBehaviour
         UI_buttonUpdate();
     }
 
+    public void PlayerUpdate()
+    {
+        live_charStats = Camera.main.GetComponent<CameraController>().player.GetComponent<CharacterStatus>();
+    }
 
 
     public void UI_buttonUpdate()

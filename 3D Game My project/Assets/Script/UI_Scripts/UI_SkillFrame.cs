@@ -5,7 +5,7 @@ using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class UI_SkillFrame : MonoBehaviour
+public class UI_SkillFrame : MonoBehaviour, IPlayerUpdate
 {
     [SerializeField] private CharacterStatus live_charStats;
     [SerializeField] private CharacterBonusStats currentCharacterBonusStats;
@@ -32,7 +32,7 @@ public class UI_SkillFrame : MonoBehaviour
     [SerializeField] CharStat charStat = new CharStat();          //enumerator, tworzy nowy obiekt CharStat dla ka¿dego elementu z listy 
     [SerializeField] Sprite[] skillImagesList;
 
-    private void OnValidate()
+    private void OnEnable()
     {
         live_charStats = Camera.main.GetComponent<CameraController>().player.GetComponent<CharacterStatus>();
         currentCharacterBonusStats = Camera.main.GetComponent<CameraController>().player.GetComponent<CharacterBonusStats>();
@@ -48,6 +48,11 @@ public class UI_SkillFrame : MonoBehaviour
     {
         SkillFrameSetUp();
     }*/
+
+    public void PlayerUpdate()
+    {
+        live_charStats = Camera.main.GetComponent<CameraController>().player.GetComponent<CharacterStatus>();
+    }        
 
     private void Update()
     {

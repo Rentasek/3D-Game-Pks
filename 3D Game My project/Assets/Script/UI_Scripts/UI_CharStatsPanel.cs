@@ -7,7 +7,7 @@ using TMPro;
 using Unity.Mathematics;
 
 [ExecuteInEditMode]
-public class UI_CharStatsPanel : MonoBehaviour
+public class UI_CharStatsPanel : MonoBehaviour, IPlayerUpdate
 {
     [SerializeField] private int statsCount;
     [SerializeField] private CharacterStatus live_charStats;
@@ -16,8 +16,6 @@ public class UI_CharStatsPanel : MonoBehaviour
 
     [SerializeField] private float[] selectedStatCurrentFloat;
     [SerializeField] private string[] selectedStatCurrentName;
-
-
 
 
     //implementacje z list¹ pozycji enumeratora
@@ -38,14 +36,18 @@ public class UI_CharStatsPanel : MonoBehaviour
         StatsFillIn();
     }
 
-    private void OnValidate()
+    /*private void OnValidate()
     {
         StatsFillIn();
 
+    }*/
+    public void PlayerUpdate()
+    {
+        live_charStats = Camera.main.GetComponent<CameraController>().player.GetComponent<CharacterStatus>();
     }
-
     void OnEnable()
     {
+        live_charStats = Camera.main.GetComponent<CameraController>().player.GetComponent<CharacterStatus>();
         StatsFillIn();
 
         StatsTextBoxCreate();
@@ -54,6 +56,7 @@ public class UI_CharStatsPanel : MonoBehaviour
     }
     private void OnDisable()
     {
+        live_charStats = Camera.main.GetComponent<CameraController>().player.GetComponent<CharacterStatus>();
         StatsTextBoxDestroy();
     }
 

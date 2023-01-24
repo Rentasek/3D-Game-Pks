@@ -4,7 +4,7 @@ using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
-public class UI_PauseMenu : MonoBehaviour
+public class UI_PauseMenu : MonoBehaviour, IPlayerUpdate
 {
     public static bool isPaused = false;
     public GameObject pauseMenu;
@@ -13,11 +13,12 @@ public class UI_PauseMenu : MonoBehaviour
     private bool mouseLocked;
     [SerializeField]private GameObject pauseOptionsPanel, pauseMainPanel;
 
-    private void OnValidate()
+    private void OnEnable()
     {
         live_charStats = Camera.main.GetComponent<CameraController>().player.GetComponent<CharacterStatus>();
         player_Input = Camera.main.GetComponent<CameraController>().player.GetComponent<Player_Input>();
     }
+    
 
     private void Update()
     {
@@ -31,6 +32,12 @@ public class UI_PauseMenu : MonoBehaviour
                 Pause();
             }
         
+    }
+
+    public void PlayerUpdate()
+    {
+        live_charStats = Camera.main.GetComponent<CameraController>().player.GetComponent<CharacterStatus>();
+        player_Input = Camera.main.GetComponent<CameraController>().player.GetComponent<Player_Input>();
     }
 
     public void Resume()
