@@ -17,18 +17,13 @@ public partial class CameraController : MonoBehaviour
     [SerializeField] private float mouseSensivity;
 
     private Transform playerTransform;
-    [SerializeField] public GameObject player;
-    //[SerializeField] private bool enableMouseMovement;
+    [SerializeField] public GameObject player;    
     [SerializeField] public CharacterStatus live_charStats;
     [SerializeField] public Player_Input player_Input;
     [SerializeField] List<IPlayerUpdate> playerObjectsList;
 
     [SerializeField] private Vector3 standardCameraOffset;
     [SerializeField] private Vector3 isometricCameraOffset;
-
-    /* [SerializeField] private float xOffset = 0;
-     [SerializeField] private float yOffset = 2;
-     [SerializeField] private float zOffset = 4;*/
 
     [SerializeField] private float timeFollowOffset = 1f;
     [SerializeField] private Vector3 currentCameraVelocity = Vector3.zero;
@@ -37,22 +32,17 @@ public partial class CameraController : MonoBehaviour
 
     [SerializeField] private float cameraDistanceYMin, cameraDistanceYMax, cameraDistanceZMin, cameraDistanceZMax;
     [SerializeField] private Vector3 cameraDistanceIsometricMin, cameraDistanceIsometricMax;
-    /* [Range(1.5f, 6f), SerializeField] private float cameraDistanceY;
-     [Range(1f, 22.5f), SerializeField] private float cameraDistanceZ;   */
-
+   
     private void OnValidate()
     {
         SearchForPlayer();
     }
 
-
     // Start is called before the first frame update
     void Start()
     {
         SearchForPlayer();
-
     }
-
 
     // Update is called once per frame  //update u¿ywaæ do input GetKeyDown, dzia³aj¹ bez laga
     private void Update()
@@ -63,17 +53,17 @@ public partial class CameraController : MonoBehaviour
         if (live_charStats.inputEnableMouseRotate) MouseRotate();
 
         CameraFollowPlayer();
-
     }
+
     private void MouseRotate()
     {
         float mouseX = Input.GetAxis("Mouse X") * mouseSensivity * Time.deltaTime;
 
         playerTransform.Rotate(Vector3.up, mouseX);
     }
+
     void CameraFollowPlayer()
     {
-
         transform.LookAt(new Vector3(playerTransform.position.x + cameraReferencePoint.x, playerTransform.position.y + cameraReferencePoint.y, playerTransform.position.z + cameraReferencePoint.z), Vector3.up);
         //funkcja lookAt z mo¿liwoœci¹ dopasowania punktu na który siê patrzy
 
@@ -91,6 +81,7 @@ public partial class CameraController : MonoBehaviour
             transform.position = new Vector3(playerTransform.position.x + isometricCameraOffset.x, playerTransform.position.y + isometricCameraOffset.y, playerTransform.position.z + isometricCameraOffset.z);
         }
     }
+
     public void SwitchCursorOptions()
     {
         if (live_charStats.isPlayer)
@@ -108,7 +99,6 @@ public partial class CameraController : MonoBehaviour
                 Cursor.visible = true;
             } //jeœli player steruje -> lock cursora, jeœli nie cursor widoczny
         }
-
     }
 
     void CameraDistance()
@@ -117,21 +107,16 @@ public partial class CameraController : MonoBehaviour
         float mouseScroll = -1 * live_charStats.inputMouseScroll; //InvertScrollMouse
         if (live_charStats.playerInputEnable)
         {
-
             standardCameraOffset.y = Mathf.Clamp(standardCameraOffset.y + (cameraDistanceYMax - cameraDistanceYMin) * mouseScroll, cameraDistanceYMin, cameraDistanceYMax);
             standardCameraOffset.z = Mathf.Clamp(standardCameraOffset.z + (cameraDistanceZMax - cameraDistanceZMin) * mouseScroll, cameraDistanceZMin, cameraDistanceZMax);
         }
         else
         {
             isometricCameraOffset = isometricCameraOffset + mouseScroll * new Vector3(1f, 1f, -1f);
-
         }
-
-    }
-    
+    }    
 
     public void SearchForPlayer()
-
     {        
         player = GameObject.FindGameObjectWithTag("Player");       //szuka tylko po aktywnych objectach z Tagiem Player
         
@@ -150,9 +135,7 @@ public partial class CameraController : MonoBehaviour
             }
             
             live_charStats.isPlayer = true;
-            player.GetComponent<CharacterAnimations>().PlayerUpdate();
-
-            SwitchCursorOptions();
+            player.GetComponent<CharControler>().PlayerUpdate();
 
             //Podmianka UI Status barów na aktulnego playera
             if (playerStatusBars != null)
@@ -163,8 +146,5 @@ public partial class CameraController : MonoBehaviour
                 }
             }
         } 
-        
-       
     }
-
 }

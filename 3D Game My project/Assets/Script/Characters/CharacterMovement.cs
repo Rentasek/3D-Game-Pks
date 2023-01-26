@@ -88,57 +88,49 @@ public class CharacterMovement : MonoBehaviour
     ///////////////////////////////////// Implementacja ///////////////////////////////////////
 
     private void OnEnable()
-    {        
-        live_charStats = GetComponent<CharacterStatus>();        
-        live_NavMeshAgent = live_charStats.currentNavMeshAgent;//live_charStats.GetComponent<NavMeshAgent>();         
-        characterController = live_charStats.currentCharacterController;//GetComponent<CharacterController>();
+    {
+        live_charStats = GetComponent<CharacterStatus>();
+        live_NavMeshAgent = live_charStats.currentNavMeshAgent;
+        characterController = live_charStats.currentCharacterController;
     }
-
-
 
     // Start is called before the first frame update
     void Start()
-    {
-        
+    {        
         
     }
 
     private void Update() //Update najszybszy update => do inputa
     {
-        
-
-        if (live_charStats.playerInputEnable && live_charStats.isPlayer)
+      /*  if (live_charStats.playerInputEnable && live_charStats.isPlayer)
         {
-            Rotate(); //Rotate musi byæ w update bo inaczej dziej¹ siê cyrki
-
+            Rotate(); 
             //Jump();
-            
-
-            //Reset/SetPosition
-            if (live_charStats.inputSetBackupPosition && live_charStats.isPlayer) live_charStats.SetCharacterPosition();
-            if (live_charStats.inputResetPosition) live_charStats.ResetCharacterPosition();
-        }
-        
-
-        
-
-        //Testing
-        live_charStats.Testing_Z_Key = !live_charStats.Testing_Z_Key;  //w³¹czanie i wy³¹czanie booleana przyciskiem ON/OFF
-         
+        }*/
     }
-
-
 
     private void FixedUpdate() //Na FixedUpdate lepiej chodzi, p³ynnie !!! //Update razem z Physics
     {
-        Movement();
+     //   Movement();
+    }
+
+    public void RotatePlayer()
+    {       
+        transform.Rotate(Vector3.up, live_charStats.inputRotateHorizontal);
+    }
+
+    public void Movement()
+    {
+        live_charStats.isGrounded = Physics.CheckSphere(transform.position, live_charStats.currentGroundDistance, live_charStats.currentGroundMask); //sprawdzanie isGrounded
+        if (live_charStats.isGrounded) live_charStats.currentAnimator.ResetTrigger("Jump");       //resetowanie triggera Jump ¿eby nie wykonywa³ animacji po wyl¹dowaniu z opóŸnieniem
+        live_charStats.currentAnimator.SetBool("IsGrounded", live_charStats.isGrounded);          //Przeniesienie status isGrounded do animatora
 
         if (live_charStats.playerInputEnable && live_charStats.isPlayer)
         //jeœli w inspektorze jest zaznaczona opcja PlayerInputEnable -> sterowanie z Player_Inputa         
 
         {
             live_NavMeshAgent.enabled = false;//Wy³¹czenie NavMeshAgenta
-            
+
             Movement_PlayerInput(); //na fixedUpdate ¿eby postaæ nie przyspiesza³a na wy¿szych fps
 
             Jump(); //jump dzia³a z animacj¹ na fixedUpdate tylko jak jest GetKey w inpucie, na GetKeyDown nie dzia³a
@@ -151,30 +143,10 @@ public class CharacterMovement : MonoBehaviour
         {
             live_NavMeshAgent.enabled = true;//W³¹czenie NavMeshAgenta
             Movement_AgentInput();  //Jeœli nie => AgentInput
-           
+
         }
 
-
-
-    }
-
-
-
-    private void Rotate()
-    {       
-        transform.Rotate(Vector3.up, live_charStats.inputRotateHorizontal);
-    }
-
-
-    private void Movement()
-    {
-        live_charStats.isGrounded = Physics.CheckSphere(transform.position, live_charStats.currentGroundDistance, live_charStats.currentGroundMask); //sprawdzanie isGrounded
-        if (live_charStats.isGrounded) live_charStats.currentAnimator.ResetTrigger("Jump");       //resetowanie triggera Jump ¿eby nie wykonywa³ animacji po wyl¹dowaniu z opóŸnieniem
-        live_charStats.currentAnimator.SetBool("IsGrounded", live_charStats.isGrounded);          //Przeniesienie status isGrounded do animatora
-
-        if (live_charStats.playerInputEnable) Movement_PlayerInput(); //jeœli w inspektorze jest zaznaczona opcja PlayerInputEnable -> sterowanie z Player_Inputa
-        else Movement_AgentInput();  //Jeœli nie => AgentInput 
-
+        MovementAnimations();
 
     }
 
@@ -192,12 +164,13 @@ public class CharacterMovement : MonoBehaviour
         //W³aœciwy movement z animacjami
         if (live_charStats.currentMoveInputDirection != Vector3.zero && live_NavMeshAgent.speed == live_charStats.currentRunSpeed)
                                                                                                                     
-        {                                                                                                                                           
-            if (live_charStats.currentStam > 0) live_charStats.currentStam = Mathf.MoveTowards(live_charStats.currentStam, 0f, 5f * Time.deltaTime); //zu¿ywa f stamy / sekunde
+        {
+            if (live_charStats.currentStam > 0) live_charStats.currentStam = Mathf.MoveTowards(live_charStats.currentStam, 0f, (10f + live_charStats.currentCharLevel) * Time.deltaTime); //zu¿ywa f stamy / sekunde
 
             ////Running Speed 
             if (/*live_charStats.currentMoveInputDirection != Vector3.zero &&*/ !live_charStats.isJumping && !live_charStats.isAttacking && live_charStats.currentStam > 5f
-                && live_charStats.navMeAge_targetAquired && !live_charStats.inputCasting)//dodatnkowy warunek ->biega tylko jak targetAquired=true, kolejny warnek jeœli nie castuje!!
+                && live_charStats.navMeAge_targetAquired && !live_charStats.inputCasting && live_charStats.currentNavMeshAgent.remainingDistance > 2 * live_charStats.navMeAge_attackRange)
+                //dodatnkowy warunek ->biega tylko jak targetAquired=true, kolejny warnek jeœli nie castuje!!, Kolejny warunek jeœli agent.eemainingDistance > 2* attack range
             {
                 live_charStats.currentAnimator.ResetTrigger("MeeleAttack");
                 localSpeedIndex = 2;
@@ -224,9 +197,6 @@ public class CharacterMovement : MonoBehaviour
         live_charStats.isWalking = (localSpeedIndex == 1);
         live_charStats.isIdle = (localSpeedIndex == 0);
         //specjalnie zrobione na jednej zmiennej tak ¿eby siê ci¹gle zmienia³a, trochê jak enumerator
-
-
-
     }
     
     private void Movement_PlayerInput()
@@ -243,7 +213,7 @@ public class CharacterMovement : MonoBehaviour
         if (live_charStats.currentMoveInputDirection != Vector3.zero && live_charStats.inputRunning) 
         {
 
-            if (live_charStats.currentStam > 0) live_charStats.currentStam = Mathf.MoveTowards(live_charStats.currentStam, 0f, 5f * Time.deltaTime); //MoveTowards na koñcu podaje czas maxymalny na zmianê wartoœci
+            if (live_charStats.currentStam > 0) live_charStats.currentStam = Mathf.MoveTowards(live_charStats.currentStam, 0f, (10f + live_charStats.currentCharLevel) * Time.deltaTime); //MoveTowards na koñcu podaje czas maxymalny na zmianê wartoœci
 
 
             if (live_charStats.currentMoveInputDirection != Vector3.zero && live_charStats.currentMoveInputDirection != Vector3.back && !live_charStats.isJumping && !live_charStats.isAttacking && live_charStats.currentStam > 5f) 
@@ -282,6 +252,29 @@ public class CharacterMovement : MonoBehaviour
 
     }
 
+    private void MovementAnimations()
+    {
+        if (live_charStats.currentMoveSpeed == 0f && live_charStats.isIdle) Idle();
+        else if (live_charStats.currentMoveSpeed <= live_charStats.currentWalkSpeed && live_charStats.isWalking) Walk();
+        else if (live_charStats.currentMoveSpeed <= live_charStats.currentRunSpeed && live_charStats.isRunning) Run();
+
+    }
+
+
+    private void Idle()
+    {
+        live_charStats.currentAnimator.SetFloat("yAnim", 0);
+    }
+    private void Walk()
+    {
+        live_charStats.currentAnimator.SetFloat("yAnim", 0.5f, 0.2f, Time.deltaTime);
+    }
+    private void Run()
+    {
+        live_charStats.currentAnimator.SetFloat("yAnim", 1, 0.2f, Time.deltaTime);
+    }
+
+
     private void Jump()
     {
         float jumpSpeed = live_charStats.currentJumpPower;    //jumpPower
@@ -293,10 +286,19 @@ public class CharacterMovement : MonoBehaviour
             live_charStats.currentMoveVector.y = live_charStats.currentJumpMode_J_ ? (jumpSpeed) : Mathf.SmoothDamp(live_charStats.currentMoveVector.y, jumpSpeed, ref live_charStats.currentMoveVector.y, live_charStats.currentJumpDeltaTime);
             //jeœli (bool) jumpMode "On"=jumpSpeed(sta³y): "OFF" = Mathf.SmootDamp <=====
                 
-            live_charStats.isJumping = true;                 
+            live_charStats.isJumping = true;
+            JumpAnimation();
         }
         else
             live_charStats.isJumping = false;
+    }
+
+    public void JumpAnimation()
+    {
+        live_charStats.currentStam -= 10f; //Koszt Stamy przy skoku        
+        live_charStats.currentAnimator.ResetTrigger("MeeleAttack"); //¿eby nie animowa³ ataku w powietrzu           
+        live_charStats.currentAnimator.SetFloat("yAnim", 0);
+        live_charStats.currentAnimator.SetTrigger("Jump");
     }
 
     private void Gravity()

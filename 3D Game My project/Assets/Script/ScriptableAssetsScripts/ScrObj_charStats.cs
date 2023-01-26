@@ -29,7 +29,8 @@ public class ScrObj_charStats : ScriptableObject
     public float navMeAge_wanderingRange;
     public float navMeAge_walkPointRange;
     public LayerMask navMeAge_whatIsGround;    
-    public float navMeAge_patrollingDelay;
+    public float navMeAge_patrollingDelay; 
+    public float navMeAge_AIRoutineDelay;
 
     [Space]
     [Header("Field of View NavMeshAgent")]

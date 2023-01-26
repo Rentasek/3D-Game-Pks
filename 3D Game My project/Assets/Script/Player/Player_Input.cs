@@ -22,23 +22,13 @@ public class Player_Input : MonoBehaviour
     {
         live_charStats = GetComponent<CharacterStatus>();        
         if (live_charStats.isPlayer)  GameObject.Find("Player_Charmander/UI_Screen/OptionsPanel");
-
     }
 
 
     // Update is called once per frame  //update u¿ywaæ do input GetKeyDown, dzia³aj¹ bez laga
     void Update()
-    {
-        if (live_charStats.isPlayer)
-        {
-            if (!live_charStats.playerInputEnable) IsometricInputClass();//jeœli nie ma flagi player input //isometric
-            if (live_charStats.playerInputEnable) PlayerInputClass();//jeœli zaznaczona jest flaga playerInputEnable //3rd person
+    {      
 
-            InputClass();
-        }
-           
-
-        
     }
    
 
@@ -108,55 +98,60 @@ public class Player_Input : MonoBehaviour
 
     public void InputClass()
     {
-        
-        //MouseMoving
-        live_charStats.inputMouseCurrentMoving = Input.GetKey(KeyCode.Mouse2);
+        if (live_charStats.isPlayer)
+        {
 
-        //MouseScroll
-        live_charStats.inputMouseScroll = Input.GetAxis("Mouse ScrollWheel");
+            //MouseMoving
+            live_charStats.inputMouseCurrentMoving = Input.GetKey(KeyCode.Mouse2);
 
-        //GameSave/Load
-        live_charStats.inputSaveGame = Input.GetKeyDown(KeyCode.Alpha5);
-        if (live_charStats.inputSaveGame) live_charStats.SaveGame();
+            //MouseScroll
+            live_charStats.inputMouseScroll = Input.GetAxis("Mouse ScrollWheel");
 
-        live_charStats.inputLoadGame = Input.GetKeyDown(KeyCode.Alpha6);
-        if (live_charStats.inputLoadGame) live_charStats.LoadGame();
+            //GameSave/Load
+            live_charStats.inputSaveGame = Input.GetKeyDown(KeyCode.Alpha5);
+            if (live_charStats.inputSaveGame) live_charStats.SaveGame();
 
-        //ResetLevel
-        if (Input.GetKeyDown(KeyCode.L)) live_charStats.ResetLevel();
+            live_charStats.inputLoadGame = Input.GetKeyDown(KeyCode.Alpha6);
+            if (live_charStats.inputLoadGame) live_charStats.LoadGame();
 
-        //Reset/SetPosition
-        live_charStats.inputSetBackupPosition = Input.GetKeyDown(KeyCode.B);
-        live_charStats.inputResetPosition = Input.GetKeyDown(KeyCode.R) || GetComponentInParent<Transform>().transform.position.y <= -5f;
+            //ResetLevel
+            if (Input.GetKeyDown(KeyCode.L)) live_charStats.ResetLevel();
 
-        live_charStats.Testing_Z_Key = Input.GetKeyDown(KeyCode.Z);
-        if (Input.GetKeyDown(KeyCode.J)) live_charStats.currentJumpMode_J_ = !live_charStats.currentJumpMode_J_;  //w³¹czanie i wy³¹czanie booleana przyciskiem ON/OFF
-        //w³¹czanie i wy³¹czanie booleana przyciskiem ON/OFF
+            //Reset/SetPosition
+            live_charStats.inputSetBackupPosition = Input.GetKeyDown(KeyCode.B);
+            live_charStats.inputResetPosition = Input.GetKeyDown(KeyCode.R) || GetComponentInParent<Transform>().transform.position.y <= -5f;
 
-        //dzia³a tylko z booleanem IsPlayer
-        if (Input.GetKeyDown(KeyCode.P) && live_charStats.isPlayer)
-        {            
-            live_charStats.playerInputEnable = !live_charStats.playerInputEnable;//input Switch
+            live_charStats.Testing_Z_Key = Input.GetKeyDown(KeyCode.Z);
+            if (Input.GetKeyDown(KeyCode.J)) live_charStats.currentJumpMode_J_ = !live_charStats.currentJumpMode_J_;  //w³¹czanie i wy³¹czanie booleana przyciskiem ON/OFF
+                                                                                                                      //w³¹czanie i wy³¹czanie booleana przyciskiem ON/OFF
 
-            if (!live_charStats.playerInputEnable)
+            //dzia³a tylko z booleanem IsPlayer
+            if (Input.GetKeyDown(KeyCode.P) && live_charStats.isPlayer)
             {
-                mouseRotateLocalBool = live_charStats.inputEnableMouseRotate;
-                live_charStats.inputEnableMouseRotate = false;
+                live_charStats.playerInputEnable = !live_charStats.playerInputEnable;//input Switch
+
+                if (!live_charStats.playerInputEnable)
+                {
+                    mouseRotateLocalBool = live_charStats.inputEnableMouseRotate;
+                    live_charStats.inputEnableMouseRotate = false;
+                }
+                else live_charStats.inputEnableMouseRotate = mouseRotateLocalBool;
+
+                if (!live_charStats.inputEnableMouseRotate) { Cursor.lockState = CursorLockMode.None; Cursor.visible = true; }
+                else Cursor.lockState = CursorLockMode.Locked;
             }
-            else live_charStats.inputEnableMouseRotate = mouseRotateLocalBool;
 
-            if (!live_charStats.inputEnableMouseRotate) { Cursor.lockState = CursorLockMode.None; Cursor.visible = true; }
-            else Cursor.lockState = CursorLockMode.Locked;
-        }
-        
-        //casting Spells
-        if (live_charStats.isPlayer) live_charStats.inputCasting = Input.GetKey(KeyCode.Mouse1);
+            //casting Spells
+            if (live_charStats.isPlayer) live_charStats.inputCasting = Input.GetKey(KeyCode.Mouse1);
 
-        pauseKeyPressed = Input.GetKeyDown(KeyCode.Escape) && live_charStats.isPlayer ; 
+            pauseKeyPressed = Input.GetKeyDown(KeyCode.Escape) && live_charStats.isPlayer;
 
-        //options panel
-        if (Input.GetKeyDown(KeyCode.O)) OptionsPanel_enabling();
-        
+            if (!live_charStats.playerInputEnable) IsometricInputClass();//jeœli nie ma flagi player input //isometric
+            if (live_charStats.playerInputEnable) PlayerInputClass();//jeœli zaznaczona jest flaga playerInputEnable //3rd person
+
+            //options panel
+            if (Input.GetKeyDown(KeyCode.O)) OptionsPanel_enabling();
+        }        
     }
     ////////////////////////////////////////////////////////////////////  
 

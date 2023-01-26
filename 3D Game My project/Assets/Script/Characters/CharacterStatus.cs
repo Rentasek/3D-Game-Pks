@@ -66,7 +66,9 @@ public class CharacterStatus : MonoBehaviour
     public LayerMask navMeAge_whatIsGround;
     public int navMeAge_failsafeCounter;
     public float navMeAge_patrollingDelay;
-    
+    public float navMeAge_AIRoutineDelay;
+    public bool navMeAge_isCheckingRoutine;
+
 
     [Space]
     [Header("Field of View NavMeshAgent")]
@@ -159,6 +161,8 @@ public class CharacterStatus : MonoBehaviour
     [Header("Character Components")]
     [CanBeNull] public Animator currentAnimator;
     [CanBeNull] public CharacterController currentCharacterController;
+    [CanBeNull] public Player_Input currentPlayer_Input;
+    [CanBeNull] public FieldOFView currentFieldOfView;
     [CanBeNull] public NavMeshAgent currentNavMeshAgent;
     [CanBeNull] public AIController currentAIController;
     [CanBeNull] public AudioSource currentAudioSource;
@@ -168,26 +172,24 @@ public class CharacterStatus : MonoBehaviour
     public CharacterBonusStats currentCharacterBonusStats;
 
 
-    private void OnEnable()
+    /*private void OnEnable()
     {
         if (isPlayer) LoadLevel();
         LoadCharStats();
-    }    
+    }    */
 
-    private void Start()
-    {
-        if (isPlayer) LoadLevel();
-        LoadCharStats();
+    /*private void Start()
+    {        
         SetCharacterPosition();
-    }
+    }*/
 
     // Update is called once per frame
-    void LateUpdate()
+    /*void LateUpdate()
     {         
         if(!isDead) ResourcesRegen();
         if (currentXP >= currentNeededXP && isPlayer) LevelGain();        
 
-    }
+    }*/
    /* private void Update()
     {
         if (Input.GetKeyDown(KeyCode.Alpha0)) scrObj_CharStats.baseHP += 1f; //testing
@@ -221,9 +223,11 @@ public class CharacterStatus : MonoBehaviour
         navMeAge_walkPointRange = scrObj_CharStats.navMeAge_walkPointRange;
         navMeAge_whatIsGround = scrObj_CharStats.navMeAge_whatIsGround;
         navMeAge_patrollingDelay = scrObj_CharStats.navMeAge_patrollingDelay;
+        
 
-        //FoV NavMesh
-        fov_MaxSightAngle = scrObj_CharStats.fov_MaxSightAngle;
+
+    //FoV NavMesh
+    fov_MaxSightAngle = scrObj_CharStats.fov_MaxSightAngle;
         fov_MinSightAngle = scrObj_CharStats.fov_MinSightAngle;
         fov_TimeDynamicSightAngle = scrObj_CharStats.fov_TimeDynamicSightAngle;
         fov_MinSightRadius = scrObj_CharStats.fov_MinSightRadius;
@@ -262,7 +266,9 @@ public class CharacterStatus : MonoBehaviour
 
         //Objects
         if (GetComponent<Animator>() != null) currentAnimator = GetComponent<Animator>();                     //ci¹gnie componenty z przypiêtych do chara
-        if (GetComponent<CharacterController>() != null) currentCharacterController = GetComponent<CharacterController>();
+        if (GetComponent<CharacterController>() != null) currentCharacterController = GetComponent<CharacterController>();        
+        if (GetComponent<FieldOFView>() != null) currentFieldOfView = GetComponent<FieldOFView>();
+        if (GetComponent<Player_Input>() != null) currentPlayer_Input = GetComponent<Player_Input>();
         if (GetComponent<NavMeshAgent>()!= null) currentNavMeshAgent = GetComponent<NavMeshAgent>();
         if (GetComponent<AIController>() != null) currentAIController = GetComponent<AIController>();
         if (GetComponent<AudioSource>() != null) currentAudioSource = GetComponent<AudioSource>();
@@ -292,7 +298,7 @@ public class CharacterStatus : MonoBehaviour
         SaveBonusStats();
     }
 
-    void LevelGain()
+    public void LevelGain()
     {
         currentXP -= currentNeededXP; //przerzuca nadwy¿ke xp na next level
         currentCharLevel ++;

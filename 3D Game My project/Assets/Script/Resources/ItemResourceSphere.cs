@@ -43,7 +43,7 @@ public class ItemResourceSphere : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
-        if (other.CompareTag("Player"))
+        if (other.CompareTag("Player") && !other.GetComponent<CharacterStatus>().isDead) //Tylko dla ¿ywych
         {
             switch (resourceType)
             {
@@ -51,12 +51,29 @@ public class ItemResourceSphere : MonoBehaviour
                     other.gameObject.GetComponent<CharacterBonusStats>().bonus_SkillPoints++;
                     break;
                 case ResourceType.HP:
+                    if(other.gameObject.GetComponent<CharacterStatus>().currentHP >= other.GetComponent<CharacterStatus>().currentMaxHP)
+                    {
+                        other.gameObject.GetComponent<CharacterStatus>().currentHP = other.GetComponent<CharacterStatus>().currentMaxHP;
+                        break;
+                    }
                     other.gameObject.GetComponent<CharacterStatus>().currentHP += other.GetComponent<CharacterStatus>().currentMaxHP * other.GetComponent<CharacterBonusStats>().percentRegen;
                     break;
+
                 case ResourceType.MP:
+                    if (other.gameObject.GetComponent<CharacterStatus>().currentMP >= other.GetComponent<CharacterStatus>().currentMaxMP)
+                    {
+                        other.gameObject.GetComponent<CharacterStatus>().currentMP = other.GetComponent<CharacterStatus>().currentMaxMP;
+                        break;
+                    }
                     other.gameObject.GetComponent<CharacterStatus>().currentMP += other.GetComponent<CharacterStatus>().currentMaxMP * other.GetComponent<CharacterBonusStats>().percentRegen;
                     break;
+
                 case ResourceType.Stamina:
+                    if (other.gameObject.GetComponent<CharacterStatus>().currentStam >= other.GetComponent<CharacterStatus>().currentMaxStam)
+                    {
+                        other.gameObject.GetComponent<CharacterStatus>().currentStam = other.GetComponent<CharacterStatus>().currentMaxStam;
+                        break;
+                    }
                     other.gameObject.GetComponent<CharacterStatus>().currentStam += other.GetComponent<CharacterStatus>().currentMaxStam * other.GetComponent<CharacterBonusStats>().percentRegen;
                     break;
             }

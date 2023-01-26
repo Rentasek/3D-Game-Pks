@@ -9,8 +9,7 @@ using UnityEngine;
 public class FieldOFView : MonoBehaviour
 {
     [SerializeField] private CharacterStatus live_charStats;
-    [SerializeField] private string[] enemiesArray;
-    
+    [SerializeField] private string[] enemiesArray;    
 
     // Start is called before the first frame update
     void Start()
@@ -22,7 +21,7 @@ public class FieldOFView : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        StartCoroutine(FOVRoutine());
+        
     }
 
     private void OnEnable()
@@ -84,7 +83,7 @@ public class FieldOFView : MonoBehaviour
 
     }
 
-    private IEnumerator FOVRoutine()
+    public IEnumerator FOVRoutine()
     {
         if (live_charStats.fov_isSearchingForTarget)
         {            
@@ -101,8 +100,6 @@ public class FieldOFView : MonoBehaviour
         }
 
     }
-
-
 
 #if UNITY_EDITOR //zamiast skryptu w Editor
 
