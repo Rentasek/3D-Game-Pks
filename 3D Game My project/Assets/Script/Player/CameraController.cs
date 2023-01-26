@@ -34,7 +34,7 @@ public partial class CameraController : MonoBehaviour
     [SerializeField] private Vector3 cameraDistanceIsometricMin, cameraDistanceIsometricMax;
    
     private void OnValidate()
-    {
+    {        
         SearchForPlayer();
     }
 
@@ -133,7 +133,7 @@ public partial class CameraController : MonoBehaviour
             {
                 playerUpdate.PlayerUpdate();
             }
-            
+
             live_charStats.isPlayer = true;
             player.GetComponent<CharControler>().PlayerUpdate();
 
@@ -145,6 +145,9 @@ public partial class CameraController : MonoBehaviour
                     playerStatusBar.live_charStats = live_charStats;
                 }
             }
-        } 
+
+        }
+        Cursor.lockState = CursorLockMode.None; //Coby da³o siê klikaæ po zmianie chara
+        Cursor.visible = true;
     }
 }

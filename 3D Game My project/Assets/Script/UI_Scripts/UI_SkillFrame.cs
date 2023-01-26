@@ -52,6 +52,7 @@ public class UI_SkillFrame : MonoBehaviour, IPlayerUpdate
     public void PlayerUpdate()
     {
         live_charStats = Camera.main.GetComponent<CameraController>().player.GetComponent<CharacterStatus>();
+        currentCharacterBonusStats = Camera.main.GetComponent<CameraController>().player.GetComponent<CharacterBonusStats>();
     }        
 
     private void Update()

@@ -37,7 +37,7 @@ public class UI_PauseMenu : MonoBehaviour, IPlayerUpdate
     public void PlayerUpdate()
     {
         live_charStats = Camera.main.GetComponent<CameraController>().player.GetComponent<CharacterStatus>();
-        player_Input = Camera.main.GetComponent<CameraController>().player.GetComponent<Player_Input>();
+        player_Input = Camera.main.GetComponent<CameraController>().player.GetComponent<Player_Input>();   
     }
 
     public void Resume()

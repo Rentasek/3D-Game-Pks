@@ -23,6 +23,7 @@ public class UI_DebugConsole : MonoBehaviour, IPlayerUpdate
     {
         live_charStats = Camera.main.GetComponent<CameraController>().player.GetComponent<CharacterStatus>();
         player_Input = Camera.main.GetComponent<CameraController>().player.GetComponent<Player_Input>();
+        currentSpell = Camera.main.GetComponent<CameraController>().player.GetComponent<CharacterStatus>().spell;
     }
 
     // Start is called before the first frame update
