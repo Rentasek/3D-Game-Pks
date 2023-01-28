@@ -1,6 +1,7 @@
 using Cinemachine;
 using JetBrains.Annotations;
 using System;
+using System.Collections.Generic;
 //using UnityEditor.UIElements;
 using UnityEngine;
 using UnityEngine.AI;
@@ -56,6 +57,7 @@ public class CharacterStatus : MonoBehaviour
     public float navMeAge_wanderingRange;
     public bool navMeAge_targetInSightRange;
     public bool navMeAge_targetInDynamicSightRange;
+    public Collider[] navMeAge_TestALLtargetsInDynamicSightRange;
     public bool navMeAge_targetInAttackRange;
     public bool navMeAge_targetAquired;
     public Vector3 navMeAge_spawnPoint;
@@ -90,7 +92,7 @@ public class CharacterStatus : MonoBehaviour
     [ColorUsageAttribute(true, true)] public Color fov_editorDynamicRadiusColor;
     [ColorUsageAttribute(true, true)] public Color fov_editorRaycastColor;
     public float fov_coneRoutineDelay;
-    public LayerMask fov_obstaclesLayerMask;
+    public LayerMask fov_obstaclesLayerMask;    
     public GameObject fov_aquiredTargetGameObject;
     public bool fov_isSearchingForTarget;
 
@@ -226,8 +228,8 @@ public class CharacterStatus : MonoBehaviour
         
 
 
-    //FoV NavMesh
-    fov_MaxSightAngle = scrObj_CharStats.fov_MaxSightAngle;
+        //FoV NavMesh
+        fov_MaxSightAngle = scrObj_CharStats.fov_MaxSightAngle;
         fov_MinSightAngle = scrObj_CharStats.fov_MinSightAngle;
         fov_TimeDynamicSightAngle = scrObj_CharStats.fov_TimeDynamicSightAngle;
         fov_MinSightRadius = scrObj_CharStats.fov_MinSightRadius;
@@ -410,11 +412,11 @@ public class CharacterStatus : MonoBehaviour
     public void ResourcesRegen()
     {
         //Stam Regen
-        if (currentStam < currentMaxStam && !isRunning && !isAttacking /*&& currentStam<currentMaxStam*/) currentStam = Mathf.MoveTowards(currentStam, currentMaxStam, (scrObj_CharStats.regenStam + (scrObj_CharStats.regenStam * scrObj_CharStats.Stam_Multiplier * currentCharLevel * 1f)) * Time.deltaTime); //regeneruje f stamy / sekunde
+        if (currentStam < currentMaxStam && !isRunning && !isAttacking /*&& currentStam<currentMaxStam*/) currentStam = Mathf.MoveTowards(currentStam, currentMaxStam, (scrObj_CharStats.regenStam + (scrObj_CharStats.regenStam * scrObj_CharStats.Stam_Multiplier * currentCharLevel * 1f) + currentMaxStam * 0.01f) * Time.deltaTime); //regeneruje f stamy / sekunde
         //HP Regen
-        if (currentHP < currentMaxHP) currentHP = Mathf.MoveTowards(currentHP, currentMaxHP, (scrObj_CharStats.regenHP + (scrObj_CharStats.regenHP * scrObj_CharStats.HP_Multiplier * currentCharLevel * 1f)) * Time.deltaTime); //regeneruje f HP / sekunde
+        if (currentHP < currentMaxHP) currentHP = Mathf.MoveTowards(currentHP, currentMaxHP, (scrObj_CharStats.regenHP + (scrObj_CharStats.regenHP * scrObj_CharStats.HP_Multiplier * currentCharLevel * 1f) + currentMaxHP * 0.01f) * Time.deltaTime); //regeneruje f HP / sekunde
         //MP Regen
-        if (currentMP < currentMaxMP && !inputCasting/*&& !isAttacking*/ /*&& currentMP < currentMaxMP*/) currentMP = Mathf.MoveTowards(currentMP, currentMaxMP, (scrObj_CharStats.regenMP + (scrObj_CharStats.regenMP * scrObj_CharStats.MP_Multiplier * currentCharLevel * 1f)) * Time.deltaTime); //regeneruje f HP / sekunde
+        if (currentMP < currentMaxMP && !inputCasting/*&& !isAttacking*/ /*&& currentMP < currentMaxMP*/) currentMP = Mathf.MoveTowards(currentMP, currentMaxMP, (scrObj_CharStats.regenMP + (scrObj_CharStats.regenMP * scrObj_CharStats.MP_Multiplier * currentCharLevel * 1f) + currentMaxMP * 0.01f) * Time.deltaTime); //regeneruje f HP / sekunde
 
     }
 }

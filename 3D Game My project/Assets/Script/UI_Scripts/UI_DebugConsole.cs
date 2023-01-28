@@ -13,7 +13,7 @@ public class UI_DebugConsole : MonoBehaviour, IPlayerUpdate
 
     private void OnEnable()
     {
-        live_charStats = Camera.main.GetComponent<CameraController>().player.GetComponent<CharacterStatus>();
+        live_charStats = Camera.main.GetComponent<CameraController>().player.GetComponent<CharacterStatus>();        
         player_Input = Camera.main.GetComponent<CameraController>().player.GetComponent<Player_Input>();
         currentSpell = Camera.main.GetComponent<CameraController>().player.GetComponent<CharacterStatus>().spell;
         
@@ -31,12 +31,11 @@ public class UI_DebugConsole : MonoBehaviour, IPlayerUpdate
     {
         //if (live_charStats == null) live_charStats = GetComponentInParent<CharacterStatus>();
         //if (player_Input == null) player_Input = GetComponentInParent<Player_Input>();
-        //if (TryGetComponent(out Canvas canvas)) GetComponent<Canvas>().worldCamera = Camera.main;  //sprawdzanie czy bar ma component canvas, jeœli tak pzydziela main camera do Event Camera, wygoda :P 
+        //if (TryGetComponent(out Canvas canvas)) GetComponent<Canvas>().worldCamera = Camera.main;  //sprawdzanie czy bar ma component canvas, jeœli tak pzydziela main camera do Event Camera, wygoda :P
 
     }
     private void LateUpdate()
     {
-
         GetComponent<TextMeshProUGUI>().SetText(
             "Player Input Enable [P] " + live_charStats.playerInputEnable + ".\n" +
             "Enable Mouse Rotate [X] " + live_charStats.inputEnableMouseRotate + ".\n" +
@@ -53,10 +52,6 @@ public class UI_DebugConsole : MonoBehaviour, IPlayerUpdate
             "IsGrounded " + live_charStats.isGrounded + ".\n" +
             "input_Testing " + live_charStats.inputJumping + ".\n" +
             "Char Level: " + live_charStats.currentCharLevel + "  Reset Level [L]" + ".\n"
-
             ); 
-        
-
-
     }
 }

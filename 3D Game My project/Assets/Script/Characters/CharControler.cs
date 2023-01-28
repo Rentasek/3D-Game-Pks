@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using Unity.VisualScripting;
+using UnityEditor;
 using UnityEngine;
 using UnityEngine.AI;
 
@@ -10,7 +11,6 @@ public class CharControler : MonoBehaviour
     public CharacterStatus live_charStats;
     public GameObject resourcePrefab;
 
-
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     private void OnValidate()
@@ -19,11 +19,14 @@ public class CharControler : MonoBehaviour
 
         if (live_charStats.isPlayer) live_charStats.LoadLevel();
         live_charStats.LoadCharStats();
+        
+        live_charStats.SetCharacterPosition();
     }
 
     private void Start()
     {
-        live_charStats.SetCharacterPosition();
+        if (live_charStats.isPlayer) live_charStats.LoadLevel();
+        live_charStats.LoadCharStats();
     }
 
     private void OnEnable()
@@ -47,14 +50,19 @@ public class CharControler : MonoBehaviour
         //PlayerInput
         if (live_charStats.currentPlayer_Input != null) live_charStats.currentPlayer_Input.InputClass();
 
+        //FieldOfView        
+        if (live_charStats.currentFieldOfView != null) { StartCoroutine(live_charStats.currentFieldOfView.FOVRoutine()); }
+
         //AIController
-        if (live_charStats.currentAIController != null && !live_charStats.playerInputEnable) { StartCoroutine(live_charStats.currentAIController.AIControllerRoutine()); }
+        if (live_charStats.currentAIController != null && !live_charStats.playerInputEnable)
+        {
+            //StartCoroutine(LiveCharStats_Base.FOVRoutine(live_charStats));
+
+            StartCoroutine(live_charStats.currentAIController.AIControllerRoutine()); 
+        }
 
         if (!live_charStats.isDead) //Jeœli ¿yje
-        { 
-            //FieldOfView        
-            if (live_charStats.currentFieldOfView != null) { StartCoroutine(live_charStats.currentFieldOfView.FOVRoutine()); }
-
+        {   
             //MeeleAttack
             if (live_charStats.inputAttacking) StartCoroutine(MeeleAttack());
 
@@ -79,8 +87,36 @@ public class CharControler : MonoBehaviour
         //Reset Position
         if (GetComponentInParent<Transform>().transform.position.y <= -5f) live_charStats.ResetCharacterPosition();
 
+        ///////////////////////////////////////////////////////
+
         //Testing
-        live_charStats.Testing_Z_Key = !live_charStats.Testing_Z_Key;  //w³¹czanie i wy³¹czanie booleana przyciskiem ON/OFF
+        //live_charStats.Testing_Z_Key = !live_charStats.Testing_Z_Key;  //w³¹czanie i wy³¹czanie booleana przyciskiem ON/OFF
+        if (live_charStats.isPlayer)
+        {
+            if (Input.GetKeyDown(KeyCode.Comma)) //Testing class get / set 
+            {
+                StaticTestingClass.SimpleDebugTestingCharStats(live_charStats, false);
+                StaticTestingClass.Attacking2(live_charStats);
+            }
+            if (Input.GetKeyDown(KeyCode.KeypadPlus))
+            {
+                StaticTestingClass.AddCurrentHP(live_charStats, 100f);
+            }
+            if (Input.GetKeyDown(KeyCode.KeypadMinus))
+            {
+                live_charStats.currentHP = StaticTestingClass.AddCurrentFloat(live_charStats.currentHP, -100f);
+            }
+            if (Input.GetKeyDown(KeyCode.KeypadMinus) && live_charStats.inputRunning)
+            {
+                live_charStats.currentHP = StaticTestingClass.AddCurrentFloat(live_charStats.currentHP, -100f, 1.2f);
+            }
+        }
+
+       /* //FieldOfView        
+        StartCoroutine(StaticTestingClass.FOVRoutine(live_charStats));
+        //StaticTestingClass.FieldOfViewTarget(live_charStats); 
+*/
+        ///////////////////////////////////////////////////////
     }
 
     private void FixedUpdate()
@@ -122,6 +158,10 @@ public class CharControler : MonoBehaviour
         
     }
 
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    
+
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     private IEnumerator MeeleAttack()
     {   //warunki ustalone tak ¿eby przerwaæ coroutine
@@ -262,7 +302,63 @@ public class CharControler : MonoBehaviour
         live_charStats.navMeAge_isCheckingRoutine= false;
        
         live_charStats.spell_OnCoroutine = false;
-
     }
+
+
+
+/// <summary>
+/// GizmosDrawers
+/// </summary>
+#if UNITY_EDITOR //zamiast skryptu w Editor
+
+    /*private void OnDrawGizmos() //rusyje wszystkie
+    {
+        GizmosDrawer();
+    }*/
+    private void OnDrawGizmosSelected() //rysuje tylko zaznaczone
+    {
+        GizmosDrawer();
+    }
+
+    private void GizmosDrawer()
+    {
+        Handles.color = live_charStats.fov_editorRadiusColor;
+        //Handles.DrawWireArc(transform.position, Vector3.up, Vector3.forward, 360, live_charStats.fov_coneRadius, live_charStats.fov_editorLineThickness); //rysowanie lini po okrêgu
+        Handles.DrawSolidArc(transform.position, Vector3.up, Vector3.forward, 360, live_charStats.fov_MaxSightRadius);  //rysowanie solid okrêgu
+
+        Handles.color = live_charStats.fov_editorDynamicRadiusColor; //closeSightRadius      
+        Handles.DrawSolidArc(transform.position, Vector3.up, Vector3.forward, 360, live_charStats.fov_CurrentDynamicSightRadius);  //rysowanie solid okrêgu
+
+        Handles.color = live_charStats.spell_editorAISpellRadiusColor; //SpellAIRange      
+        Handles.DrawSolidArc(transform.position, Vector3.up, Vector3.forward, 360, live_charStats.spell_MaxRadius * live_charStats.spell_AISpellRangeFromMax);  //rysowanie solid okrêgu
+
+
+        /*  
+          Vector3 viewAngleLeft = DirectionFromAngle(transform.eulerAngles.y, -live_charStats.fov_coneAngle / 2); //tworzy view angle w lewo od vectora transform.forward do coneAngle/2
+          Vector3 viewAngleRight = DirectionFromAngle(transform.eulerAngles.y, live_charStats.fov_coneAngle / 2); //tworzy view angle w prawo od vectora transform.forward do coneAngle/2
+  */
+
+        Handles.color = live_charStats.fov_editorAngleLineColor;
+        Handles.DrawLine(transform.position, transform.position + Quaternion.AngleAxis(-(live_charStats.fov_CurrentDynamicSightAngle / 2), Vector3.up) * transform.forward * live_charStats.fov_MaxSightRadius, live_charStats.fov_editorLineThickness);//rysowanie lini left
+        Handles.DrawLine(transform.position, transform.position + Quaternion.AngleAxis((live_charStats.fov_CurrentDynamicSightAngle / 2), Vector3.up) * transform.forward * live_charStats.fov_MaxSightRadius, live_charStats.fov_editorLineThickness);//rysowanie lini right
+
+        Handles.color = live_charStats.fov_editorAngleColor;
+        Handles.DrawSolidArc(transform.position, Vector3.up, /*viewAngleLeft*/Quaternion.AngleAxis(-(live_charStats.fov_CurrentDynamicSightAngle / 2), Vector3.up) * transform.forward, live_charStats.fov_CurrentDynamicSightAngle, live_charStats./*fov_MaxSightRadius*/fov_CurrentDynamicSightRadius); //rysuje coneAngle view               
+                                                                                                                                                                                                                                                                                                          //Quaternion.AngleAxis korzysta z lokalnego transforma zamiast skomplikowanego Mathf.sin/cos
+
+        if (live_charStats.navMeAge_walkPointSet)
+        {
+            Handles.color = live_charStats.fov_editorRaycastColor;
+            Handles.DrawLine(transform.position, live_charStats.navMeAge_walkPoint, live_charStats.fov_editorLineThickness);
+        }
+
+        if (live_charStats.navMeAge_targetAquired && live_charStats.fov_aquiredTargetGameObject != null)
+        {
+            Handles.color = live_charStats.fov_editorRaycastColor;
+            Handles.DrawLine(transform.position, live_charStats.fov_aquiredTargetGameObject.transform.position, live_charStats.fov_editorLineThickness); //rysowanie lini w kierunku playera jeœli nie zas³ania go obstacle Layer
+        }
+    }
+    
+#endif
 
 }

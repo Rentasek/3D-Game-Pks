@@ -55,6 +55,7 @@ public class AIController : MonoBehaviour
 
             if (!live_charStats.inputMouseCurrentMoving && !live_charStats.inputCasting)     //mouse input -> wy³¹cza CheckTagetInRange //dodatkowo input casting
             {
+                //LiveCharStats_Base.FieldOfViewTarget(live_charStats);
                 CheckForTargetInDynamicSightRange();
                 CheckForTargetInAttackRange();
             }
@@ -80,6 +81,7 @@ public class AIController : MonoBehaviour
         //wy³¹czone player input na ka¿dej innej postaci
         if (!live_charStats.playerInputEnable && GetComponent<NavMeshAgent>().enabled && live_charStats.isPlayer == false)
         {
+            //LiveCharStats_Base.FieldOfViewTarget(live_charStats);
             CheckForTargetInDynamicSightRange();
             CheckForTargetInSpellRange();
             CheckForTargetInAttackRange();

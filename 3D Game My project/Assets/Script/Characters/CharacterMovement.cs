@@ -10,80 +10,16 @@ using UnityEngine.UIElements;
 
 public class CharacterMovement : MonoBehaviour
 {
-
-/*
-    // Imported from live_charStats
-    [Space]
-    private float walkSpeed;
-    private float runSpeed;
-    private float jumpPower;
-    private float gravity;
-
-    private float attackCooldown = 0.15f;
-
-    private LayerMask groundMask;
-    private float groundDistance;                   //pobierane z live_charStats
-    ////////////////////////////////////////////////////////////////////////////////////////*/
-
-    /*[Header("Booleany/Vectory z klasy Input")]
-    //[SerializeField] private Vector3 inputMovingVector;
-    //[SerializeField] private float inputRotateHorizontal;
-    //[SerializeField] private bool inputMoving;
-    //[SerializeField] private bool inputRunning;
-    //[SerializeField] private bool inputJumping;
-    //[SerializeField] private bool inputAttacking;
-
-    [Space]
-    //[SerializeField] private bool inputSaveGame;
-    //[SerializeField] private bool inputLoadGame;
-    //[SerializeField] private bool inputResetPosition;
-    //[SerializeField] private bool inputSetBackupPosition;
-    //[SerializeField] private bool Testing_Z_Key;*/
-                                                               //pobierane z Player_input
-    /////////////////////////////////////////////////////////////////////////////////////////
-
-    /*[Space]
-      [Header("Character State")]    
-      [SerializeField] private float comboMeele = 0f;
-      [SerializeField] private float moveSpeed;*/
-
-    // [SerializeField] private bool runningTesting_LShift_Key;
-
-                                                                //pobierane z live_charStats
-    ///////////////////////////////////////////////////////////////////////////////////////////
-
-
-    /*  [Space]
-      [Header("Character Current Movement")]
-      [SerializeField] private Vector3 inputDirection;
-      [SerializeField] private Vector3 moveVector;
-      [SerializeField] private Vector3 velocity;*/
-                                                                //pobierane z live_charStats
-    ///////////////////////////////////////////////////////////////////////////////////////
-
-
-    //[SerializeField] private float rotateSensivity;
-
-    //[SerializeField] private float jumpDeltaTime;
-                                                                 //pobierane z Player_input
-    ////////////////////////////////////////////////////////////////////////////////////////
-
-    /*public Animator animator;
-    [SerializeField] private CharacterController characterController;
-    public ScrObj_charStats scrObj_charStats;*/
-                                                                //pobierane z live_charStats
-    ///////////////////////////////////////////////////////////////////////////////////////
     [Space]
     [Header("Character Components")]
-    public CharacterStatus live_charStats;
-    //public Player_Input live_Player_Input;
+    public CharacterStatus live_charStats;   
     public NavMeshAgent live_NavMeshAgent;
 
     [SerializeField] private CharacterController characterController;    
 
     [SerializeField] private bool _GravityEnabled = true;
 
-    //[SerializeField] private Rigidbody rb;
+    
 
     ///////////////////////////////////// Implementacja ///////////////////////////////////////
 
@@ -295,7 +231,7 @@ public class CharacterMovement : MonoBehaviour
 
     public void JumpAnimation()
     {
-        live_charStats.currentStam -= 10f; //Koszt Stamy przy skoku        
+        live_charStats.currentStam -= (10f + live_charStats.currentCharLevel); //Koszt Stamy przy skoku        
         live_charStats.currentAnimator.ResetTrigger("MeeleAttack"); //¿eby nie animowa³ ataku w powietrzu           
         live_charStats.currentAnimator.SetFloat("yAnim", 0);
         live_charStats.currentAnimator.SetTrigger("Jump");

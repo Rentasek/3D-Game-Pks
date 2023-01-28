@@ -9,7 +9,13 @@ using UnityEngine;
 public class FieldOFView : MonoBehaviour
 {
     [SerializeField] private CharacterStatus live_charStats;
-    [SerializeField] private string[] enemiesArray;    
+    [SerializeField] private string[] enemiesArray;
+
+    /* private void OnValidate()
+   {
+       live_charStats = GetComponentInParent<CharacterStatus>();
+       enemiesArray = live_charStats.currentEnemiesArray;
+   }*/
 
     // Start is called before the first frame update
     void Start()
@@ -17,6 +23,7 @@ public class FieldOFView : MonoBehaviour
        // live_charStats = GetComponentInParent<CharacterStatus>();
        // enemiesArray = live_charStats.currentEnemiesArray;
     }
+  
 
     // Update is called once per frame
     void Update()
@@ -94,6 +101,7 @@ public class FieldOFView : MonoBehaviour
             live_charStats.fov_isSearchingForTarget = true;
 
             yield return new WaitForSeconds(live_charStats.fov_coneRoutineDelay);
+            
             
             FieldOfViewCheck();
             live_charStats.fov_isSearchingForTarget = false;

@@ -118,7 +118,7 @@ public class Spell_FireBreath : MonoBehaviour
             if (!live_charStats.isCasting)
             {
                 breath_VisualEffect.Play(); //mo¿e siê odpaliæ tylko raz przy ka¿dym inpucie, nie mo¿e siê dapisaæ -> taki sam efekt jak przy GetKeyDown
-                breath_AudioSource.PlayOneShot(fireBreathAudioClip, 1);//clip audio
+                breath_AudioSource.PlayOneShot(fireBreathAudioClip, 0.5f);//clip audio
                 //GetComponentInParent<AudioSource>(live_charStats.inputCasting).volume = 1;//play audio volume
                 //GetComponentInParent<AudioSource>(live_charStats.inputCasting).Play();//play audio
                 
@@ -170,7 +170,7 @@ public class Spell_FireBreath : MonoBehaviour
     private void BreathAttackConeCheck()  //dynamiczna lista colliderów z OverlapSphere
     {
         if (live_charStats.isCasting)
-        {
+        {            
             for (int i = 0; i < Physics.OverlapSphere(transform.position, breath_currentFireRadius).Length; i++)
             {
                 for (int j = 0; j < breath_EnemiesArray.Length; j++)
@@ -181,32 +181,26 @@ public class Spell_FireBreath : MonoBehaviour
 
                         Vector3 directionToTarget = (Physics.OverlapSphere(transform.position, breath_currentFireRadius)[i].transform.position - transform.position).normalized; //0-1(normalized) ró¿nica pomiêdzy targetem a characterem Vector3.normalized ==> vector wyra¿ony w radianach
                                                                                                                                                                                  //sprawdzanie aktualnie ostatniego elementu z listy
-                        if (Vector3.Angle(transform.forward, directionToTarget) < breath_currentFireAngle / 2 )
-                            //sprawdzanie angle wektora forward charactera i direction to target
-                            //target mo¿e byæ na + albo - od charactera dlatego w ka¿d¹ stronê angle / 2
+                        if (Vector3.Angle(transform.forward, directionToTarget) < breath_currentFireAngle / 2)
+                        //sprawdzanie angle wektora forward charactera i direction to target
+                        //target mo¿e byæ na + albo - od charactera dlatego w ka¿d¹ stronê angle / 2
                         {
                             breath_targetInBreathAngle = true;
                             //if (!Physics.Raycast(transform.position, directionToTarget, breath_currentFireRadius, live_charStats.fov_obstaclesLayerMask))    //dodatkowo sprawdza Raycastem czy nie ma przeszkody pomiêdzy playerem a targetem //  
-                            if (breath_targetColliders.IndexOf(Physics.OverlapSphere(transform.position, breath_currentFireRadius)[i]) < 0) //sprawdza czy nie ma na liœcie
+                            if (breath_targetColliders.IndexOf(Physics.OverlapSphere(transform.position, breath_currentFireRadius)[i]) < 0) //sprawdza czy nie ma na liœcie. Je¿eli IndexOf < 0 czyli nie ma obiektów z tym indexem
                             {
-                                breath_targetColliders.Add(Physics.OverlapSphere(transform.position, breath_currentFireRadius)[i]); //przypisuje do listy /array/ collidera jeœli ma taga z listy enemies
+                                breath_targetColliders.Add(Physics.OverlapSphere(transform.position, breath_currentFireRadius)[i]); //przypisuje do listy colliders jeœli ma taga z listy enemies
                             }
-
-
                             else
                             {
                                 breath_targetColliders.Remove(Physics.OverlapSphere(transform.position, breath_currentFireRadius)[i]);
                                 if (breath_targetColliders.Count() <= 0) breath_targetInBreathAngle = false; //jeœli nie ma ¿adnych targetów w Cone
                             }
-
                         }
-                        
                     }
+                    
                 }
             }
-
-            
-
         }
         else
         {
@@ -214,9 +208,6 @@ public class Spell_FireBreath : MonoBehaviour
             breath_targetInBreathRange = false;
             breath_targetColliders.Clear();  //czyszczenie listy colliderów
         }
-
-
-
     }
 
     private void FireBreathDamage()
