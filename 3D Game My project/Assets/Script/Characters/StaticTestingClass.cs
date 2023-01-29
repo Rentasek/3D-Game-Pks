@@ -79,7 +79,7 @@ public static class StaticTestingClass
         return floatValueToAdd;
     }
 
-    public static IEnumerator FOVRoutine(CharacterStatus live_charStats)
+    /*public static IEnumerator FOVRoutine(CharacterStatus live_charStats)
     {
         if (live_charStats.fov_isSearchingForTarget)
         {            
@@ -148,6 +148,6 @@ public static class StaticTestingClass
                 live_charStats.navMeAge_targetAquired = false;
             }
         }
-    }
+    }*/
 
 }

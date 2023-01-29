@@ -109,12 +109,12 @@ public class FieldOFView : MonoBehaviour
 
     }
 
-#if UNITY_EDITOR //zamiast skryptu w Editor
+/*#if UNITY_EDITOR //zamiast skryptu w Editor
 
-    /*private void OnDrawGizmos() //rusyje wszystkie
+    *//*private void OnDrawGizmos() //rusyje wszystkie
     {
         GizmosDrawer();
-    }*/
+    }*//*
     private void OnDrawGizmosSelected() //rysuje tylko zaznaczone
     {
         GizmosDrawer();
@@ -133,17 +133,17 @@ public class FieldOFView : MonoBehaviour
         Handles.DrawSolidArc(transform.position, Vector3.up, Vector3.forward, 360, live_charStats.spell_MaxRadius * live_charStats.spell_AISpellRangeFromMax);  //rysowanie solid okrêgu
 
 
-        /*  
+        *//*  
           Vector3 viewAngleLeft = DirectionFromAngle(transform.eulerAngles.y, -live_charStats.fov_coneAngle / 2); //tworzy view angle w lewo od vectora transform.forward do coneAngle/2
           Vector3 viewAngleRight = DirectionFromAngle(transform.eulerAngles.y, live_charStats.fov_coneAngle / 2); //tworzy view angle w prawo od vectora transform.forward do coneAngle/2
-  */
+  *//*
 
         Handles.color = live_charStats.fov_editorAngleLineColor;
         Handles.DrawLine(transform.position, transform.position + Quaternion.AngleAxis(-(live_charStats.fov_CurrentDynamicSightAngle / 2), Vector3.up) * transform.forward * live_charStats.fov_MaxSightRadius, live_charStats.fov_editorLineThickness);//rysowanie lini left
         Handles.DrawLine(transform.position, transform.position + Quaternion.AngleAxis((live_charStats.fov_CurrentDynamicSightAngle / 2), Vector3.up) * transform.forward * live_charStats.fov_MaxSightRadius, live_charStats.fov_editorLineThickness);//rysowanie lini right
 
         Handles.color = live_charStats.fov_editorAngleColor;
-        Handles.DrawSolidArc(transform.position, Vector3.up, /*viewAngleLeft*/Quaternion.AngleAxis(-(live_charStats.fov_CurrentDynamicSightAngle/2),Vector3.up)*transform.forward, live_charStats.fov_CurrentDynamicSightAngle, live_charStats./*fov_MaxSightRadius*/fov_CurrentDynamicSightRadius); //rysuje coneAngle view               
+        Handles.DrawSolidArc(transform.position, Vector3.up, *//*viewAngleLeft*//*Quaternion.AngleAxis(-(live_charStats.fov_CurrentDynamicSightAngle/2),Vector3.up)*transform.forward, live_charStats.fov_CurrentDynamicSightAngle, live_charStats.*//*fov_MaxSightRadius*//*fov_CurrentDynamicSightRadius); //rysuje coneAngle view               
                                                                                                                                                                                                                                   //Quaternion.AngleAxis korzysta z lokalnego transforma zamiast skomplikowanego Mathf.sin/cos
 
         if (live_charStats.navMeAge_walkPointSet)
@@ -158,11 +158,11 @@ public class FieldOFView : MonoBehaviour
             Handles.DrawLine(transform.position, live_charStats.fov_aquiredTargetGameObject.transform.position, live_charStats.fov_editorLineThickness); //rysowanie lini w kierunku playera jeœli nie zas³ania go obstacle Layer
         }
     }
-   /* private Vector3 DirectionFromAngle(float eulerY, float angleInDegrees)
+   *//* private Vector3 DirectionFromAngle(float eulerY, float angleInDegrees)
     {
         angleInDegrees += eulerY;
         return new Vector3(Mathf.Sin(angleInDegrees * Mathf.Deg2Rad), 0, Mathf.Cos(angleInDegrees * Mathf.Deg2Rad)); //zwraca vector3 (x,y,z)
-    }*///Zbêdne dziêki wykorzystaniu quaterniona z lokalnym transform.forward
+    }*//*//Zbêdne dziêki wykorzystaniu quaterniona z lokalnym transform.forward
 
-#endif
+#endif*/
 }

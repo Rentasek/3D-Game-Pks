@@ -56,7 +56,7 @@ public class CharacterStatus : MonoBehaviour
     public float navMeAge_attackRange;
     public float navMeAge_wanderingRange;
     public bool navMeAge_targetInSightRange;
-    public bool navMeAge_targetInDynamicSightRange;
+    public bool navMeAge_targetInDynamicSightRange;    
     public Collider[] navMeAge_TestALLtargetsInDynamicSightRange;
     public bool navMeAge_targetInAttackRange;
     public bool navMeAge_targetAquired;
@@ -95,6 +95,43 @@ public class CharacterStatus : MonoBehaviour
     public LayerMask fov_obstaclesLayerMask;    
     public GameObject fov_aquiredTargetGameObject;
     public bool fov_isSearchingForTarget;
+
+    [Space]
+    [Header("New Field of View")]
+    [Space]
+    [Header("Angle")]
+    [Range(0, 360)] public float FOV__CurrentDynamicSightAngle;
+    [Range(0, 360)] public float FOV__MaxSightAngle;
+    [Range(0, 360)] public float FOV__MinSightAngle;
+    public float FOV__CurrentVectorDynamicSightAngle;   //wektor aktualnej zmiany wartoœci +/-    
+    [Range(0, 1)] public float FOV__TimeDynamicSightAngle; //ile sekund na ca³y ruch (90->360)
+    [Space]
+    [Header("Radius")]
+    [Range(0, 100)] public float FOV__MinSightRadius;
+    [Range(0, 100)] public float FOV__MaxSightRadius;
+    [Range(0, 100)] public float FOV__CurrentDynamicSightRadius;
+    public float FOV__lerpedDistance;
+    public float FOV__CurrentVectorDynamicSightRadius;   //wektor aktualnej zmiany wartoœci +/-
+    [Range(0, 5)] public float FOV__TimeDynamicSightRadius;
+    [Space]
+    [Header("Range")]
+    public bool FOV__enemyInDynamicSightRange;
+    public float FOV__attackRange;
+    public bool FOV__inAttackRange;
+    public float FOV__spellRange;
+    public bool FOV__inSpellkRange;
+    [Space]
+    [Header("Utils")]
+    public float FOV__FOVRoutineDelay;
+    public Collider[] FOV__allTargetsInDynamicSightRange;
+    [Space]
+    public List <Collider> FOV__enemyTargetsInDynamicSightRange;
+    public LayerMask FOV__obstaclesLayerMask;
+    public GameObject FOV__aquiredTargetGameObject;
+    public bool FOV__targetAquired;
+    public bool FOV__isSearchingForTarget;
+    
+
 
     [Space]
     [Header("Character Speed")]

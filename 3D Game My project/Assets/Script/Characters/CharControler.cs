@@ -50,17 +50,20 @@ public class CharControler : MonoBehaviour
         //PlayerInput
         if (live_charStats.currentPlayer_Input != null) live_charStats.currentPlayer_Input.InputClass();
 
-        //FieldOfView        
+        /*//FieldOfView        
         if (live_charStats.currentFieldOfView != null) { StartCoroutine(live_charStats.currentFieldOfView.FOVRoutine()); }
+*/
+        //LiveCharStats_Base.FieldOfViewTarget(live_charStats);
+        StartCoroutine(FOVRoutine());
 
-        //AIController
+       /* //AIController
         if (live_charStats.currentAIController != null && !live_charStats.playerInputEnable)
         {
-            //StartCoroutine(LiveCharStats_Base.FOVRoutine(live_charStats));
+            StartCoroutine(LiveCharStats_Base.FOVRoutine(live_charStats));
 
             StartCoroutine(live_charStats.currentAIController.AIControllerRoutine()); 
         }
-
+*/
         if (!live_charStats.isDead) //Jeœli ¿yje
         {   
             //MeeleAttack
@@ -159,7 +162,44 @@ public class CharControler : MonoBehaviour
     }
 
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    
+
+    private IEnumerator FOVRoutine()
+    {
+        if (live_charStats.FOV__isSearchingForTarget)
+        {
+            yield break; // ¿eby nie nadpisywa³ coroutine co klatke
+        }
+        else
+        {
+            live_charStats.FOV__isSearchingForTarget = true;
+
+            yield return new WaitForSeconds(live_charStats.FOV__FOVRoutineDelay);
+
+            LiveCharStats_Base.FieldOfViewTarget(live_charStats);
+
+            live_charStats.FOV__isSearchingForTarget = false;
+        }
+    }
+
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+    public IEnumerator AIControllerRoutine()
+    {
+        if (live_charStats.navMeAge_isCheckingRoutine)
+        {
+            yield break; // ¿eby nie nadpisywa³ coroutine co klatke
+        }
+        else
+        {
+            live_charStats.navMeAge_isCheckingRoutine = true;
+
+            yield return new WaitForSeconds(live_charStats.navMeAge_AIRoutineDelay);
+
+           //AIControllerCheck();
+            live_charStats.navMeAge_isCheckingRoutine = false;
+        }
+    }
 
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -306,9 +346,9 @@ public class CharControler : MonoBehaviour
 
 
 
-/// <summary>
-/// GizmosDrawers
-/// </summary>
+    /// <summary>
+    /// GizmosDrawers
+    /// </summary>
 #if UNITY_EDITOR //zamiast skryptu w Editor
 
     /*private void OnDrawGizmos() //rusyje wszystkie
@@ -324,26 +364,20 @@ public class CharControler : MonoBehaviour
     {
         Handles.color = live_charStats.fov_editorRadiusColor;
         //Handles.DrawWireArc(transform.position, Vector3.up, Vector3.forward, 360, live_charStats.fov_coneRadius, live_charStats.fov_editorLineThickness); //rysowanie lini po okrêgu
-        Handles.DrawSolidArc(transform.position, Vector3.up, Vector3.forward, 360, live_charStats.fov_MaxSightRadius);  //rysowanie solid okrêgu
+        Handles.DrawSolidArc(transform.position, Vector3.up, Vector3.forward, 360, live_charStats.FOV__MaxSightRadius);  //rysowanie solid okrêgu
 
         Handles.color = live_charStats.fov_editorDynamicRadiusColor; //closeSightRadius      
-        Handles.DrawSolidArc(transform.position, Vector3.up, Vector3.forward, 360, live_charStats.fov_CurrentDynamicSightRadius);  //rysowanie solid okrêgu
+        Handles.DrawSolidArc(transform.position, Vector3.up, Vector3.forward, 360, live_charStats.FOV__CurrentDynamicSightRadius);  //rysowanie solid okrêgu
 
         Handles.color = live_charStats.spell_editorAISpellRadiusColor; //SpellAIRange      
-        Handles.DrawSolidArc(transform.position, Vector3.up, Vector3.forward, 360, live_charStats.spell_MaxRadius * live_charStats.spell_AISpellRangeFromMax);  //rysowanie solid okrêgu
-
-
-        /*  
-          Vector3 viewAngleLeft = DirectionFromAngle(transform.eulerAngles.y, -live_charStats.fov_coneAngle / 2); //tworzy view angle w lewo od vectora transform.forward do coneAngle/2
-          Vector3 viewAngleRight = DirectionFromAngle(transform.eulerAngles.y, live_charStats.fov_coneAngle / 2); //tworzy view angle w prawo od vectora transform.forward do coneAngle/2
-  */
+        Handles.DrawSolidArc(transform.position, Vector3.up, Vector3.forward, 360, live_charStats.FOV__spellRange);  //rysowanie solid okrêgu
 
         Handles.color = live_charStats.fov_editorAngleLineColor;
-        Handles.DrawLine(transform.position, transform.position + Quaternion.AngleAxis(-(live_charStats.fov_CurrentDynamicSightAngle / 2), Vector3.up) * transform.forward * live_charStats.fov_MaxSightRadius, live_charStats.fov_editorLineThickness);//rysowanie lini left
-        Handles.DrawLine(transform.position, transform.position + Quaternion.AngleAxis((live_charStats.fov_CurrentDynamicSightAngle / 2), Vector3.up) * transform.forward * live_charStats.fov_MaxSightRadius, live_charStats.fov_editorLineThickness);//rysowanie lini right
+        Handles.DrawLine(transform.position, transform.position + Quaternion.AngleAxis(-(live_charStats.FOV__CurrentDynamicSightAngle / 2), Vector3.up) * transform.forward * live_charStats.FOV__MaxSightRadius, live_charStats.fov_editorLineThickness);//rysowanie lini left
+        Handles.DrawLine(transform.position, transform.position + Quaternion.AngleAxis((live_charStats.FOV__CurrentDynamicSightAngle / 2), Vector3.up) * transform.forward * live_charStats.FOV__MaxSightRadius, live_charStats.fov_editorLineThickness);//rysowanie lini right
 
         Handles.color = live_charStats.fov_editorAngleColor;
-        Handles.DrawSolidArc(transform.position, Vector3.up, /*viewAngleLeft*/Quaternion.AngleAxis(-(live_charStats.fov_CurrentDynamicSightAngle / 2), Vector3.up) * transform.forward, live_charStats.fov_CurrentDynamicSightAngle, live_charStats./*fov_MaxSightRadius*/fov_CurrentDynamicSightRadius); //rysuje coneAngle view               
+        Handles.DrawSolidArc(transform.position, Vector3.up, /*viewAngleLeft*/Quaternion.AngleAxis(-(live_charStats.FOV__CurrentDynamicSightAngle / 2), Vector3.up) * transform.forward, live_charStats.FOV__CurrentDynamicSightAngle, live_charStats.FOV__CurrentDynamicSightRadius); //rysuje coneAngle view               
                                                                                                                                                                                                                                                                                                           //Quaternion.AngleAxis korzysta z lokalnego transforma zamiast skomplikowanego Mathf.sin/cos
 
         if (live_charStats.navMeAge_walkPointSet)
@@ -352,13 +386,71 @@ public class CharControler : MonoBehaviour
             Handles.DrawLine(transform.position, live_charStats.navMeAge_walkPoint, live_charStats.fov_editorLineThickness);
         }
 
-        if (live_charStats.navMeAge_targetAquired && live_charStats.fov_aquiredTargetGameObject != null)
+        if (live_charStats.FOV__targetAquired && live_charStats.FOV__aquiredTargetGameObject != null)
         {
             Handles.color = live_charStats.fov_editorRaycastColor;
-            Handles.DrawLine(transform.position, live_charStats.fov_aquiredTargetGameObject.transform.position, live_charStats.fov_editorLineThickness); //rysowanie lini w kierunku playera jeœli nie zas³ania go obstacle Layer
+            Handles.DrawLine(transform.position, live_charStats.FOV__aquiredTargetGameObject.transform.position, live_charStats.fov_editorLineThickness); //rysowanie lini w kierunku playera jeœli nie zas³ania go obstacle Layer
         }
     }
-    
+
 #endif
+
+
+
+
+    /*/// <summary>
+    /// GizmosDrawers
+    /// </summary>
+    #if UNITY_EDITOR //zamiast skryptu w Editor
+
+        *//*private void OnDrawGizmos() //rusyje wszystkie
+        {
+            GizmosDrawer();
+        }*//*
+        private void OnDrawGizmosSelected() //rysuje tylko zaznaczone
+        {
+            GizmosDrawer();
+        }
+
+        private void GizmosDrawer()
+        {
+            Handles.color = live_charStats.fov_editorRadiusColor;
+            //Handles.DrawWireArc(transform.position, Vector3.up, Vector3.forward, 360, live_charStats.fov_coneRadius, live_charStats.fov_editorLineThickness); //rysowanie lini po okrêgu
+            Handles.DrawSolidArc(transform.position, Vector3.up, Vector3.forward, 360, live_charStats.fov_MaxSightRadius);  //rysowanie solid okrêgu
+
+            Handles.color = live_charStats.fov_editorDynamicRadiusColor; //closeSightRadius      
+            Handles.DrawSolidArc(transform.position, Vector3.up, Vector3.forward, 360, live_charStats.fov_CurrentDynamicSightRadius);  //rysowanie solid okrêgu
+
+            Handles.color = live_charStats.spell_editorAISpellRadiusColor; //SpellAIRange      
+            Handles.DrawSolidArc(transform.position, Vector3.up, Vector3.forward, 360, live_charStats.spell_MaxRadius * live_charStats.spell_AISpellRangeFromMax);  //rysowanie solid okrêgu
+
+
+            *//*  
+              Vector3 viewAngleLeft = DirectionFromAngle(transform.eulerAngles.y, -live_charStats.fov_coneAngle / 2); //tworzy view angle w lewo od vectora transform.forward do coneAngle/2
+              Vector3 viewAngleRight = DirectionFromAngle(transform.eulerAngles.y, live_charStats.fov_coneAngle / 2); //tworzy view angle w prawo od vectora transform.forward do coneAngle/2
+      *//*
+
+            Handles.color = live_charStats.fov_editorAngleLineColor;
+            Handles.DrawLine(transform.position, transform.position + Quaternion.AngleAxis(-(live_charStats.fov_CurrentDynamicSightAngle / 2), Vector3.up) * transform.forward * live_charStats.fov_MaxSightRadius, live_charStats.fov_editorLineThickness);//rysowanie lini left
+            Handles.DrawLine(transform.position, transform.position + Quaternion.AngleAxis((live_charStats.fov_CurrentDynamicSightAngle / 2), Vector3.up) * transform.forward * live_charStats.fov_MaxSightRadius, live_charStats.fov_editorLineThickness);//rysowanie lini right
+
+            Handles.color = live_charStats.fov_editorAngleColor;
+            Handles.DrawSolidArc(transform.position, Vector3.up, *//*viewAngleLeft*//*Quaternion.AngleAxis(-(live_charStats.fov_CurrentDynamicSightAngle / 2), Vector3.up) * transform.forward, live_charStats.fov_CurrentDynamicSightAngle, live_charStats.*//*fov_MaxSightRadius*//*fov_CurrentDynamicSightRadius); //rysuje coneAngle view               
+                                                                                                                                                                                                                                                                                                              //Quaternion.AngleAxis korzysta z lokalnego transforma zamiast skomplikowanego Mathf.sin/cos
+
+            if (live_charStats.navMeAge_walkPointSet)
+            {
+                Handles.color = live_charStats.fov_editorRaycastColor;
+                Handles.DrawLine(transform.position, live_charStats.navMeAge_walkPoint, live_charStats.fov_editorLineThickness);
+            }
+
+            if (live_charStats.navMeAge_targetAquired && live_charStats.fov_aquiredTargetGameObject != null)
+            {
+                Handles.color = live_charStats.fov_editorRaycastColor;
+                Handles.DrawLine(transform.position, live_charStats.fov_aquiredTargetGameObject.transform.position, live_charStats.fov_editorLineThickness); //rysowanie lini w kierunku playera jeœli nie zas³ania go obstacle Layer
+            }
+        }
+
+    #endif*/
 
 }
