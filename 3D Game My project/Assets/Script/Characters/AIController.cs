@@ -24,25 +24,25 @@ public class AIController : MonoBehaviour
         enemiesArray = live_charStats.currentEnemiesArray;
         agent = live_charStats.currentNavMeshAgent;
         live_charStats.navMeAge_spawnPoint = transform.position;
-        agent.stoppingDistance = live_charStats.navMeAge_attackRange;
+        agent.stoppingDistance = live_charStats.fov_attackRange;
     }
 
     ///////////////////////////////////////////////////////////////////////////////////////
 
     public IEnumerator AIControllerRoutine()
     {
-        if (live_charStats.navMeAge_isCheckingRoutine)
+        if (live_charStats.navMeAge_isCheckingAIRoutine)
         {
             yield break; // ¿eby nie nadpisywa³ coroutine co klatke
         }
         else
         {
-            live_charStats.navMeAge_isCheckingRoutine = true;
+            live_charStats.navMeAge_isCheckingAIRoutine = true;
 
             yield return new WaitForSeconds(live_charStats.navMeAge_AIRoutineDelay);
 
             AIControllerCheck();
-            live_charStats.navMeAge_isCheckingRoutine = false;
+            live_charStats.navMeAge_isCheckingAIRoutine = false;
         }
     }
 
@@ -70,9 +70,9 @@ public class AIController : MonoBehaviour
                 }
             }
             // Jeœli dystans do walkPoint jest mniejszy ni¿ 1f resetuje walkPointSet (wykorzystanie agent.*)            
-            if (agent.remainingDistance <= live_charStats.navMeAge_attackRange) { live_charStats.navMeAge_walkPoint = transform.position; }
+            if (agent.remainingDistance <= live_charStats.fov_attackRange) { live_charStats.navMeAge_walkPoint = transform.position; }
 
-            if (live_charStats.navMeAge_targetInDynamicSightRange && !live_charStats.navMeAge_targetInAttackRange) Chasing(); // player bez inputa œciga tylko przy close sight range
+            if (live_charStats.fov_targetInDynamicSightRange && !live_charStats.fov_targetInAttackRange) Chasing(); // player bez inputa œciga tylko przy close sight range
 
             if (live_charStats.inputMouseCurrentMoving) live_charStats.navMeAge_walkPoint = live_charStats.navMeAge_mouseWalkPoint; //mouse input -> ovveriride walkPointSet z CheckRange
         }
@@ -86,11 +86,20 @@ public class AIController : MonoBehaviour
             CheckForTargetInSpellRange();
             CheckForTargetInAttackRange();
 
-            if (!live_charStats.navMeAge_targetInDynamicSightRange && !live_charStats.navMeAge_targetAquired && !live_charStats.navMeAge_targetInAttackRange && !live_charStats.inputCasting) Patrolling();
+            if (!live_charStats.fov_targetInDynamicSightRange && !live_charStats.fov_targetAquired && !live_charStats.fov_targetInAttackRange && !live_charStats.inputCasting) Patrolling();
 
-            //Routine AI_Castowanie Spelli, live_charStats.navMeAge_targetAquired zablokowane poniewa¿ DynamicRange jeœli trafi to nadpisuje target Aquired  
-            if (live_charStats.spell != null /*&& live_charStats.navMeAge_targetAquired*/ && live_charStats.spell_targetInSpellRange && !live_charStats.navMeAge_targetInAttackRange
-                && live_charStats.currentMP >= 10f) StartCoroutine(AI_SpellRoutine());
+            //AI_Castowanie Spelli  
+            if (live_charStats.spell != null && live_charStats.spell_targetInSpellRange && !live_charStats.fov_targetInAttackRange)
+            {
+                if (live_charStats.currentMP <= 10f)    //jeœli zejdzie do 10 many to nie castuje
+                {
+                    live_charStats.inputCasting = false;
+                }
+                else if (live_charStats.currentMP >= 70f)   //jeœli nie osi¹gnie 70 many to nie castuje
+                {
+                    AI_SpellCast();
+                }
+            }
             else
             {
                 live_charStats.inputCasting = false;
@@ -98,8 +107,8 @@ public class AIController : MonoBehaviour
                 /*if (live_charStats.navMeAge_targetInDynamicSightRange && !live_charStats.navMeAge_targetInAttackRange && !live_charStats.inputCasting) Chasing();
                 if (live_charStats.navMeAge_targetInDynamicSightRange && live_charStats.navMeAge_targetInAttackRange && !live_charStats.inputCasting) Attacking();*/
             }
-            if (live_charStats.navMeAge_targetInDynamicSightRange && !live_charStats.navMeAge_targetInAttackRange && !live_charStats.inputCasting) Chasing();
-            if (live_charStats.navMeAge_targetInDynamicSightRange && live_charStats.navMeAge_targetInAttackRange && !live_charStats.inputCasting) Attacking();
+            if (live_charStats.fov_targetInDynamicSightRange && !live_charStats.fov_targetInAttackRange && !live_charStats.inputCasting) Chasing();
+            if (live_charStats.fov_targetInDynamicSightRange && live_charStats.fov_targetInAttackRange && !live_charStats.inputCasting) Attacking();
         }
 
         if (live_charStats.isDead) { StopMovementNavMeshAgent(); }  //Stop Nav Mesh Agent przy œmierci
@@ -112,16 +121,16 @@ public class AIController : MonoBehaviour
         {
             if (enemiesArray.Contains(collider.tag))                                         //jeœli ma tag zawarty w arrayu enemiesArray
             {
-                live_charStats.navMeAge_targetInDynamicSightRange = true;                          //ustawia znaleziony colliderem game objecta jako target               
+                live_charStats.fov_targetInDynamicSightRange = true;                          //ustawia znaleziony colliderem game objecta jako target               
 
 
                 if (live_charStats.fov_aquiredTargetGameObject == null) live_charStats.fov_aquiredTargetGameObject = collider.gameObject; //debugowanie gdyby nie z³apa³ targeta w DynamicSight range
                 break;
             }
-            else live_charStats.navMeAge_targetInDynamicSightRange = false;            
+            else live_charStats.fov_targetInDynamicSightRange = false;            
         }
         
-        if (live_charStats.navMeAge_targetInDynamicSightRange)
+        if (live_charStats.fov_targetInDynamicSightRange)
         {
             live_charStats.fov_CurrentDynamicSightRadius = Mathf.SmoothDamp(live_charStats.fov_CurrentDynamicSightRadius, live_charStats.fov_MinSightRadius, ref live_charStats.fov_CurrentVectorDynamicSightRadius, live_charStats.fov_TimeDynamicSightRadius);
             //dynamiczny sight range zmniejsza siê ¿eby player nie lockowa³ siê na sta³e na targecie
@@ -141,19 +150,19 @@ public class AIController : MonoBehaviour
 
     private void CheckForTargetInAttackRange()
     {
-        foreach (Collider collider in Physics.OverlapSphere(transform.position, live_charStats.navMeAge_attackRange)) //dla ka¿dego collidera w zasiêgu wzroku
+        foreach (Collider collider in Physics.OverlapSphere(transform.position, live_charStats.fov_attackRange)) //dla ka¿dego collidera w zasiêgu wzroku
         {
             if (enemiesArray.Contains(collider.tag))                                         //jeœli ma tag zawarty w arrayu enemiesArray
             {                                                      
-                live_charStats.navMeAge_targetInAttackRange = true;                          //ustawia znaleziony colliderem game objecta jako target
+                live_charStats.fov_targetInAttackRange = true;                          //ustawia znaleziony colliderem game objecta jako target
                 
                 if (live_charStats.fov_aquiredTargetGameObject == null) live_charStats.fov_aquiredTargetGameObject = collider.gameObject; //debugowanie gdyby nie z³apa³ targeta w attack range
                 break;
             }
-            else live_charStats.navMeAge_targetInAttackRange = false;
+            else live_charStats.fov_targetInAttackRange = false;
         }
         //Jeœli jest w zasiêgu ataku, triggeruje booleana inputAttacking w charStats, które posy³a go dalej => CharacterMovement
-        live_charStats.inputAttacking = live_charStats.navMeAge_targetInAttackRange;
+        live_charStats.inputAttacking = live_charStats.fov_targetInAttackRange;
     }
 
     private void CheckForTargetInSpellRange()
@@ -182,7 +191,7 @@ public class AIController : MonoBehaviour
         }
 
         // Jeœli dystans do walkPoint jest mniejszy ni¿ 1f resetuje walkPointSet i szuka nowego (wykorzystanie agent.*)
-        if (agent.remainingDistance < live_charStats.navMeAge_attackRange) live_charStats.navMeAge_walkPointSet = false;                
+        if (agent.remainingDistance < live_charStats.fov_attackRange) live_charStats.navMeAge_walkPointSet = false;                
     }
 
     private void SearchForWalkPoint()
@@ -221,30 +230,13 @@ public class AIController : MonoBehaviour
         }
     }
 
-    private IEnumerator AI_SpellRoutine()   //Routine AI_Castowanie Spelli
+    private  void AI_SpellCast()   //AI_Castowanie Spelli
     {
-        if (live_charStats.spell_OnCoroutine)// jeœli true to odbija a¿ nie minie delay              
+        if (!Physics.Raycast(live_charStats.gameObject.transform.position, live_charStats.gameObject.transform.forward, live_charStats.spell_MaxRadius * live_charStats.spell_AISpellRangeFromMax, live_charStats.fov_obstaclesLayerMask)) //raycast ¿eby nie bi³ przez œciany
         {
-            transform.LookAt(live_charStats.fov_aquiredTargetGameObject.transform); //¿eby trafia³
-            yield break; // ¿eby nie nadpisywa³ coroutine co klatke
-        }
-        else
-        {
-            live_charStats.spell_OnCoroutine = true;
-            transform.LookAt(live_charStats.fov_aquiredTargetGameObject.transform);
-            agent.SetDestination(transform.position);            
-            if (!Physics.Raycast(transform.position, transform.forward, live_charStats.spell_MaxRadius * live_charStats.spell_AISpellRangeFromMax, live_charStats.fov_obstaclesLayerMask)) //raycast ¿eby nie bi³ przez œciany
-            {                
-                live_charStats.inputCasting = true;                
-            }
-
-            yield return new WaitForSeconds(live_charStats.spell_coroutineDelay);            
-            live_charStats.spell_OnCoroutine = false;
-            live_charStats.inputCasting = false;    
-            if (live_charStats.fov_aquiredTargetGameObject != null && live_charStats.gameObject.GetComponent<NavMeshAgent>().enabled == true) 
-            {
-                agent.SetDestination(live_charStats.fov_aquiredTargetGameObject.transform.position);    //ustawia target tak ¿eby nie biegaæ na Patrolling
-            } 
+            live_charStats.inputCasting = true;
+            live_charStats.gameObject.transform.LookAt(live_charStats.fov_aquiredTargetGameObject.transform);
+            live_charStats.currentNavMeshAgent.SetDestination(live_charStats.gameObject.transform.position);
         }
     }
 

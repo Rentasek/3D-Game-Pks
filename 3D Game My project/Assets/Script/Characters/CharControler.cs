@@ -6,8 +6,7 @@ using UnityEngine;
 using UnityEngine.AI;
 
 public class CharControler : MonoBehaviour
-{
-    
+{    
     public CharacterStatus live_charStats;
     public GameObject resourcePrefab;
 
@@ -31,7 +30,7 @@ public class CharControler : MonoBehaviour
 
     private void OnEnable()
     {
-        live_charStats = GetComponent<CharacterStatus>();
+        //live_charStats = GetComponent<CharacterStatus>();
         
         if (live_charStats.isPlayer) live_charStats.LoadLevel();
         live_charStats.LoadCharStats();
@@ -41,36 +40,31 @@ public class CharControler : MonoBehaviour
             ResetAllTriggers();
             ResetInputsAndStates();
         }
-
     }
 
     // Update is called once per frame
     private void Update()
-    {        
+    {
         //PlayerInput
-        if (live_charStats.currentPlayer_Input != null) live_charStats.currentPlayer_Input.InputClass();
-
-        /*//FieldOfView        
-        if (live_charStats.currentFieldOfView != null) { StartCoroutine(live_charStats.currentFieldOfView.FOVRoutine()); }
-*/
-        //LiveCharStats_Base.FieldOfViewTarget(live_charStats);
-        StartCoroutine(FOVRoutine());
-
-       /* //AIController
-        if (live_charStats.currentAIController != null && !live_charStats.playerInputEnable)
+        if (live_charStats.currentPlayer_Input != null)
         {
-            StartCoroutine(LiveCharStats_Base.FOVRoutine(live_charStats));
-
-            StartCoroutine(live_charStats.currentAIController.AIControllerRoutine()); 
+            live_charStats.currentPlayer_Input.InputClass();
         }
-*/
+
         if (!live_charStats.isDead) //Jeœli ¿yje
-        {   
+        {
+            //AIController
+            if (live_charStats.currentNavMeshAgent != null && !live_charStats.playerInputEnable) //Jeœli PplayerInput (3rd person view) nie jest w³¹czony
+            {
+                StartCoroutine(AIControllerRoutine());
+            }
+
             //MeeleAttack
             if (live_charStats.inputAttacking) StartCoroutine(MeeleAttack());
 
             //RotatePlayer
-            if (live_charStats.playerInputEnable && live_charStats.isPlayer) { live_charStats.currentcharacterMovement.RotatePlayer(); }    //Rotate musi byæ w update bo inaczej dziej¹ siê cyrki
+            if (live_charStats.playerInputEnable && live_charStats.isPlayer) { LiveCharStats_Base.RotatePlayer(live_charStats); }    //Rotate musi byæ w update bo inaczej dziej¹ siê cyrki            
+            //if (live_charStats.playerInputEnable && live_charStats.isPlayer) { live_charStats.currentcharacterMovement.RotatePlayer(); }    //Rotate musi byæ w update bo inaczej dziej¹ siê cyrki
 
             //Reset/SetPosition
             if (live_charStats.inputSetBackupPosition && live_charStats.isPlayer) live_charStats.SetCharacterPosition();
@@ -89,60 +83,34 @@ public class CharControler : MonoBehaviour
 
         //Reset Position
         if (GetComponentInParent<Transform>().transform.position.y <= -5f) live_charStats.ResetCharacterPosition();
-
-        ///////////////////////////////////////////////////////
-
-        //Testing
-        //live_charStats.Testing_Z_Key = !live_charStats.Testing_Z_Key;  //w³¹czanie i wy³¹czanie booleana przyciskiem ON/OFF
-        if (live_charStats.isPlayer)
-        {
-            if (Input.GetKeyDown(KeyCode.Comma)) //Testing class get / set 
-            {
-                StaticTestingClass.SimpleDebugTestingCharStats(live_charStats, false);
-                StaticTestingClass.Attacking2(live_charStats);
-            }
-            if (Input.GetKeyDown(KeyCode.KeypadPlus))
-            {
-                StaticTestingClass.AddCurrentHP(live_charStats, 100f);
-            }
-            if (Input.GetKeyDown(KeyCode.KeypadMinus))
-            {
-                live_charStats.currentHP = StaticTestingClass.AddCurrentFloat(live_charStats.currentHP, -100f);
-            }
-            if (Input.GetKeyDown(KeyCode.KeypadMinus) && live_charStats.inputRunning)
-            {
-                live_charStats.currentHP = StaticTestingClass.AddCurrentFloat(live_charStats.currentHP, -100f, 1.2f);
-            }
-        }
-
-       /* //FieldOfView        
-        StartCoroutine(StaticTestingClass.FOVRoutine(live_charStats));
-        //StaticTestingClass.FieldOfViewTarget(live_charStats); 
-*/
-        ///////////////////////////////////////////////////////
+               
+        /*//Testing
+        Testing();*/
     }
-
     private void FixedUpdate()
     {
         if (!live_charStats.isDead)
         {
             //Character Movement
-            if (live_charStats.currentcharacterMovement != null) { live_charStats.currentcharacterMovement.Movement(); }
+            if (live_charStats.currentCharacterController != null && !live_charStats.inputAttacking) { LiveCharStats_Base.Movement(live_charStats); }
+            //if (live_charStats.currentCharacterController != null) { live_charStats.currentcharacterMovement.Movement(); }
 
             //Resource Regen
             live_charStats.ResourcesRegen();
-        }
-        
+        }        
     }
-
 
     void LateUpdate()
     {        
         if (live_charStats.currentXP >= live_charStats.currentNeededXP && live_charStats.isPlayer) live_charStats.LevelGain();
     }
 
-    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+    /// <summary>
+    /// <br>PlayerUpdate class - reload character stars from scriptable object and Character Level</br>
+    /// <br>Also resets all triggers, states and inputs</br>
+    /// </summary>
+    /// <returns></returns>
     public void PlayerUpdate()
     {
         if (live_charStats.isPlayer)
@@ -155,54 +123,61 @@ public class CharControler : MonoBehaviour
             {
                 ResetAllTriggers();
                 ResetInputsAndStates();
-            }
-            
-        }
-        
+            }            
+        }        
     }
 
-    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
+    /// <summary>
+    /// <br>Perform Coroutine FOVRoutine </br>
+    /// <br>Use static LiveCharStats_Base class, contains only: </br>
+    /// <br>Dynamic FieldOfViewCheck</br>
+    /// </summary>
+    /// <returns></returns>
     private IEnumerator FOVRoutine()
     {
-        if (live_charStats.FOV__isSearchingForTarget)
+        if (live_charStats.fov_isSearchingForTarget)
         {
             yield break; // ¿eby nie nadpisywa³ coroutine co klatke
         }
         else
         {
-            live_charStats.FOV__isSearchingForTarget = true;
+            live_charStats.fov_isSearchingForTarget = true;
 
-            yield return new WaitForSeconds(live_charStats.FOV__FOVRoutineDelay);
+            yield return new WaitForSeconds(live_charStats.fov_RoutineDelay);
 
             LiveCharStats_Base.FieldOfViewTarget(live_charStats);
 
-            live_charStats.FOV__isSearchingForTarget = false;
+            live_charStats.fov_isSearchingForTarget = false;
         }
     }
 
-    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-
+    /// <summary>
+    /// <br>Perform Coroutine AIControllerRoutine </br>
+    /// <br>Use static LiveCharStats_Base class, contains: </br>
+    /// <br>Dynamic FieldOfViewCheck, NavMeshAgent Controll, AI Movement</br>
+    /// </summary>
+    /// <returns></returns>
     public IEnumerator AIControllerRoutine()
     {
-        if (live_charStats.navMeAge_isCheckingRoutine)
+        if (live_charStats.navMeAge_isCheckingAIRoutine)
         {
             yield break; // ¿eby nie nadpisywa³ coroutine co klatke
         }
         else
         {
-            live_charStats.navMeAge_isCheckingRoutine = true;
+            live_charStats.navMeAge_isCheckingAIRoutine = true;
 
             yield return new WaitForSeconds(live_charStats.navMeAge_AIRoutineDelay);
 
-           //AIControllerCheck();
-            live_charStats.navMeAge_isCheckingRoutine = false;
+            LiveCharStats_Base.AIControllerCheck(live_charStats);
+            live_charStats.navMeAge_isCheckingAIRoutine = false;
         }
     }
 
-    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
+    /// <summary>
+    /// Perform Coroutine MeeleAttack action current Animator involved
+    /// </summary>
+    /// <returns></returns>
     private IEnumerator MeeleAttack()
     {   //warunki ustalone tak ¿eby przerwaæ coroutine
         if (live_charStats.isAttacking || live_charStats.currentStam <= live_charStats.currentAttackStamCost)
@@ -226,7 +201,10 @@ public class CharControler : MonoBehaviour
         }
     }
 
-
+    /// <summary>
+    /// Perform Coroutine Death Action with Respawn Invoke and reset all Triggers / Inputs / States for current char
+    /// </summary>
+    /// <returns></returns>
     IEnumerator DeathAction()
     {
         live_charStats.isDead = true;
@@ -237,30 +215,22 @@ public class CharControler : MonoBehaviour
             ResetAllTriggers();
             live_charStats.currentAnimator.SetBool("ISDead", live_charStats.isDead);
         }
-        /*if (live_charStats.GetComponent<CharacterMovement>() != null)
-        {
-            live_charStats.gameObject.GetComponent<CharacterMovement>().enabled = false;  //przy smierci wy³¹czanie componentów
-        }
-        if (live_charStats.GetComponent<NavMeshAgent>() != null)
-        {
-            live_charStats.gameObject.GetComponent<NavMeshAgent>().enabled = false;  //przy smierci wy³¹czanie componentów
-        }
-        if (live_charStats.GetComponent<NavMeshObstacle>() != null)
-        {
-            live_charStats.gameObject.GetComponent<NavMeshObstacle>().enabled = false;  //przy smierci wy³¹czanie componentów
-        }*/
+
+        if (live_charStats.inputEnableMouseRotate && live_charStats.isPlayer) { Camera.main.GetComponent<CameraController>().SwitchCursorOptions(); }
         
         live_charStats.currentHP = 0;
 
         yield return new WaitForSeconds(live_charStats.corpseTime);
 
-        Invoke("RespawnAction", live_charStats.respawnTime); //musi byæ invoke poniewa¿ coroutiny przestaj¹ dzia³aæ kiedy object.SetActive(false)!!!
+        Invoke(nameof(RespawnAction), live_charStats.respawnTime); //musi byæ invoke poniewa¿ coroutiny przestaj¹ dzia³aæ kiedy object.SetActive(false)!!!
         ResetInputsAndStates();
         
         gameObject.SetActive(false); //lepiej wygl¹da ale  czasami siê sypie przy respawnie
-
     }
 
+    /// <summary>
+    /// Spawn Resource orb after char death
+    /// </summary>
     void SpawnResourceOrb()
     {
         GameObject resourceOrb = Instantiate(resourcePrefab);
@@ -268,7 +238,11 @@ public class CharControler : MonoBehaviour
         resourceOrb.GetComponent<Rigidbody>().AddForce(Random.Range(-2f, 2f), 2f, Random.Range(-2f, 2f), ForceMode.Impulse); //bounce orba
     }
 
-
+    /// <summary>
+    /// <br>Perform Invoked Respawn Action for current char</br>
+    /// <br>Also resets all triggers, states and inputs</br>
+    /// <br>Reload character stats from scriptable object and Character Level</br>
+    /// </summary>
     void RespawnAction()
     {
         gameObject.SetActive(true);
@@ -282,20 +256,6 @@ public class CharControler : MonoBehaviour
             live_charStats.currentAnimator.SetBool("ISDead", live_charStats.isDead);
         }
 
-        /*if (live_charStats.GetComponent<NavMeshAgent>() != null)
-        {
-            live_charStats.gameObject.GetComponent<NavMeshAgent>().enabled = true;  //przy smierci wy³¹czanie componentów
-            live_charStats.fov_isSearchingForTarget = false; //reset coroutine FOVRoutine przy respawnie, bo pózniej goni playera lub przestaje biegaæ
-
-        }
-        if (live_charStats.GetComponent<NavMeshObstacle>() != null)
-        {
-            live_charStats.gameObject.GetComponent<NavMeshObstacle>().enabled = true;  //przy smierci wy³¹czanie componentów
-        }
-        if (live_charStats.GetComponent<CharacterMovement>() != null)
-        {
-            live_charStats.gameObject.GetComponent<CharacterMovement>().enabled = true;  //przy smierci wy³¹czanie componentów
-        }*/
         if (live_charStats != null )
         {
             if (live_charStats.isPlayer) live_charStats.LoadGame();
@@ -303,12 +263,13 @@ public class CharControler : MonoBehaviour
             {
                 live_charStats.ResetCharacterPosition();
                 live_charStats.LoadCharStats();
-            }
-             
-            
+            } 
         }
     }
 
+    /// <summary>
+    /// Resets all Animator Triggers from current char
+    /// </summary>
     public void ResetAllTriggers() //resetuje wszytkie triggery przy œmierci ¿eby nie skaka³ / uderza³ po respwanie
     {
         foreach (var trigger in live_charStats.currentAnimator.parameters)
@@ -322,6 +283,10 @@ public class CharControler : MonoBehaviour
         live_charStats.currentAnimator.Update(0f);
 
     }
+
+    /// <summary>
+    /// Resets all inputs and states from current char / live_charStats
+    /// </summary>
     public void ResetInputsAndStates()  //resetuje inputy i statsy przy œmierci ¿eby nie skaka³ / uderza³ po respwanie
     {        
         live_charStats.inputMoving = false;
@@ -339,11 +304,40 @@ public class CharControler : MonoBehaviour
         live_charStats.isCasting = false;
 
         live_charStats.fov_isSearchingForTarget = false;
-        live_charStats.navMeAge_isCheckingRoutine= false;
+        live_charStats.navMeAge_isCheckingAIRoutine= false;
        
         live_charStats.spell_OnCoroutine = false;
+
+        if (live_charStats.isPlayer) live_charStats.inputEnableMouseRotate = true;
     }
 
+    /// <summary>
+    /// TestingMethod
+    /// </summary>
+    private void Testing()
+    {
+        //live_charStats.Testing_Z_Key = !live_charStats.Testing_Z_Key;  //w³¹czanie i wy³¹czanie booleana przyciskiem ON/OFF
+        if (live_charStats.isPlayer)
+        {
+            if (Input.GetKeyDown(KeyCode.Comma)) //Testing class get / set 
+            {
+                StaticTestingClass.SimpleDebugTestingCharStats(live_charStats, false);
+                StaticTestingClass.Attacking2(live_charStats);
+            }
+            if (Input.GetKeyDown(KeyCode.KeypadPlus))
+            {
+                StaticTestingClass.AddCurrentHP(live_charStats, 9999f);
+            }
+            if (Input.GetKeyDown(KeyCode.KeypadMinus))
+            {
+                live_charStats.currentHP = StaticTestingClass.AddCurrentFloat(live_charStats.currentHP, -100f);
+            }
+            if (Input.GetKeyDown(KeyCode.KeypadMinus) && live_charStats.inputRunning)
+            {
+                live_charStats.currentHP = StaticTestingClass.AddCurrentFloat(live_charStats.currentHP, -100f, 1.2f);
+            }
+        }
+    }
 
 
     /// <summary>
@@ -364,20 +358,20 @@ public class CharControler : MonoBehaviour
     {
         Handles.color = live_charStats.fov_editorRadiusColor;
         //Handles.DrawWireArc(transform.position, Vector3.up, Vector3.forward, 360, live_charStats.fov_coneRadius, live_charStats.fov_editorLineThickness); //rysowanie lini po okrêgu
-        Handles.DrawSolidArc(transform.position, Vector3.up, Vector3.forward, 360, live_charStats.FOV__MaxSightRadius);  //rysowanie solid okrêgu
+        Handles.DrawSolidArc(transform.position, Vector3.up, Vector3.forward, 360, live_charStats.fov_MaxSightRadius);  //rysowanie solid okrêgu
 
         Handles.color = live_charStats.fov_editorDynamicRadiusColor; //closeSightRadius      
-        Handles.DrawSolidArc(transform.position, Vector3.up, Vector3.forward, 360, live_charStats.FOV__CurrentDynamicSightRadius);  //rysowanie solid okrêgu
+        Handles.DrawSolidArc(transform.position, Vector3.up, Vector3.forward, 360, live_charStats.fov_CurrentDynamicSightRadius);  //rysowanie solid okrêgu
 
         Handles.color = live_charStats.spell_editorAISpellRadiusColor; //SpellAIRange      
-        Handles.DrawSolidArc(transform.position, Vector3.up, Vector3.forward, 360, live_charStats.FOV__spellRange);  //rysowanie solid okrêgu
+        Handles.DrawSolidArc(transform.position, Vector3.up, Vector3.forward, 360, live_charStats.spell_MaxRadius * live_charStats.spell_AISpellRangeFromMax);  //rysowanie solid okrêgu
 
         Handles.color = live_charStats.fov_editorAngleLineColor;
-        Handles.DrawLine(transform.position, transform.position + Quaternion.AngleAxis(-(live_charStats.FOV__CurrentDynamicSightAngle / 2), Vector3.up) * transform.forward * live_charStats.FOV__MaxSightRadius, live_charStats.fov_editorLineThickness);//rysowanie lini left
-        Handles.DrawLine(transform.position, transform.position + Quaternion.AngleAxis((live_charStats.FOV__CurrentDynamicSightAngle / 2), Vector3.up) * transform.forward * live_charStats.FOV__MaxSightRadius, live_charStats.fov_editorLineThickness);//rysowanie lini right
+        Handles.DrawLine(transform.position, transform.position + Quaternion.AngleAxis(-(live_charStats.fov_CurrentDynamicSightAngle / 2), Vector3.up) * transform.forward * live_charStats.fov_MaxSightRadius, live_charStats.fov_editorLineThickness);//rysowanie lini left
+        Handles.DrawLine(transform.position, transform.position + Quaternion.AngleAxis((live_charStats.fov_CurrentDynamicSightAngle / 2), Vector3.up) * transform.forward * live_charStats.fov_MaxSightRadius, live_charStats.fov_editorLineThickness);//rysowanie lini right
 
         Handles.color = live_charStats.fov_editorAngleColor;
-        Handles.DrawSolidArc(transform.position, Vector3.up, /*viewAngleLeft*/Quaternion.AngleAxis(-(live_charStats.FOV__CurrentDynamicSightAngle / 2), Vector3.up) * transform.forward, live_charStats.FOV__CurrentDynamicSightAngle, live_charStats.FOV__CurrentDynamicSightRadius); //rysuje coneAngle view               
+        Handles.DrawSolidArc(transform.position, Vector3.up, /*viewAngleLeft*/Quaternion.AngleAxis(-(live_charStats.fov_CurrentDynamicSightAngle / 2), Vector3.up) * transform.forward, live_charStats.fov_CurrentDynamicSightAngle, live_charStats.fov_CurrentDynamicSightRadius); //rysuje coneAngle view               
                                                                                                                                                                                                                                                                                                           //Quaternion.AngleAxis korzysta z lokalnego transforma zamiast skomplikowanego Mathf.sin/cos
 
         if (live_charStats.navMeAge_walkPointSet)
@@ -386,71 +380,11 @@ public class CharControler : MonoBehaviour
             Handles.DrawLine(transform.position, live_charStats.navMeAge_walkPoint, live_charStats.fov_editorLineThickness);
         }
 
-        if (live_charStats.FOV__targetAquired && live_charStats.FOV__aquiredTargetGameObject != null)
+        if (live_charStats.fov_targetAquired && live_charStats.fov_aquiredTargetGameObject != null)
         {
             Handles.color = live_charStats.fov_editorRaycastColor;
-            Handles.DrawLine(transform.position, live_charStats.FOV__aquiredTargetGameObject.transform.position, live_charStats.fov_editorLineThickness); //rysowanie lini w kierunku playera jeœli nie zas³ania go obstacle Layer
+            Handles.DrawLine(transform.position, live_charStats.fov_aquiredTargetGameObject.transform.position, live_charStats.fov_editorLineThickness); //rysowanie lini w kierunku playera jeœli nie zas³ania go obstacle Layer
         }
     }
-
 #endif
-
-
-
-
-    /*/// <summary>
-    /// GizmosDrawers
-    /// </summary>
-    #if UNITY_EDITOR //zamiast skryptu w Editor
-
-        *//*private void OnDrawGizmos() //rusyje wszystkie
-        {
-            GizmosDrawer();
-        }*//*
-        private void OnDrawGizmosSelected() //rysuje tylko zaznaczone
-        {
-            GizmosDrawer();
-        }
-
-        private void GizmosDrawer()
-        {
-            Handles.color = live_charStats.fov_editorRadiusColor;
-            //Handles.DrawWireArc(transform.position, Vector3.up, Vector3.forward, 360, live_charStats.fov_coneRadius, live_charStats.fov_editorLineThickness); //rysowanie lini po okrêgu
-            Handles.DrawSolidArc(transform.position, Vector3.up, Vector3.forward, 360, live_charStats.fov_MaxSightRadius);  //rysowanie solid okrêgu
-
-            Handles.color = live_charStats.fov_editorDynamicRadiusColor; //closeSightRadius      
-            Handles.DrawSolidArc(transform.position, Vector3.up, Vector3.forward, 360, live_charStats.fov_CurrentDynamicSightRadius);  //rysowanie solid okrêgu
-
-            Handles.color = live_charStats.spell_editorAISpellRadiusColor; //SpellAIRange      
-            Handles.DrawSolidArc(transform.position, Vector3.up, Vector3.forward, 360, live_charStats.spell_MaxRadius * live_charStats.spell_AISpellRangeFromMax);  //rysowanie solid okrêgu
-
-
-            *//*  
-              Vector3 viewAngleLeft = DirectionFromAngle(transform.eulerAngles.y, -live_charStats.fov_coneAngle / 2); //tworzy view angle w lewo od vectora transform.forward do coneAngle/2
-              Vector3 viewAngleRight = DirectionFromAngle(transform.eulerAngles.y, live_charStats.fov_coneAngle / 2); //tworzy view angle w prawo od vectora transform.forward do coneAngle/2
-      *//*
-
-            Handles.color = live_charStats.fov_editorAngleLineColor;
-            Handles.DrawLine(transform.position, transform.position + Quaternion.AngleAxis(-(live_charStats.fov_CurrentDynamicSightAngle / 2), Vector3.up) * transform.forward * live_charStats.fov_MaxSightRadius, live_charStats.fov_editorLineThickness);//rysowanie lini left
-            Handles.DrawLine(transform.position, transform.position + Quaternion.AngleAxis((live_charStats.fov_CurrentDynamicSightAngle / 2), Vector3.up) * transform.forward * live_charStats.fov_MaxSightRadius, live_charStats.fov_editorLineThickness);//rysowanie lini right
-
-            Handles.color = live_charStats.fov_editorAngleColor;
-            Handles.DrawSolidArc(transform.position, Vector3.up, *//*viewAngleLeft*//*Quaternion.AngleAxis(-(live_charStats.fov_CurrentDynamicSightAngle / 2), Vector3.up) * transform.forward, live_charStats.fov_CurrentDynamicSightAngle, live_charStats.*//*fov_MaxSightRadius*//*fov_CurrentDynamicSightRadius); //rysuje coneAngle view               
-                                                                                                                                                                                                                                                                                                              //Quaternion.AngleAxis korzysta z lokalnego transforma zamiast skomplikowanego Mathf.sin/cos
-
-            if (live_charStats.navMeAge_walkPointSet)
-            {
-                Handles.color = live_charStats.fov_editorRaycastColor;
-                Handles.DrawLine(transform.position, live_charStats.navMeAge_walkPoint, live_charStats.fov_editorLineThickness);
-            }
-
-            if (live_charStats.navMeAge_targetAquired && live_charStats.fov_aquiredTargetGameObject != null)
-            {
-                Handles.color = live_charStats.fov_editorRaycastColor;
-                Handles.DrawLine(transform.position, live_charStats.fov_aquiredTargetGameObject.transform.position, live_charStats.fov_editorLineThickness); //rysowanie lini w kierunku playera jeœli nie zas³ania go obstacle Layer
-            }
-        }
-
-    #endif*/
-
 }

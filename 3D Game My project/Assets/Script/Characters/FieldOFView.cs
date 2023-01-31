@@ -44,7 +44,7 @@ public class FieldOFView : MonoBehaviour
         {
             if (enemiesArray.Contains(collider.tag))                                        //jeœli ma tag zawarty w arrayu enemiesArray
             {
-                live_charStats.navMeAge_targetInDynamicSightRange = true;                     //target jest w sight range                
+                live_charStats.fov_targetInDynamicSightRange = true;                     //target jest w sight range                
                 Vector3 directionToTarget = (collider.transform.position - transform.position).normalized; //0-1(normalized) ró¿nica pomiêdzy targetem a characterem
                 
                 /*live_charStats.fov_CurrentDynamicSightAngle = Mathf.Lerp(live_charStats.fov_MaxSightAngle, live_charStats.fov_MinSightAngle, Mathf.InverseLerp(live_charStats.fov_MinSightRadius, live_charStats.fov_MaxSightRadius, Vector3.Distance(transform.position, collider.transform.position)));
@@ -59,7 +59,7 @@ public class FieldOFView : MonoBehaviour
                     {   //jeœli raycast do targetu nie jest zas³oniêty przez jakiekolwiek obstacles!!
 
                         live_charStats.fov_aquiredTargetGameObject = collider.gameObject;           //ustawia znaleziony colliderem game objecta jako target
-                        live_charStats.navMeAge_targetAquired = true;
+                        live_charStats.fov_targetAquired = true;
                         
 
                         break;          //najwa¿niejszy jest brake, nie da siê jednoczeœnie porównaæ listy colliderów z Overlapa z list¹ tagów z enemiesArray
@@ -69,21 +69,21 @@ public class FieldOFView : MonoBehaviour
                     else
                     {
                         //live_charStats.fov_aquiredTargetGameObject = null;           //ustawia nie znaleziony colliderem game objecta jako null
-                        live_charStats.navMeAge_targetAquired = false;
+                        live_charStats.fov_targetAquired = false;
                     }
                     
                 }
                 else
                 {
                     //live_charStats.fov_aquiredTargetGameObject = null;           //ustawia nie znaleziony colliderem game objecta jako null
-                    live_charStats.navMeAge_targetAquired = false;
+                    live_charStats.fov_targetAquired = false;
                 }
             }
             else
             {                
-                live_charStats.navMeAge_targetInDynamicSightRange = false;                     //target nie jest w sight range
+                live_charStats.fov_targetInDynamicSightRange = false;                     //target nie jest w sight range
                 live_charStats.fov_aquiredTargetGameObject = null;           //ustawia nie znaleziony colliderem game objecta jako null
-                live_charStats.navMeAge_targetAquired = false;
+                live_charStats.fov_targetAquired = false;
                 
             }
         }               
@@ -100,7 +100,7 @@ public class FieldOFView : MonoBehaviour
         {
             live_charStats.fov_isSearchingForTarget = true;
 
-            yield return new WaitForSeconds(live_charStats.fov_coneRoutineDelay);
+            yield return new WaitForSeconds(live_charStats.fov_RoutineDelay);
             
             
             FieldOfViewCheck();

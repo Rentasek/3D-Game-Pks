@@ -53,85 +53,64 @@ public class CharacterStatus : MonoBehaviour
 
     [Space]
     [Header("Zmienne z NavMeshAgenta")]
-    public float navMeAge_attackRange;
-    public float navMeAge_wanderingRange;
-    public bool navMeAge_targetInSightRange;
-    public bool navMeAge_targetInDynamicSightRange;    
-    public Collider[] navMeAge_TestALLtargetsInDynamicSightRange;
-    public bool navMeAge_targetInAttackRange;
-    public bool navMeAge_targetAquired;
+    public float navMeAge_wanderingRange;    
     public Vector3 navMeAge_spawnPoint;
     public Vector3 navMeAge_walkPoint;
-    public Vector3 navMeAge_mouseWalkPoint;
+    public Vector3 navMeAge_mouseWalkPoint;    
     public bool navMeAge_walkPointSet;
     public float navMeAge_walkPointRange;
-    public LayerMask navMeAge_whatIsGround;
+    public LayerMask navMeAge_whatIsGround;    
     public int navMeAge_failsafeCounter;
     public float navMeAge_patrollingDelay;
     public float navMeAge_AIRoutineDelay;
-    public bool navMeAge_isCheckingRoutine;
-
+    public bool navMeAge_isCheckingAIRoutine;
 
     [Space]
     [Header("Field of View NavMeshAgent")]
+    [Space]
+    [Header("Angle")]
     [Range(0, 360)] public float fov_CurrentDynamicSightAngle;
     [Range(0, 360)] public float fov_MaxSightAngle;
     [Range(0, 360)] public float fov_MinSightAngle;
     public float fov_CurrentVectorDynamicSightAngle;   //wektor aktualnej zmiany wartoœci +/-
+
+    [Space]
+    [Header("Radius")]
     [Range(0, 1)] public float fov_TimeDynamicSightAngle; //ile sekund na ca³y ruch (90->360)
     [Range(0, 100)] public float fov_MinSightRadius;
     [Range(0, 100)] public float fov_MaxSightRadius;
-    [Range(0, 100)] public float fov_CurrentDynamicSightRadius;
-    public float fov_lerpedDistance;
+    [Range(0, 100)] public float fov_CurrentDynamicSightRadius;    
+    public float fov_lerpedDistance;    
     public float fov_CurrentVectorDynamicSightRadius;   //wektor aktualnej zmiany wartoœci +/-
     [Range(0, 5)] public float fov_TimeDynamicSightRadius;
+
+    [Space]
+    [Header("GizmosColor")]    
     [Range(0, 10)] public float fov_editorLineThickness;
     [ColorUsageAttribute(true,true)] public Color fov_editorAngleLineColor; //kolor HDR picker
     [ColorUsageAttribute(true, true)] public Color fov_editorAngleColor; //kolor HDR picker
     [ColorUsageAttribute(true, true)] public Color fov_editorRadiusColor;
     [ColorUsageAttribute(true, true)] public Color fov_editorDynamicRadiusColor;
     [ColorUsageAttribute(true, true)] public Color fov_editorRaycastColor;
-    public float fov_coneRoutineDelay;
+
+    [Space]
+    [Header("Range")]
+    public bool fov_targetInAttackRange;
+    public float fov_attackRange;
+    public bool fov_targetInDynamicSightRange;
+    public bool fov_inSpellkRange;
+
+    [Space]
+    [Header("Utils")]
+    public Collider[] fov_allTargetsInDynamicSightRange;
+    [Space]
+    public List<Collider> fov_enemyTargetsInDynamicSightRange;
+    [Space]
+    public float fov_RoutineDelay;
     public LayerMask fov_obstaclesLayerMask;    
     public GameObject fov_aquiredTargetGameObject;
     public bool fov_isSearchingForTarget;
-
-    [Space]
-    [Header("New Field of View")]
-    [Space]
-    [Header("Angle")]
-    [Range(0, 360)] public float FOV__CurrentDynamicSightAngle;
-    [Range(0, 360)] public float FOV__MaxSightAngle;
-    [Range(0, 360)] public float FOV__MinSightAngle;
-    public float FOV__CurrentVectorDynamicSightAngle;   //wektor aktualnej zmiany wartoœci +/-    
-    [Range(0, 1)] public float FOV__TimeDynamicSightAngle; //ile sekund na ca³y ruch (90->360)
-    [Space]
-    [Header("Radius")]
-    [Range(0, 100)] public float FOV__MinSightRadius;
-    [Range(0, 100)] public float FOV__MaxSightRadius;
-    [Range(0, 100)] public float FOV__CurrentDynamicSightRadius;
-    public float FOV__lerpedDistance;
-    public float FOV__CurrentVectorDynamicSightRadius;   //wektor aktualnej zmiany wartoœci +/-
-    [Range(0, 5)] public float FOV__TimeDynamicSightRadius;
-    [Space]
-    [Header("Range")]
-    public bool FOV__enemyInDynamicSightRange;
-    public float FOV__attackRange;
-    public bool FOV__inAttackRange;
-    public float FOV__spellRange;
-    public bool FOV__inSpellkRange;
-    [Space]
-    [Header("Utils")]
-    public float FOV__FOVRoutineDelay;
-    public Collider[] FOV__allTargetsInDynamicSightRange;
-    [Space]
-    public List <Collider> FOV__enemyTargetsInDynamicSightRange;
-    public LayerMask FOV__obstaclesLayerMask;
-    public GameObject FOV__aquiredTargetGameObject;
-    public bool FOV__targetAquired;
-    public bool FOV__isSearchingForTarget;
-    
-
+    public bool fov_targetAquired;   
 
     [Space]
     [Header("Character Speed")]
@@ -142,6 +121,7 @@ public class CharacterStatus : MonoBehaviour
     public float currentJumpStamCost;
     public bool currentJumpMode_J_ = true;
     public float currentJumpDeltaTime;
+    public bool currentGravityEnabled = true;
     public float currentGravity;
     public Vector3 currentBackupPosition;
     public Quaternion currentBackupRotation;
@@ -201,48 +181,17 @@ public class CharacterStatus : MonoBehaviour
     [CanBeNull] public Animator currentAnimator;
     [CanBeNull] public CharacterController currentCharacterController;
     [CanBeNull] public Player_Input currentPlayer_Input;
-    [CanBeNull] public FieldOFView currentFieldOfView;
     [CanBeNull] public NavMeshAgent currentNavMeshAgent;
-    [CanBeNull] public AIController currentAIController;
     [CanBeNull] public AudioSource currentAudioSource;
-    [CanBeNull] public CharacterMovement currentcharacterMovement;
     public ScrObj_charStats scrObj_CharStats;
     [CanBeNull] public MeeleAttack[] currentMeeleColliders;
     public CharacterBonusStats currentCharacterBonusStats;
-
-
-    /*private void OnEnable()
-    {
-        if (isPlayer) LoadLevel();
-        LoadCharStats();
-    }    */
-
-    /*private void Start()
-    {        
-        SetCharacterPosition();
-    }*/
-
-    // Update is called once per frame
-    /*void LateUpdate()
-    {         
-        if(!isDead) ResourcesRegen();
-        if (currentXP >= currentNeededXP && isPlayer) LevelGain();        
-
-    }*/
-   /* private void Update()
-    {
-        if (Input.GetKeyDown(KeyCode.Alpha0)) scrObj_CharStats.baseHP += 1f; //testing
-    }*/
-
-
 
     public void LoadCharStats()
     {
         //Info
         currentCharName = scrObj_CharStats.charName;
         isPlayer = Camera.main.GetComponent<CameraController>().player == gameObject;
-        
-
 
         //Movement
         currentMoveSpeed = scrObj_CharStats.moveSpeed;
@@ -257,13 +206,11 @@ public class CharacterStatus : MonoBehaviour
         inputRotateSensivity = scrObj_CharStats.inputRotateSensivity;
 
         //NavMesh
-        navMeAge_attackRange = scrObj_CharStats.navMeAge_attackRange;
+        fov_attackRange = scrObj_CharStats.navMeAge_attackRange;
         navMeAge_wanderingRange = scrObj_CharStats.navMeAge_wanderingRange;
         navMeAge_walkPointRange = scrObj_CharStats.navMeAge_walkPointRange;
         navMeAge_whatIsGround = scrObj_CharStats.navMeAge_whatIsGround;
         navMeAge_patrollingDelay = scrObj_CharStats.navMeAge_patrollingDelay;
-        
-
 
         //FoV NavMesh
         fov_MaxSightAngle = scrObj_CharStats.fov_MaxSightAngle;
@@ -278,7 +225,7 @@ public class CharacterStatus : MonoBehaviour
         fov_editorRadiusColor = scrObj_CharStats.fov_editorRadiusColor;
         fov_editorDynamicRadiusColor = scrObj_CharStats.fov_editorDynamicRadiusColor;
         fov_editorRaycastColor = scrObj_CharStats.fov_editorRaycastColor;
-        fov_coneRoutineDelay = scrObj_CharStats.fov_coneRoutineDelay;
+        fov_RoutineDelay = scrObj_CharStats.fov_coneRoutineDelay;
         fov_obstaclesLayerMask = scrObj_CharStats.fov_obstaclesLayerMask;
 
         //Mask
@@ -301,17 +248,13 @@ public class CharacterStatus : MonoBehaviour
         currentAttackStamCost = scrObj_CharStats.attackStamCost + (scrObj_CharStats.attackStamCost * (currentCharLevel/2f * scrObj_CharStats.MultiplierDamageCombo));
         currentSpell_Damage = scrObj_CharStats.baseSpell_Damage + (scrObj_CharStats.baseSpell_Damage * (currentCharLevel * scrObj_CharStats.MultiplierSpell_Damage)) + (scrObj_CharStats.baseSpell_Damage * (currentCharacterBonusStats.bonus_Spell_Damage * scrObj_CharStats.MultiplierSpell_Damage)); //+bonus
         currentSpell_MPCost = scrObj_CharStats.baseSpell_MPCost + (scrObj_CharStats.baseSpell_Damage * (currentCharLevel * scrObj_CharStats.MultiplierSpell_Damage));
-        
 
         //Objects
         if (GetComponent<Animator>() != null) currentAnimator = GetComponent<Animator>();                     //ci¹gnie componenty z przypiêtych do chara
-        if (GetComponent<CharacterController>() != null) currentCharacterController = GetComponent<CharacterController>();        
-        if (GetComponent<FieldOFView>() != null) currentFieldOfView = GetComponent<FieldOFView>();
+        if (GetComponent<CharacterController>() != null) currentCharacterController = GetComponent<CharacterController>();
         if (GetComponent<Player_Input>() != null) currentPlayer_Input = GetComponent<Player_Input>();
-        if (GetComponent<NavMeshAgent>()!= null) currentNavMeshAgent = GetComponent<NavMeshAgent>();
-        if (GetComponent<AIController>() != null) currentAIController = GetComponent<AIController>();
-        if (GetComponent<AudioSource>() != null) currentAudioSource = GetComponent<AudioSource>();
-        if (GetComponent<CharacterMovement>() != null) currentcharacterMovement = GetComponent<CharacterMovement>();
+        if (GetComponent<NavMeshAgent>()!= null) currentNavMeshAgent = GetComponent<NavMeshAgent>();        
+        if (GetComponent<AudioSource>() != null) currentAudioSource = GetComponent<AudioSource>();        
         if (GetComponentInChildren<MeeleAttack>() != null) currentMeeleColliders = GetComponentsInChildren<MeeleAttack>();
         if (GetComponent<CharacterBonusStats>() != null) currentCharacterBonusStats = GetComponent<CharacterBonusStats>();
 
@@ -423,6 +366,7 @@ public class CharacterStatus : MonoBehaviour
     {
         currentBackupPosition = new Vector3(transform.position.x, transform.position.y + 0.5f, transform.position.z); //y+0.5f ¿eby zrespi³ siê powy¿ej terrain
         currentBackupRotation = transform.rotation;
+        navMeAge_spawnPoint = transform.position;
     }
 
     ///////////////////////////////

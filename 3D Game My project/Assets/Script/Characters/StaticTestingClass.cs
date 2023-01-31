@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Unity.VisualScripting;
 using UnityEditor;
-using UnityEditor.PackageManager.UI;
+//using UnityEditor.PackageManager.UI;
 using UnityEngine;
 /// <summary>
 /// Prosta testowa statyczna klasa :)
