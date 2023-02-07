@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Linq;
+using TMPro;
 using Unity.VisualScripting;
 using UnityEngine;
 
@@ -36,37 +37,14 @@ public static class LiveCharStats_Base
     {
         live_charStats.fov_allTargetsInDynamicSightRange = Physics.OverlapSphere(live_charStats.gameObject.transform.position, live_charStats.fov_CurrentDynamicSightRadius);
 
+        //sprawdzanie czy jest enemy przed wrzucaniem targetu, musi być brake po (targetInDynamicRange = true) i zwrócony boolean, bez tego prawdopodobnie się nadpisuje i przeciwnik nie reaguje na gracza
+
         foreach (Collider collider in Physics.OverlapSphere(live_charStats.gameObject.transform.position, live_charStats.fov_CurrentDynamicSightRadius)) //dla każdego collidera w zasięgu wzroku
         {
             if (live_charStats.currentEnemiesArray.Contains(collider.tag))    //jeśli ma tag zawarty w arrayu enemiesArray
             {
-                live_charStats.fov_targetInDynamicSightRange = true;    //target jest w sight range 
-
-                Vector3 directionToTarget = (collider.transform.position - live_charStats.gameObject.transform.position).normalized; //0-1(normalized) różnica pomiędzy targetem a characterem
-
-                if (Vector3.Angle(live_charStats.gameObject.transform.forward, directionToTarget) < live_charStats.fov_CurrentDynamicSightAngle / 2) //sprawdzanie angle wektora forward charactera i direction to target
-                                                                                                                                                     //target może być na + albo - od charactera dlatego w każdą stronę angle / 2
-                {
-                    if (!Physics.Raycast(live_charStats.gameObject.transform.position, directionToTarget, live_charStats.fov_CurrentDynamicSightRadius, live_charStats.fov_obstaclesLayerMask))
-                    {
-                        //jeśli raycast do targetu nie jest zasłonięty przez jakiekolwiek obstacles!!
-                        live_charStats.fov_aquiredTargetGameObject = collider.gameObject;           //ustawia znaleziony colliderem game objecta jako target
-                        live_charStats.fov_targetAquired = true;
-                        break;          //najważniejszy jest brake, nie da się jednocześnie porównać listy colliderów z Overlapa z listą tagów z enemiesArray
-                                        //foreach sprawdza wszystkie collidery jeśli trafi => target bool = true, ale że sprawdza wszystkie collidery
-                                        //to trafia i pudłuje cały czas, dlatego trzeba foreacha zatrzymać breakiem kiedy trafi !!!
-                    }
-                    else
-                    {
-                        //live_charStats.fov_aquiredTargetGameObject = null;           //ustawia nie znaleziony colliderem game objecta jako null
-                        live_charStats.fov_targetAquired = false;
-                    }
-                }
-                else
-                {
-                    //live_charStats.fov_aquiredTargetGameObject = null;           //ustawia nie znaleziony colliderem game objecta jako null
-                    live_charStats.fov_targetAquired = false;
-                }
+                live_charStats.fov_targetInDynamicSightRange = true;    //target jest w sight range                 
+                break;
             }
             else
             {
@@ -75,6 +53,124 @@ public static class LiveCharStats_Base
                 live_charStats.fov_targetAquired = false;
             }
         }
+
+        if (live_charStats.fov_targetInDynamicSightRange)
+        {
+            foreach (Collider collider in Physics.OverlapSphere(live_charStats.gameObject.transform.position, live_charStats.fov_CurrentDynamicSightRadius)) //dla każdego collidera w zasięgu wzroku
+            {
+                if (live_charStats.currentEnemiesArray.Contains(collider.tag))    //jeśli ma tag zawarty w arrayu enemiesArray
+                {
+                    //live_charStats.fov_targetInDynamicSightRange = true;    //target jest w sight range 
+
+                    Vector3 directionToTarget = (collider.transform.position - live_charStats.gameObject.transform.position).normalized; //0-1(normalized) różnica pomiędzy targetem a characterem
+
+                    if (Vector3.Angle(live_charStats.gameObject.transform.forward, directionToTarget) < live_charStats.fov_CurrentDynamicSightAngle / 2) //sprawdzanie angle wektora forward charactera i direction to target
+                                                                                                                                                         //target może być na + albo - od charactera dlatego w każdą stronę angle / 2
+                    {
+                        if (!Physics.Raycast(live_charStats.gameObject.transform.position, directionToTarget, live_charStats.fov_CurrentDynamicSightRadius, live_charStats.fov_obstaclesLayerMask))
+                        {
+                            //jeśli raycast do targetu nie jest zasłonięty przez jakiekolwiek obstacles!!
+                            live_charStats.fov_aquiredTargetGameObject = collider.gameObject;           //ustawia znaleziony colliderem game objecta jako target
+                            live_charStats.fov_targetAquired = true;
+                            break;          //najważniejszy jest brake, nie da się jednocześnie porównać listy colliderów z Overlapa z listą tagów z enemiesArray
+                                            //foreach sprawdza wszystkie collidery jeśli trafi => target bool = true, ale że sprawdza wszystkie collidery
+                                            //to trafia i pudłuje cały czas, dlatego trzeba foreacha zatrzymać breakiem kiedy trafi !!!
+                        }
+                        else
+                        {
+                            //live_charStats.fov_aquiredTargetGameObject = null;           //ustawia nie znaleziony colliderem game objecta jako null
+                            live_charStats.fov_targetAquired = false;
+                        }
+                    }
+                    else
+                    {
+                        //live_charStats.fov_aquiredTargetGameObject = null;           //ustawia nie znaleziony colliderem game objecta jako null
+                        live_charStats.fov_targetAquired = false;
+                    }
+                }
+                /*else
+                {
+                    live_charStats.fov_targetInDynamicSightRange = false;                     //target nie jest w sight range
+                    live_charStats.fov_aquiredTargetGameObject = null;           //ustawia nie znaleziony colliderem game objecta jako null
+                    live_charStats.fov_targetAquired = false;
+                }*/
+            }
+        }        
+        
+        ///Nie działa do końca i jest wolniejsze od foreach !!!
+        ///
+        /*live_charStats.fov_enemyTargetsInDynamicSightRange.Clear();
+        
+        foreach (Collider collider in live_charStats.fov_allTargetsInDynamicSightRange)
+        {
+            if (live_charStats.currentEnemiesArray.Contains(collider.tag))    //jeśli ma tag zawarty w arrayu enemiesArray
+            {
+                live_charStats.fov_targetInDynamicSightRange = true;
+                break;
+            }
+            else
+            {
+                live_charStats.fov_targetInDynamicSightRange = false;
+                live_charStats.fov_aquiredTargetGameObject = null;           //ustawia nie znaleziony colliderem game objecta jako null
+                live_charStats.fov_targetAquired = false;
+            }
+        }
+
+        if(live_charStats.fov_targetInDynamicSightRange == true)
+        {
+            for (int i = 0; i < Physics.OverlapSphere(live_charStats.gameObject.transform.position, live_charStats.fov_CurrentDynamicSightRadius).Length; i++)
+            {
+                for (int j = 0; j < live_charStats.currentEnemiesArray.Length; j++)
+                {
+                    if (Physics.OverlapSphere(live_charStats.gameObject.transform.position, live_charStats.fov_CurrentDynamicSightRadius)[i].CompareTag(live_charStats.currentEnemiesArray[j]))
+                    {
+                        Vector3 directionToTarget = (Physics.OverlapSphere(live_charStats.gameObject.transform.position, live_charStats.fov_CurrentDynamicSightRadius)[i].transform.position - live_charStats.gameObject.transform.position).normalized; //0-1(normalized) różnica pomiędzy targetem a characterem Vector3.normalized ==> vector wyrażony w radianach
+                                                                                                                                                                                                                                                         //sprawdzanie aktualnie ostatniego elementu z listy
+                        if (Vector3.Angle(live_charStats.gameObject.transform.forward, directionToTarget) < live_charStats.fov_CurrentDynamicSightAngle / 2)
+                        //sprawdzanie angle wektora forward charactera i direction to target
+                        //target może być na + albo - od charactera dlatego w każdą stronę angle / 2
+                        {
+                            //if (!Physics.Raycast(transform.position, directionToTarget, breath_currentFireRadius, live_charStats.fov_obstaclesLayerMask))    //dodatkowo sprawdza Raycastem czy nie ma przeszkody pomiędzy playerem a targetem //  
+                            if (live_charStats.fov_enemyTargetsInDynamicSightRange.IndexOf(Physics.OverlapSphere(live_charStats.gameObject.transform.position, live_charStats.fov_CurrentDynamicSightRadius)[i]) < 0) //sprawdza czy nie ma na liście. Jeżeli IndexOf < 0 czyli nie ma obiektów z tym indexem
+                            {
+                                live_charStats.fov_enemyTargetsInDynamicSightRange.Add(Physics.OverlapSphere(live_charStats.gameObject.transform.position, live_charStats.fov_CurrentDynamicSightRadius)[i]); //przypisuje do listy colliders jeśli ma taga z listy enemies                           
+
+                            }
+                            else
+                            {
+                                live_charStats.fov_enemyTargetsInDynamicSightRange.Remove(Physics.OverlapSphere(live_charStats.gameObject.transform.position, live_charStats.fov_CurrentDynamicSightRadius)[i]);
+                            }
+
+                            if (!Physics.Raycast(live_charStats.gameObject.transform.position, directionToTarget, live_charStats.fov_CurrentDynamicSightRadius, live_charStats.fov_obstaclesLayerMask))
+                            {
+                                //jeśli raycast do targetu nie jest zasłonięty przez jakiekolwiek obstacles!!
+                                live_charStats.fov_aquiredTargetGameObject = live_charStats.fov_enemyTargetsInDynamicSightRange.ElementAt(0).gameObject;           //ustawia znaleziony colliderem game objecta jako target
+                                live_charStats.fov_targetAquired = true;
+                            }
+                            else
+                            {
+                                live_charStats.fov_aquiredTargetGameObject = null;           //ustawia nie znaleziony colliderem game objecta jako null
+                                live_charStats.fov_targetAquired = false;
+                            }
+                        }
+                    }
+                    else
+                    {
+                        live_charStats.fov_aquiredTargetGameObject = null;           //ustawia nie znaleziony colliderem game objecta jako null
+                        live_charStats.fov_targetAquired = false;
+                    }
+                }
+            }
+
+            if (live_charStats.fov_enemyTargetsInDynamicSightRange.Count() <= 0)
+            {
+                live_charStats.fov_targetInDynamicSightRange = false;       //jeśli nie ma żadnych targetów w zasięgu
+                live_charStats.fov_aquiredTargetGameObject = null;           //ustawia nie znaleziony colliderem game objecta jako null
+                live_charStats.fov_targetAquired = false;
+            }
+        }*/
+
+
     }
 
     private static void DynamicSightRangeScalling(CharacterStatus live_charStats)
@@ -141,10 +237,10 @@ public static class LiveCharStats_Base
     /// <returns></returns>    
     public static void AIControllerCheck(CharacterStatus live_charStats)
     {
-        if (!live_charStats.inputCasting) //nie zmniejsza range jeśli castuje
-        {
-            DynamicSightRangeScalling(live_charStats);
-        }
+        /* if (!live_charStats.inputCasting) //nie zmniejsza range jeśli castuje
+         {
+             DynamicSightRangeScalling(live_charStats);
+         }*/
 
         //wyłączone player input na postaci gracza
         if (!live_charStats.playerInputEnable && live_charStats.currentNavMeshAgent.enabled && live_charStats.isPlayer)
@@ -153,9 +249,11 @@ public static class LiveCharStats_Base
 
             if (!live_charStats.inputMouseCurrentMoving && !live_charStats.inputCasting)     //mouse input -> wyłącza CheckTagetInRange //dodatkowo input casting
             {
-                CheckForTargetInDynamicSightRange(live_charStats);
+                /*CheckForTargetInDynamicSightRange(live_charStats);
                 CheckForTargetInSpellRange(live_charStats);
-                CheckForTargetInAttackRange(live_charStats);                
+                CheckForTargetInAttackRange(live_charStats);   */
+
+                FieldOfViewTarget(live_charStats);
             }
 
             if (live_charStats.isAttacking)
@@ -165,10 +263,16 @@ public static class LiveCharStats_Base
                 {
                     live_charStats.gameObject.transform.LookAt(live_charStats.fov_aquiredTargetGameObject.transform);//Enemy jest zwrócony w stronę Playera
                     live_charStats.navMeAge_walkPoint = live_charStats.fov_aquiredTargetGameObject.transform.position;
+                    StopMovementNavMeshAgent(live_charStats);
                 }
             }
+            else live_charStats.currentNavMeshAgent.isStopped = false; //żeby odblokować agenta po atakowaniu
+
             // Jeśli dystans do walkPoint jest mniejszy niż 1f resetuje walkPointSet (wykorzystanie live_charStats.currentNavMeshAgent.*)            
-            if (live_charStats.currentNavMeshAgent.remainingDistance <= live_charStats.fov_attackRange) { live_charStats.navMeAge_walkPoint = live_charStats.gameObject.transform.position; }
+            if (live_charStats.currentNavMeshAgent.remainingDistance <= live_charStats.fov_attackRange)
+            {
+                live_charStats.navMeAge_walkPoint = live_charStats.gameObject.transform.position;
+            }
 
             if (live_charStats.fov_targetInDynamicSightRange && !live_charStats.fov_targetInAttackRange) Chasing(live_charStats); // player bez inputa ściga tylko przy close sight range
 
@@ -178,9 +282,10 @@ public static class LiveCharStats_Base
         //wyłączone player input na każdej innej postaci
         if (!live_charStats.playerInputEnable && live_charStats.currentNavMeshAgent.enabled && !live_charStats.isPlayer)
         {
-            CheckForTargetInDynamicSightRange(live_charStats);
-            CheckForTargetInSpellRange(live_charStats);
-            CheckForTargetInAttackRange(live_charStats);            
+            /* CheckForTargetInDynamicSightRange(live_charStats);
+             CheckForTargetInSpellRange(live_charStats);
+             CheckForTargetInAttackRange(live_charStats);    */
+            FieldOfViewTarget(live_charStats);
 
             if (!live_charStats.fov_targetInDynamicSightRange && !live_charStats.fov_targetAquired && !live_charStats.fov_targetInAttackRange && !live_charStats.inputCasting) Patrolling(live_charStats);
 
@@ -204,14 +309,12 @@ public static class LiveCharStats_Base
             if (live_charStats.fov_targetInDynamicSightRange && live_charStats.fov_targetInAttackRange && !live_charStats.inputCasting) Attacking(live_charStats);
         }
 
-        if (live_charStats.isDead) { StopMovementNavMeshAgent(live_charStats); }  //Stop Nav Mesh Agent przy śmierci
-
-        
-
+        if (live_charStats.isDead) { StopMovementNavMeshAgent(live_charStats); } //Stop Nav Mesh Agent przy śmierci        
     }
 
     private static void Patrolling(CharacterStatus live_charStats)
     {
+        live_charStats.currentNavMeshAgent.isStopped = false; //żeby odblokować agenta
         //jeśli walkPoint nie jest ustawiony        
         if (!live_charStats.navMeAge_walkPointSet) SearchForWalkPoint(live_charStats);
         //jeśli walkPoint jest ustawiony
@@ -254,6 +357,7 @@ public static class LiveCharStats_Base
 
     public static void Chasing(CharacterStatus live_charStats) //w Sight Range poza Attack Range
     {
+        live_charStats.currentNavMeshAgent.isStopped = false; //żeby odblokować agenta
         if (live_charStats.fov_aquiredTargetGameObject != null)//debug
         {
             live_charStats.currentNavMeshAgent.SetDestination(live_charStats.fov_aquiredTargetGameObject.transform.position);
@@ -270,11 +374,12 @@ public static class LiveCharStats_Base
         }
     }
 
-    public static void StopMovementNavMeshAgent(CharacterStatus live_charStats)
+    public static void StopMovementNavMeshAgent(CharacterStatus live_charStats) //debugging żeby nie próbował uciekać
     {
-        live_charStats.navMeAge_walkPoint = live_charStats.gameObject.transform.position; //debugging żeby nie próbował uciekać
-
+        live_charStats.navMeAge_walkPoint = live_charStats.gameObject.transform.position;
         live_charStats.currentNavMeshAgent.SetDestination(live_charStats.navMeAge_walkPoint);
+
+        //live_charStats.currentNavMeshAgent.isStopped = true;
     }
 
     private static void Attacking(CharacterStatus live_charStats)
