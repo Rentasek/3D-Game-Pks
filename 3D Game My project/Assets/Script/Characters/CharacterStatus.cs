@@ -253,11 +253,14 @@ public class CharacterStatus : MonoBehaviour
         if (GetComponent<Animator>() != null) currentAnimator = GetComponent<Animator>();                     //ci¹gnie componenty z przypiêtych do chara
         if (GetComponent<CharacterController>() != null) currentCharacterController = GetComponent<CharacterController>();
         if (GetComponent<Player_Input>() != null) currentPlayer_Input = GetComponent<Player_Input>();
-        if (GetComponent<NavMeshAgent>()!= null) currentNavMeshAgent = GetComponent<NavMeshAgent>();        
+        if (GetComponent<NavMeshAgent>() != null) 
+        {
+            currentNavMeshAgent = GetComponent<NavMeshAgent>();
+            currentNavMeshAgent.stoppingDistance = fov_attackRange;
+        }
         if (GetComponent<AudioSource>() != null) currentAudioSource = GetComponent<AudioSource>();        
         if (GetComponentInChildren<MeeleAttack>() != null) currentMeeleColliders = GetComponentsInChildren<MeeleAttack>();
         if (GetComponent<CharacterBonusStats>() != null) currentCharacterBonusStats = GetComponent<CharacterBonusStats>();
-
 
     }
 

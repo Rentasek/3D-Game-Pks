@@ -70,7 +70,7 @@ public class Player_Input : MonoBehaviour
                 live_charStats.fov_targetInDynamicSightRange = false;      //debugging ¿eby nie blokowa³ siê przy atakowaniu
                 live_charStats.isAttacking = false;                     //debugging ¿eby nie blokowa³ siê przy atakowaniu
                 live_charStats.inputAttacking = false;                  //debugging ¿eby nie blokowa³ siê przy atakowaniu
-                live_charStats.fov_targetAquired = true;             //debugging ¿eby nie blokowa³ siê przy atakowaniu
+                live_charStats.fov_targetAquired = true;             //debugging ¿eby nie blokowa³ siê przy atakowaniu                
             }
         }
 
@@ -89,6 +89,7 @@ public class Player_Input : MonoBehaviour
             live_charStats.fov_targetAquired = true;             //debugging ¿eby nie blokowa³ siê przy atakowaniu
             live_charStats.isRunning= false;
             live_charStats.breath_CanBreath = live_charStats.inputCasting;
+            live_charStats.currentNavMeshAgent.isStopped = true;
 
         }
 

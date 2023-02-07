@@ -163,8 +163,7 @@ public class UI_CharStatsPanel : MonoBehaviour, IPlayerUpdate
                     selectedStatCurrentName[i] = "XP Needed to next Level";
 
                     break;
-            }
-
+            }            
             //Debug.Log(charStat[i] + " : " + selectedStatCurrentFloat[i]);
         }
 

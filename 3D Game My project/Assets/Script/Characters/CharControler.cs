@@ -216,7 +216,7 @@ public class CharControler : MonoBehaviour
             live_charStats.currentAnimator.SetBool("ISDead", live_charStats.isDead);
         }
 
-        if (live_charStats.inputEnableMouseRotate && live_charStats.isPlayer) { Camera.main.GetComponent<CameraController>().SwitchCursorOptions(); }
+        //if (live_charStats.inputEnableMouseRotate && live_charStats.isPlayer) { Camera.main.GetComponent<CameraController>().SwitchCursorOptions(); }
         
         live_charStats.currentHP = 0;
 
@@ -305,10 +305,10 @@ public class CharControler : MonoBehaviour
 
         live_charStats.fov_isSearchingForTarget = false;
         live_charStats.navMeAge_isCheckingAIRoutine= false;
-       
+
         live_charStats.spell_OnCoroutine = false;
 
-        if (live_charStats.isPlayer) live_charStats.inputEnableMouseRotate = true;
+        //if (live_charStats.isPlayer) live_charStats.inputEnableMouseRotate = true;
     }
 
     /// <summary>

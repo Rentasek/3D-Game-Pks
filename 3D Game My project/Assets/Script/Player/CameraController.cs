@@ -117,7 +117,7 @@ public partial class CameraController : MonoBehaviour
     }    
 
     public void SearchForPlayer()
-    {        
+    {       
         player = GameObject.FindGameObjectWithTag("Player");       //szuka tylko po aktywnych objectach z Tagiem Player
         
         if (player != null)
@@ -137,9 +137,6 @@ public partial class CameraController : MonoBehaviour
             live_charStats.isPlayer = true;
             player.GetComponent<CharControler>().PlayerUpdate();
             
-            Cursor.lockState = CursorLockMode.None; //Coby da³o siê klikaæ po zmianie chara
-            Cursor.visible = true;
-
             //Podmianka UI Status barów na aktulnego playera
             if (playerStatusBars != null)
             {
@@ -148,6 +145,8 @@ public partial class CameraController : MonoBehaviour
                     playerStatusBar.live_charStats = live_charStats;
                 }
             }
-        }        
+        }
+        Cursor.lockState = CursorLockMode.None; //Coby da³o siê klikaæ po zmianie chara
+        Cursor.visible = true;
     }
 }
