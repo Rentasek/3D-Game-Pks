@@ -26,11 +26,8 @@ public static class LiveCharStats_Base
         }
 
         CheckForTargetInDynamicSightRange(live_charStats);
-        if (live_charStats.fov_targetInDynamicSightRange && live_charStats.fov_targetAquired)
-        {
-            CheckForTargetInSpellRange(live_charStats);
-            CheckForTargetInAttackRange(live_charStats);
-        }
+        CheckForTargetInSpellRange(live_charStats);
+        CheckForTargetInAttackRange(live_charStats);        
     }
 
     public static void CheckForTargetInDynamicSightRange(CharacterStatus live_charStats)
