@@ -92,6 +92,6 @@ public class ScrObj_charStats : ScriptableObject
     [Space]
     [Header("Target Audio")]    
     public AudioClip damagedEnemy;
-    public AudioClip damagedEnvironment;
+    public AudioClip damagedDestructibles;
 
 }

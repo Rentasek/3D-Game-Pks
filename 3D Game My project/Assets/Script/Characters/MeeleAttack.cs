@@ -74,9 +74,9 @@ public class MeeleAttack : MonoBehaviour
             i++;  //zmienna testing only
 
         }
-        else if (other.CompareTag("Environment") && live_charStats.isAttacking && live_charStats.currentComboMeele == onCombo) 
+        else if (other.CompareTag("Destructibles") && live_charStats.isAttacking && live_charStats.currentComboMeele == onCombo) 
         {
-            audioSource.PlayOneShot(other.GetComponent<CharacterStatus>().scrObj_CharStats.damagedEnvironment, 1);
+            audioSource.PlayOneShot(other.GetComponent<CharacterStatus>().scrObj_CharStats.damagedDestructibles, 1);
 
             //other.GetComponent<Animator>().SetTrigger("IsHit");   animacja hit dla environment -> in da progress
 
