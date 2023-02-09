@@ -80,7 +80,7 @@ public class Spell_FireBreath : MonoBehaviour
     {
         breath_EnemiesArray = new string[live_charStats.currentEnemiesArray.Length + 1]; //tworzy array +1 od current enemies arraya
         live_charStats.currentEnemiesArray.CopyTo(breath_EnemiesArray, 0);              //kopiuje current enemies arraya od indexu 0
-        breath_EnemiesArray[breath_EnemiesArray.Length - 1] = "Environment";            //wstawia jako ostatni index Environment
+        breath_EnemiesArray[breath_EnemiesArray.Length - 1] = "Destructibles";            //wstawia jako ostatni index Destructibles ¿eby zawsze mo¿na by³o go zniszczyæ
     }
 
 
@@ -184,18 +184,21 @@ public class Spell_FireBreath : MonoBehaviour
                         if (Vector3.Angle(transform.forward, directionToTarget) < breath_currentFireAngle / 2)
                         //sprawdzanie angle wektora forward charactera i direction to target
                         //target mo¿e byæ na + albo - od charactera dlatego w ka¿d¹ stronê angle / 2
-                        {
-                            breath_targetInBreathAngle = true;
-                            //if (!Physics.Raycast(transform.position, directionToTarget, breath_currentFireRadius, live_charStats.fov_obstaclesLayerMask))    //dodatkowo sprawdza Raycastem czy nie ma przeszkody pomiêdzy playerem a targetem //  
-                            if (breath_targetColliders.IndexOf(Physics.OverlapSphere(transform.position, breath_currentFireRadius)[i]) < 0) //sprawdza czy nie ma na liœcie. Je¿eli IndexOf < 0 czyli nie ma obiektów z tym indexem
+                        {                            
+                            breath_targetInBreathAngle = true;                            
+                            if (!Physics.Raycast(transform.position, directionToTarget, breath_currentFireRadius, live_charStats.fov_obstaclesLayerMask))    //dodatkowo sprawdza Raycastem czy nie ma przeszkody pomiêdzy playerem a targetem //  
                             {
-                                breath_targetColliders.Add(Physics.OverlapSphere(transform.position, breath_currentFireRadius)[i]); //przypisuje do listy colliders jeœli ma taga z listy enemies
+                                if (breath_targetColliders.IndexOf(Physics.OverlapSphere(transform.position, breath_currentFireRadius)[i]) < 0) //sprawdza czy nie ma na liœcie. Je¿eli IndexOf < 0 czyli nie ma obiektów z tym indexem
+                                {
+                                    breath_targetColliders.Add(Physics.OverlapSphere(transform.position, breath_currentFireRadius)[i]); //przypisuje do listy colliders jeœli ma taga z listy enemies
+                                }
+                                else
+                                {
+                                    breath_targetColliders.Remove(Physics.OverlapSphere(transform.position, breath_currentFireRadius)[i]);
+                                    if (breath_targetColliders.Count() <= 0) breath_targetInBreathAngle = false; //jeœli nie ma ¿adnych targetów w Cone
+                                }
                             }
-                            else
-                            {
-                                breath_targetColliders.Remove(Physics.OverlapSphere(transform.position, breath_currentFireRadius)[i]);
-                                if (breath_targetColliders.Count() <= 0) breath_targetInBreathAngle = false; //jeœli nie ma ¿adnych targetów w Cone
-                            }
+                                
                         }
                     }
                     

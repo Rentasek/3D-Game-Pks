@@ -96,23 +96,9 @@ public static class LiveCharStats_Base
         
         ///Nie działa do końca i jest wolniejsze od foreach !!!
         ///
-        /*live_charStats.fov_enemyTargetsInDynamicSightRange.Clear();
+        /*live_charStats.fov_enemyTargetsInDynamicSightRange.Clear; 
+       
         
-        foreach (Collider collider in live_charStats.fov_allTargetsInDynamicSightRange)
-        {
-            if (live_charStats.currentEnemiesArray.Contains(collider.tag))    //jeśli ma tag zawarty w arrayu enemiesArray
-            {
-                live_charStats.fov_targetInDynamicSightRange = true;
-                break;
-            }
-            else
-            {
-                live_charStats.fov_targetInDynamicSightRange = false;
-                live_charStats.fov_aquiredTargetGameObject = null;           //ustawia nie znaleziony colliderem game objecta jako null
-                live_charStats.fov_targetAquired = false;
-            }
-        }
-
         if(live_charStats.fov_targetInDynamicSightRange == true)
         {
             for (int i = 0; i < Physics.OverlapSphere(live_charStats.gameObject.transform.position, live_charStats.fov_CurrentDynamicSightRadius).Length; i++)
