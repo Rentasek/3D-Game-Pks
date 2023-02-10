@@ -119,7 +119,7 @@ public class UI_SkillFrame : MonoBehaviour, IPlayerUpdate
                 break;
 
             case CharStat.AttSpellDamage:
-                skill_BonusFloat = currentCharacterBonusStats.bonus_Spell_Damage;
+                skill_BonusFloat = currentCharacterBonusStats.bonus_Skill_Damage;
                 skill_OutputFloat = live_charStats.currentSpell_Damage;
                 skill_selectedName = "Spell Damage";
                 skill_Image.GetComponent<Image>().sprite = skillImagesList[5];
@@ -171,7 +171,7 @@ public class UI_SkillFrame : MonoBehaviour, IPlayerUpdate
                 break;
 
             case CharStat.AttSpellDamage:
-                skill_BonusFloat = currentCharacterBonusStats.bonus_Spell_Damage;
+                skill_BonusFloat = currentCharacterBonusStats.bonus_Skill_Damage;
                 skill_OutputFloat = live_charStats.currentSpell_Damage;
                 break;
 
@@ -246,7 +246,7 @@ public class UI_SkillFrame : MonoBehaviour, IPlayerUpdate
                 break;
 
             case CharStat.AttSpellDamage:
-                currentCharacterBonusStats.bonus_Spell_Damage = skill_BonusFloat;
+                currentCharacterBonusStats.bonus_Skill_Damage = skill_BonusFloat;
                 break;
 /*
             case CharStat.SkillPTS:                

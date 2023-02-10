@@ -19,7 +19,7 @@ public class CharacterBonusStats : MonoBehaviour
     
     [Space]
     [Header("Character Magic Combat")]
-    public float bonus_Spell_Damage; //zwiêkszaæ o 0.1f
+    public float bonus_Skill_Damage; //zwiêkszaæ o 0.1f
     //public float bonus_breath_MPCost;  //wpisywaæ wartoœci ujemne
     [Space, Header("Regen From Orbs")]
     public float percentRegen;

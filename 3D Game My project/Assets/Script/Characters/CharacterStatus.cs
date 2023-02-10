@@ -137,7 +137,7 @@ public class CharacterStatus : MonoBehaviour
     [Space]
     [Header("Character Magic Combat")]
     [CanBeNull]public Spell_FireBreath spell;
-    public bool breath_CanBreath;
+    public bool spell_CanCast;
     public float spell_coroutineDelay;
     public bool spell_OnCoroutine;
     [Range(0.2f,1f)]public float spell_AISpellRangeFromMax;
@@ -245,9 +245,12 @@ public class CharacterStatus : MonoBehaviour
         //Damage
         currentAttackCooldown = scrObj_CharStats.attackCooldown;
         currentDamageCombo = scrObj_CharStats.baseDamageCombo + (scrObj_CharStats.baseDamageCombo * (currentCharLevel * scrObj_CharStats.MultiplierDamageCombo)) + (scrObj_CharStats.baseDamageCombo * (currentCharacterBonusStats.bonus_currentDamageCombo * scrObj_CharStats.MultiplierDamageCombo)); //+bonus
-        currentAttackStamCost = scrObj_CharStats.attackStamCost + (scrObj_CharStats.attackStamCost * (currentCharLevel/2f * scrObj_CharStats.MultiplierDamageCombo));
-        currentSpell_Damage = scrObj_CharStats.baseSpell_Damage + (scrObj_CharStats.baseSpell_Damage * (currentCharLevel * scrObj_CharStats.MultiplierSpell_Damage)) + (scrObj_CharStats.baseSpell_Damage * (currentCharacterBonusStats.bonus_Spell_Damage * scrObj_CharStats.MultiplierSpell_Damage)); //+bonus
+        currentAttackStamCost = scrObj_CharStats.attackStamCost + (scrObj_CharStats.attackStamCost * (currentCharLevel/2f * scrObj_CharStats.MultiplierDamageCombo));        
+        currentSpell_Damage = scrObj_CharStats.baseSpell_Damage + (scrObj_CharStats.baseSpell_Damage * (currentCharLevel * scrObj_CharStats.MultiplierSpell_Damage)) + (scrObj_CharStats.baseSpell_Damage * (currentCharacterBonusStats.bonus_Skill_Damage * scrObj_CharStats.MultiplierSpell_Damage)); //+bonus
         currentSpell_MPCost = scrObj_CharStats.baseSpell_MPCost + (scrObj_CharStats.baseSpell_Damage * (currentCharLevel * scrObj_CharStats.MultiplierSpell_Damage));
+        spell_editorAISpellRadiusColor = scrObj_CharStats.spell_editorAISpellRadiusColor;
+        spell_breathAngleColor = scrObj_CharStats.spell_breathAngleColor;
+        spell_breathRaycastColor = scrObj_CharStats.spell_breathRaycastColor;
 
         //Objects
         if (GetComponent<Animator>() != null) currentAnimator = GetComponent<Animator>();                     //ci¹gnie componenty z przypiêtych do chara
@@ -278,7 +281,7 @@ public class CharacterStatus : MonoBehaviour
         //Damage
         currentDamageCombo = scrObj_CharStats.baseDamageCombo + (scrObj_CharStats.baseDamageCombo * (currentCharLevel * scrObj_CharStats.MultiplierDamageCombo)) + (scrObj_CharStats.baseDamageCombo * (currentCharacterBonusStats.bonus_currentDamageCombo * scrObj_CharStats.MultiplierDamageCombo)); //+bonus
         currentAttackStamCost = scrObj_CharStats.attackStamCost + (scrObj_CharStats.attackStamCost * (currentCharLevel / 2f * scrObj_CharStats.MultiplierDamageCombo));
-        currentSpell_Damage = scrObj_CharStats.baseSpell_Damage + (scrObj_CharStats.baseSpell_Damage * (currentCharLevel * scrObj_CharStats.MultiplierSpell_Damage)) + (scrObj_CharStats.baseSpell_Damage * (currentCharacterBonusStats.bonus_Spell_Damage * scrObj_CharStats.MultiplierSpell_Damage)); //+bonus
+        currentSpell_Damage = scrObj_CharStats.baseSpell_Damage + (scrObj_CharStats.baseSpell_Damage * (currentCharLevel * scrObj_CharStats.MultiplierSpell_Damage)) + (scrObj_CharStats.baseSpell_Damage * (currentCharacterBonusStats.bonus_Skill_Damage * scrObj_CharStats.MultiplierSpell_Damage)); //+bonus
         currentSpell_MPCost = scrObj_CharStats.baseSpell_MPCost + (scrObj_CharStats.baseSpell_Damage * (currentCharLevel * scrObj_CharStats.MultiplierSpell_Damage));
         SaveBonusStats();
     }
@@ -342,7 +345,7 @@ public class CharacterStatus : MonoBehaviour
         {
             PlayerPrefs.SetInt("BonusWalkSpeed", (int)currentCharacterBonusStats.bonus_currentWalkSpeed);
             PlayerPrefs.SetInt("BonusDamageCombo", (int)currentCharacterBonusStats.bonus_currentDamageCombo);
-            PlayerPrefs.SetInt("BonusSpellDamage", (int)currentCharacterBonusStats.bonus_Spell_Damage);
+            PlayerPrefs.SetInt("BonusSpellDamage", (int)currentCharacterBonusStats.bonus_Skill_Damage);
             PlayerPrefs.SetInt("BonusMaxHP", (int)currentCharacterBonusStats.bonus_currentMaxHP);
             PlayerPrefs.SetInt("BonusMaxMP", (int)currentCharacterBonusStats.bonus_currentMaxMP);
             PlayerPrefs.SetInt("BonusMaxStam", (int)currentCharacterBonusStats.bonus_currentMaxStam);
@@ -356,7 +359,7 @@ public class CharacterStatus : MonoBehaviour
         {
             currentCharacterBonusStats.bonus_currentWalkSpeed = PlayerPrefs.GetInt("BonusWalkSpeed", 0);
             currentCharacterBonusStats.bonus_currentDamageCombo = PlayerPrefs.GetInt("BonusDamageCombo", 0);
-            currentCharacterBonusStats.bonus_Spell_Damage = PlayerPrefs.GetInt("BonusSpellDamage", 0);
+            currentCharacterBonusStats.bonus_Skill_Damage = PlayerPrefs.GetInt("BonusSpellDamage", 0);
             currentCharacterBonusStats.bonus_currentMaxHP = PlayerPrefs.GetInt("BonusMaxHP", 0);
             currentCharacterBonusStats.bonus_currentMaxMP = PlayerPrefs.GetInt("BonusMaxMP", 0);
             currentCharacterBonusStats.bonus_currentMaxStam = PlayerPrefs.GetInt("BonusMaxStam", 0);

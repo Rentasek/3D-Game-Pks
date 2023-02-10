@@ -45,6 +45,7 @@ public class Spell_FireBreath : MonoBehaviour
     [SerializeField] private float breath_Damage;
     [Space]
     [SerializeField,TagField] private string[] breath_EnemiesArray; //Pozwala na wybór Enemies przy pomocy Tag 
+    [SerializeField] private LayerMask breath_ObstaclesMask; //Obstacles dla spella
     [Space]
     [Header("Audio")]
     [SerializeField] private AudioSource breath_AudioSource;
@@ -78,9 +79,9 @@ public class Spell_FireBreath : MonoBehaviour
 
     private void EnemyArraySelector()
     {
-        breath_EnemiesArray = new string[live_charStats.currentEnemiesArray.Length + 1]; //tworzy array +1 od current enemies arraya
-        live_charStats.currentEnemiesArray.CopyTo(breath_EnemiesArray, 0);              //kopiuje current enemies arraya od indexu 0
-        breath_EnemiesArray[breath_EnemiesArray.Length - 1] = "Destructibles";            //wstawia jako ostatni index Destructibles ¿eby zawsze mo¿na by³o go zniszczyæ
+        breath_EnemiesArray = new string[live_charStats.currentEnemiesArray.Length + 1];    //tworzy array +1 od current enemies arraya
+        live_charStats.currentEnemiesArray.CopyTo(breath_EnemiesArray, 0);                  //kopiuje current enemies arraya od indexu 0
+        breath_EnemiesArray[breath_EnemiesArray.Length - 1] = "Destructibles";              //wstawia jako ostatni index Destructibles ¿eby zawsze mo¿na by³o go zniszczyæ
     }
 
 
@@ -88,7 +89,7 @@ public class Spell_FireBreath : MonoBehaviour
     void Update()
     {
         breath_input = live_charStats.inputCasting; //testing inspector
-        live_charStats.breath_CanBreath = !live_charStats.inputAttacking && !live_charStats.isRunning && live_charStats.currentMoveSpeed != live_charStats.currentRunSpeed;
+        live_charStats.spell_CanCast = !live_charStats.inputAttacking && !live_charStats.isRunning && live_charStats.currentMoveSpeed != live_charStats.currentRunSpeed;
     }
     private void FixedUpdate()
     {
@@ -100,8 +101,7 @@ public class Spell_FireBreath : MonoBehaviour
 
 
             if (live_charStats.currentMP >= 1f)
-            {
-                FireBreathDynamicCone();
+            {                
                 BreathAttackConeCheck();
             }
 
@@ -113,11 +113,11 @@ public class Spell_FireBreath : MonoBehaviour
     private void FireBreathVFX_Audio()
     {
 
-        if (live_charStats.inputCasting && live_charStats.breath_CanBreath && live_charStats.currentMP >= 1f) 
+        if (live_charStats.inputCasting && live_charStats.spell_CanCast && live_charStats.currentMP >= 1f) 
         {
             if (!live_charStats.isCasting)
             {
-                breath_VisualEffect.Play(); //mo¿e siê odpaliæ tylko raz przy ka¿dym inpucie, nie mo¿e siê dapisaæ -> taki sam efekt jak przy GetKeyDown
+                breath_VisualEffect.Play(); //mo¿e siê odpaliæ tylko raz przy ka¿dym inpucie, nie mo¿e siê nadpisaæ -> taki sam efekt jak przy GetKeyDown
                 breath_AudioSource.PlayOneShot(fireBreathAudioClip, 0.5f);//clip audio
                 //GetComponentInParent<AudioSource>(live_charStats.inputCasting).volume = 1;//play audio volume
                 //GetComponentInParent<AudioSource>(live_charStats.inputCasting).Play();//play audio
@@ -169,6 +169,8 @@ public class Spell_FireBreath : MonoBehaviour
     }
     private void BreathAttackConeCheck()  //dynamiczna lista colliderów z OverlapSphere
     {
+        FireBreathDynamicCone();
+
         if (live_charStats.isCasting)
         {            
             for (int i = 0; i < Physics.OverlapSphere(transform.position, breath_currentFireRadius).Length; i++)
@@ -186,7 +188,7 @@ public class Spell_FireBreath : MonoBehaviour
                         //target mo¿e byæ na + albo - od charactera dlatego w ka¿d¹ stronê angle / 2
                         {                            
                             breath_targetInBreathAngle = true;                            
-                            if (!Physics.Raycast(transform.position, directionToTarget, breath_currentFireRadius, live_charStats.fov_obstaclesLayerMask))    //dodatkowo sprawdza Raycastem czy nie ma przeszkody pomiêdzy playerem a targetem //  
+                            if (!Physics.Raycast(transform.position, directionToTarget, breath_currentFireRadius, breath_ObstaclesMask))    //dodatkowo sprawdza Raycastem czy nie ma przeszkody pomiêdzy playerem a targetem //  
                             {
                                 if (breath_targetColliders.IndexOf(Physics.OverlapSphere(transform.position, breath_currentFireRadius)[i]) < 0) //sprawdza czy nie ma na liœcie. Je¿eli IndexOf < 0 czyli nie ma obiektów z tym indexem
                                 {

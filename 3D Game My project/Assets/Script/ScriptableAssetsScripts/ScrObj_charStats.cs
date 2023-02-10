@@ -84,6 +84,9 @@ public class ScrObj_charStats : ScriptableObject
     public float MultiplierDamageCombo;
     public float attackStamCost;
     [Space]
+    [ColorUsageAttribute(true, true)] public Color spell_editorAISpellRadiusColor; //kolor HDR picker
+    [ColorUsageAttribute(true, true)] public Color spell_breathAngleColor;
+    [ColorUsageAttribute(true, true)] public Color spell_breathRaycastColor;
     public float baseSpell_Damage;
     public float MultiplierSpell_Damage;
     public float baseSpell_MPCost;
