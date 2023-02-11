@@ -399,11 +399,11 @@ public class CharacterStatus : MonoBehaviour
     public void ResourcesRegen()
     {
         //Stam Regen
-        if (currentStam < currentMaxStam && !isRunning && !isAttacking /*&& currentStam<currentMaxStam*/) currentStam = Mathf.MoveTowards(currentStam, currentMaxStam, (scrObj_CharStats.regenStam + (scrObj_CharStats.regenStam * scrObj_CharStats.Stam_Multiplier * currentCharLevel * 1f) + currentMaxStam * 0.01f) * Time.deltaTime); //regeneruje f stamy / sekunde
+        if (currentStam < currentMaxStam && !isRunning && !isAttacking /*&& currentStam<currentMaxStam*/) currentStam = Mathf.MoveTowards(currentStam, currentMaxStam, (scrObj_CharStats.regenStam + (scrObj_CharStats.regenStam * scrObj_CharStats.Stam_Multiplier * currentCharLevel * 1f) + (currentMaxStam * 0.1f * scrObj_CharStats.Stam_Multiplier)) * Time.deltaTime); //regeneruje f stamy / sekunde
         //HP Regen
-        if (currentHP < currentMaxHP) currentHP = Mathf.MoveTowards(currentHP, currentMaxHP, (scrObj_CharStats.regenHP + (scrObj_CharStats.regenHP * scrObj_CharStats.HP_Multiplier * currentCharLevel * 1f) + currentMaxHP * 0.01f) * Time.deltaTime); //regeneruje f HP / sekunde
+        if (currentHP < currentMaxHP) currentHP = Mathf.MoveTowards(currentHP, currentMaxHP, (scrObj_CharStats.regenHP + (scrObj_CharStats.regenHP * scrObj_CharStats.HP_Multiplier * currentCharLevel * 1f) + (currentMaxHP * 0.1f * scrObj_CharStats.HP_Multiplier)) * Time.deltaTime); //regeneruje f HP / sekunde
         //MP Regen
-        if (currentMP < currentMaxMP && !inputSecondary/*&& !isAttacking*/ /*&& currentMP < currentMaxMP*/) currentMP = Mathf.MoveTowards(currentMP, currentMaxMP, (scrObj_CharStats.regenMP + (scrObj_CharStats.regenMP * scrObj_CharStats.MP_Multiplier * currentCharLevel * 1f) + currentMaxMP * 0.01f) * Time.deltaTime); //regeneruje f HP / sekunde
+        if (currentMP < currentMaxMP && !inputSecondary/*&& !isAttacking*/ /*&& currentMP < currentMaxMP*/) currentMP = Mathf.MoveTowards(currentMP, currentMaxMP, (scrObj_CharStats.regenMP + (scrObj_CharStats.regenMP * scrObj_CharStats.MP_Multiplier * currentCharLevel * 1f) + (currentMaxMP * 0.1f * scrObj_CharStats.MP_Multiplier)) * Time.deltaTime); //regeneruje f HP / sekunde
 
     }
 }
