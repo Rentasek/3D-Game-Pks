@@ -85,9 +85,9 @@ public class CharControler : MonoBehaviour
 
         //Reset Position
         if (GetComponentInParent<Transform>().transform.position.y <= -5f) live_charStats.ResetCharacterPosition();
-               
-        /*//Testing
-        Testing();*/
+
+        //Testing
+        Testing();
     }
     private void FixedUpdate()
     {
@@ -337,6 +337,19 @@ public class CharControler : MonoBehaviour
             if (Input.GetKeyDown(KeyCode.KeypadMinus) && live_charStats.inputRunning)
             {
                 live_charStats.currentHP = StaticTestingClass.AddCurrentFloat(live_charStats.currentHP, -100f, 1.2f);
+            }
+            
+            if (Input.GetKey(KeyCode.Alpha8))
+            {
+                StaticTestingClass.ResetLocalFloat();
+            }
+            if (Input.GetKey(KeyCode.Alpha9))
+            {
+                StaticTestingClass.MoveTowardsLocalFloat(100f, 1f);
+            }
+            if (Input.GetKey(KeyCode.Alpha0))
+            {
+                StaticTestingClass.MoveTowardsLocalFloat(200f, 0.5f);
             }
         }
     }
