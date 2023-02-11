@@ -88,12 +88,12 @@ public class Spell_FireBreath : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        breath_input = live_charStats.inputCasting; //testing inspector
-        live_charStats.spell_CanCast = !live_charStats.inputAttacking && !live_charStats.isRunning && live_charStats.currentMoveSpeed != live_charStats.currentRunSpeed;
+        breath_input = live_charStats.inputSecondary; //testing inspector
+        live_charStats.skill_CanCast = !live_charStats.inputPrimary && !live_charStats.isRunning && live_charStats.currentMoveSpeed != live_charStats.currentRunSpeed;
     }
     private void FixedUpdate()
     {
-        audioVolume = GetComponentInParent<AudioSource>(live_charStats.inputCasting).volume;    //testing inspector
+        audioVolume = GetComponentInParent<AudioSource>(live_charStats.inputSecondary).volume;    //testing inspector
 
         if (!live_charStats.isDead) //tylko dla ¿ywych :P
         {
@@ -113,7 +113,7 @@ public class Spell_FireBreath : MonoBehaviour
     private void FireBreathVFX_Audio()
     {
 
-        if (live_charStats.inputCasting && live_charStats.spell_CanCast && live_charStats.currentMP >= 1f) 
+        if (live_charStats.inputSecondary && live_charStats.skill_CanCast && live_charStats.currentMP >= 1f) 
         {
             if (!live_charStats.isCasting)
             {

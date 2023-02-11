@@ -37,12 +37,12 @@ public class UI_ButtonActive : MonoBehaviour, IPlayerUpdate
         switch (ui_button)
         {
             case ui_Button.AttackButton:
-                if (live_charStats.inputAttacking) currentButton.interactable = true;
+                if (live_charStats.inputPrimary) currentButton.interactable = true;
                 else currentButton.interactable = false;
                 break;
 
             case ui_Button.SpecialAttackButton:
-                if (live_charStats.inputCasting) currentButton.interactable = true;
+                if (live_charStats.inputSecondary) currentButton.interactable = true;
                 else currentButton.interactable = false;
                 break;
 

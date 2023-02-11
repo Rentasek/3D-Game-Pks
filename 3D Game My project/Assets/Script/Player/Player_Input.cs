@@ -45,7 +45,7 @@ public class Player_Input : MonoBehaviour
         live_charStats.inputRotateHorizontal = Input.GetAxis("Horizontal") * live_charStats.inputRotateSensivity * Time.deltaTime;
 
         //MeeleAttack
-        live_charStats.inputAttacking = Input.GetKey(KeyCode.Mouse0);
+        live_charStats.inputPrimary = Input.GetKey(KeyCode.Mouse0);
 
        
 
@@ -69,12 +69,12 @@ public class Player_Input : MonoBehaviour
                 live_charStats.fov_targetInAttackRange = false;      //debugging ¿eby nie blokowa³ siê przy atakowaniu
                 live_charStats.fov_targetInDynamicSightRange = false;      //debugging ¿eby nie blokowa³ siê przy atakowaniu
                 live_charStats.isAttacking = false;                     //debugging ¿eby nie blokowa³ siê przy atakowaniu
-                live_charStats.inputAttacking = false;                  //debugging ¿eby nie blokowa³ siê przy atakowaniu
+                live_charStats.inputPrimary = false;                  //debugging ¿eby nie blokowa³ siê przy atakowaniu
                 live_charStats.fov_targetAquired = true;             //debugging ¿eby nie blokowa³ siê przy atakowaniu                
             }
         }
 
-        if (live_charStats.inputCasting)  //lub castujemy
+        if (live_charStats.inputSecondary)  //lub castujemy
         {
             Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
             if (Physics.Raycast(ray, out RaycastHit hit))
@@ -85,10 +85,10 @@ public class Player_Input : MonoBehaviour
             live_charStats.fov_targetInAttackRange = false;      //debugging ¿eby nie blokowa³ siê przy atakowaniu
             live_charStats.fov_targetInDynamicSightRange = false;      //debugging ¿eby nie blokowa³ siê przy atakowaniu
             live_charStats.isAttacking = false;                     //debugging ¿eby nie blokowa³ siê przy atakowaniu
-            live_charStats.inputAttacking = false;                  //debugging ¿eby nie blokowa³ siê przy atakowaniu
+            live_charStats.inputPrimary = false;                  //debugging ¿eby nie blokowa³ siê przy atakowaniu
             live_charStats.fov_targetAquired = true;             //debugging ¿eby nie blokowa³ siê przy atakowaniu
             live_charStats.isRunning= false;
-            live_charStats.spell_CanCast = live_charStats.inputCasting;
+            live_charStats.skill_CanCast = live_charStats.inputSecondary;
             live_charStats.currentNavMeshAgent.isStopped = true;
 
         }
@@ -143,7 +143,7 @@ public class Player_Input : MonoBehaviour
             }
 
             //casting Spells
-            if (live_charStats.isPlayer) live_charStats.inputCasting = Input.GetKey(KeyCode.Mouse1);
+            if (live_charStats.isPlayer) live_charStats.inputSecondary = Input.GetKey(KeyCode.Mouse1);
 
             pauseKeyPressed = Input.GetKeyDown(KeyCode.Escape) && live_charStats.isPlayer;
 

@@ -37,11 +37,11 @@ public class CharacterStatus : MonoBehaviour
     public bool inputMoving;
     public bool inputRunning;
     public bool inputJumping;
-    public bool inputAttacking;
+    public bool inputPrimary;
     public float inputRotateSensivity;
     public bool inputEnableMouseRotate;
     public bool inputMouseCurrentMoving;
-    public bool inputCasting;
+    public bool inputSecondary;
 
     [Space]
     public bool inputSaveGame;
@@ -137,7 +137,7 @@ public class CharacterStatus : MonoBehaviour
     [Space]
     [Header("Character Magic Combat")]
     [CanBeNull]public Spell_FireBreath spell;
-    public bool spell_CanCast;
+    public bool skill_CanCast;
     public float spell_coroutineDelay;
     public bool spell_OnCoroutine;
     [Range(0.2f,1f)]public float spell_AISpellRangeFromMax;
@@ -403,7 +403,7 @@ public class CharacterStatus : MonoBehaviour
         //HP Regen
         if (currentHP < currentMaxHP) currentHP = Mathf.MoveTowards(currentHP, currentMaxHP, (scrObj_CharStats.regenHP + (scrObj_CharStats.regenHP * scrObj_CharStats.HP_Multiplier * currentCharLevel * 1f) + currentMaxHP * 0.01f) * Time.deltaTime); //regeneruje f HP / sekunde
         //MP Regen
-        if (currentMP < currentMaxMP && !inputCasting/*&& !isAttacking*/ /*&& currentMP < currentMaxMP*/) currentMP = Mathf.MoveTowards(currentMP, currentMaxMP, (scrObj_CharStats.regenMP + (scrObj_CharStats.regenMP * scrObj_CharStats.MP_Multiplier * currentCharLevel * 1f) + currentMaxMP * 0.01f) * Time.deltaTime); //regeneruje f HP / sekunde
+        if (currentMP < currentMaxMP && !inputSecondary/*&& !isAttacking*/ /*&& currentMP < currentMaxMP*/) currentMP = Mathf.MoveTowards(currentMP, currentMaxMP, (scrObj_CharStats.regenMP + (scrObj_CharStats.regenMP * scrObj_CharStats.MP_Multiplier * currentCharLevel * 1f) + currentMaxMP * 0.01f) * Time.deltaTime); //regeneruje f HP / sekunde
 
     }
 }

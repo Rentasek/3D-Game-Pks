@@ -20,6 +20,8 @@ public class CharControler : MonoBehaviour
         live_charStats.LoadCharStats();
         
         live_charStats.SetCharacterPosition();
+
+
     }
 
     private void Start()
@@ -60,7 +62,7 @@ public class CharControler : MonoBehaviour
             }
 
             //MeeleAttack
-            if (live_charStats.inputAttacking) StartCoroutine(MeeleAttack());
+            if (live_charStats.inputPrimary) StartCoroutine(MeeleAttack());
 
             //RotatePlayer
             if (live_charStats.playerInputEnable && live_charStats.isPlayer) { LiveCharStats_Base.RotatePlayer(live_charStats); }    //Rotate musi byæ w update bo inaczej dziej¹ siê cyrki            
@@ -92,7 +94,7 @@ public class CharControler : MonoBehaviour
         if (!live_charStats.isDead)
         {
             //Character Movement
-            if (live_charStats.currentCharacterController != null && !live_charStats.inputAttacking) { LiveCharStats_Base.Movement(live_charStats); }
+            if (live_charStats.currentCharacterController != null && !live_charStats.inputPrimary) { LiveCharStats_Base.Movement(live_charStats); }
             //if (live_charStats.currentCharacterController != null) { live_charStats.currentcharacterMovement.Movement(); }
 
             //Resource Regen
@@ -292,8 +294,8 @@ public class CharControler : MonoBehaviour
         live_charStats.inputMoving = false;
         live_charStats.inputRunning = false;
         live_charStats.inputJumping = false;
-        live_charStats.inputAttacking = false;
-        live_charStats.inputCasting = false;       
+        live_charStats.inputPrimary = false;
+        live_charStats.inputSecondary = false;       
 
         live_charStats.isMoving = false;
         live_charStats.isJumping = false;

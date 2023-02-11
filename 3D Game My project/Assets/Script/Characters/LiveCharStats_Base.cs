@@ -20,7 +20,7 @@ public static class LiveCharStats_Base
     /// <returns></returns>    
     public static void FieldOfViewTarget(CharacterStatus live_charStats)
     {
-        if (!live_charStats.inputCasting) //nie zmniejsza range jeśli castuje
+        if (!live_charStats.inputSecondary) //nie zmniejsza range jeśli castuje
         {
             DynamicSightRangeScalling(live_charStats);
         }
@@ -191,7 +191,7 @@ public static class LiveCharStats_Base
             else live_charStats.fov_targetInAttackRange = false;
         }
         //Jeśli jest w zasięgu ataku, triggeruje booleana inputAttacking w charStats, które posyła go dalej => CharacterMovement
-        live_charStats.inputAttacking = live_charStats.fov_targetInAttackRange;
+        live_charStats.inputPrimary = live_charStats.fov_targetInAttackRange;
     }
 
     private static void CheckForTargetInSpellRange(CharacterStatus live_charStats)
@@ -230,7 +230,7 @@ public static class LiveCharStats_Base
         {
             live_charStats.currentNavMeshAgent.SetDestination(live_charStats.navMeAge_walkPoint);
 
-            if (!live_charStats.inputMouseCurrentMoving && !live_charStats.inputCasting)     //mouse input -> wyłącza CheckTagetInRange //dodatkowo input casting
+            if (!live_charStats.inputMouseCurrentMoving && !live_charStats.inputSecondary)     //mouse input -> wyłącza CheckTagetInRange //dodatkowo input casting
             {
                 /*CheckForTargetInDynamicSightRange(live_charStats);
                 CheckForTargetInSpellRange(live_charStats);
@@ -270,14 +270,14 @@ public static class LiveCharStats_Base
              CheckForTargetInAttackRange(live_charStats);    */
             FieldOfViewTarget(live_charStats);
 
-            if (!live_charStats.fov_targetInDynamicSightRange && !live_charStats.fov_targetAquired && !live_charStats.fov_targetInAttackRange && !live_charStats.inputCasting) Patrolling(live_charStats);
+            if (!live_charStats.fov_targetInDynamicSightRange && !live_charStats.fov_targetAquired && !live_charStats.fov_targetInAttackRange && !live_charStats.inputSecondary) Patrolling(live_charStats);
 
             //AI_Castowanie Spelli
             if (live_charStats.spell != null && live_charStats.fov_targetAquired && live_charStats.spell_targetInSpellRange && !live_charStats.fov_targetInAttackRange)
             {
                 if (live_charStats.currentMP <= 10f)    //jeśli zejdzie do 10 many to nie castuje
                 {
-                    live_charStats.inputCasting = false;
+                    live_charStats.inputSecondary = false;
                 }
                 else if (live_charStats.currentMP >= 70f)   //jeśli nie osiągnie 70 many to nie castuje
                 {
@@ -286,10 +286,10 @@ public static class LiveCharStats_Base
             }
             else
             {
-                live_charStats.inputCasting = false;
+                live_charStats.inputSecondary = false;
             }
-            if (live_charStats.fov_targetInDynamicSightRange && !live_charStats.fov_targetInAttackRange && !live_charStats.inputCasting) Chasing(live_charStats);
-            if (live_charStats.fov_targetInDynamicSightRange && live_charStats.fov_targetInAttackRange && !live_charStats.inputCasting) Attacking(live_charStats);
+            if (live_charStats.fov_targetInDynamicSightRange && !live_charStats.fov_targetInAttackRange && !live_charStats.inputSecondary) Chasing(live_charStats);
+            if (live_charStats.fov_targetInDynamicSightRange && live_charStats.fov_targetInAttackRange && !live_charStats.inputSecondary) Attacking(live_charStats);
         }
 
         if (live_charStats.isDead) { StopMovementNavMeshAgent(live_charStats); } //Stop Nav Mesh Agent przy śmierci        
@@ -351,7 +351,7 @@ public static class LiveCharStats_Base
     {
         if (!Physics.Raycast(live_charStats.gameObject.transform.position, live_charStats.gameObject.transform.forward, live_charStats.spell_MaxRadius * live_charStats.spell_AISpellRangeFromMax, live_charStats.fov_obstaclesLayerMask)) //raycast żeby nie bił przez ściany
         {
-            live_charStats.inputCasting = true;
+            live_charStats.inputSecondary = true;
             live_charStats.gameObject.transform.LookAt(live_charStats.fov_aquiredTargetGameObject.transform);
             live_charStats.currentNavMeshAgent.SetDestination(live_charStats.gameObject.transform.position);
         }
@@ -434,7 +434,7 @@ public static class LiveCharStats_Base
 
             ////Running Speed 
             if (live_charStats.currentMoveInputDirection != Vector3.zero && !live_charStats.isJumping && !live_charStats.isAttacking && live_charStats.currentStam > 5f
-                && live_charStats.fov_targetAquired && !live_charStats.inputCasting && live_charStats.currentNavMeshAgent.remainingDistance > 2 * live_charStats.fov_attackRange)
+                && live_charStats.fov_targetAquired && !live_charStats.inputSecondary && live_charStats.currentNavMeshAgent.remainingDistance > 2 * live_charStats.fov_attackRange)
             //dodatnkowy warunek ->biega tylko jak targetAquired=true, kolejny warnek jeśli nie castuje!!, Kolejny warunek jeśli agent.eemainingDistance > 2* attack range
             {
                 live_charStats.currentAnimator.ResetTrigger("MeeleAttack");

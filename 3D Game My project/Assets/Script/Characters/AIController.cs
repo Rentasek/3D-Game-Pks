@@ -53,7 +53,7 @@ public class AIController : MonoBehaviour
         {
             agent.SetDestination(live_charStats.navMeAge_walkPoint);
 
-            if (!live_charStats.inputMouseCurrentMoving && !live_charStats.inputCasting)     //mouse input -> wy³¹cza CheckTagetInRange //dodatkowo input casting
+            if (!live_charStats.inputMouseCurrentMoving && !live_charStats.inputSecondary)     //mouse input -> wy³¹cza CheckTagetInRange //dodatkowo input casting
             {
                 //LiveCharStats_Base.FieldOfViewTarget(live_charStats);
                 CheckForTargetInDynamicSightRange();
@@ -86,14 +86,14 @@ public class AIController : MonoBehaviour
             CheckForTargetInSpellRange();
             CheckForTargetInAttackRange();
 
-            if (!live_charStats.fov_targetInDynamicSightRange && !live_charStats.fov_targetAquired && !live_charStats.fov_targetInAttackRange && !live_charStats.inputCasting) Patrolling();
+            if (!live_charStats.fov_targetInDynamicSightRange && !live_charStats.fov_targetAquired && !live_charStats.fov_targetInAttackRange && !live_charStats.inputSecondary) Patrolling();
 
             //AI_Castowanie Spelli  
             if (live_charStats.spell != null && live_charStats.spell_targetInSpellRange && !live_charStats.fov_targetInAttackRange)
             {
                 if (live_charStats.currentMP <= 10f)    //jeœli zejdzie do 10 many to nie castuje
                 {
-                    live_charStats.inputCasting = false;
+                    live_charStats.inputSecondary = false;
                 }
                 else if (live_charStats.currentMP >= 70f)   //jeœli nie osi¹gnie 70 many to nie castuje
                 {
@@ -102,13 +102,13 @@ public class AIController : MonoBehaviour
             }
             else
             {
-                live_charStats.inputCasting = false;
+                live_charStats.inputSecondary = false;
                 //Jabky coœ nie dzia³a³o to odblokowaæ
                 /*if (live_charStats.navMeAge_targetInDynamicSightRange && !live_charStats.navMeAge_targetInAttackRange && !live_charStats.inputCasting) Chasing();
                 if (live_charStats.navMeAge_targetInDynamicSightRange && live_charStats.navMeAge_targetInAttackRange && !live_charStats.inputCasting) Attacking();*/
             }
-            if (live_charStats.fov_targetInDynamicSightRange && !live_charStats.fov_targetInAttackRange && !live_charStats.inputCasting) Chasing();
-            if (live_charStats.fov_targetInDynamicSightRange && live_charStats.fov_targetInAttackRange && !live_charStats.inputCasting) Attacking();
+            if (live_charStats.fov_targetInDynamicSightRange && !live_charStats.fov_targetInAttackRange && !live_charStats.inputSecondary) Chasing();
+            if (live_charStats.fov_targetInDynamicSightRange && live_charStats.fov_targetInAttackRange && !live_charStats.inputSecondary) Attacking();
         }
 
         if (live_charStats.isDead) { StopMovementNavMeshAgent(); }  //Stop Nav Mesh Agent przy œmierci
@@ -162,7 +162,7 @@ public class AIController : MonoBehaviour
             else live_charStats.fov_targetInAttackRange = false;
         }
         //Jeœli jest w zasiêgu ataku, triggeruje booleana inputAttacking w charStats, które posy³a go dalej => CharacterMovement
-        live_charStats.inputAttacking = live_charStats.fov_targetInAttackRange;
+        live_charStats.inputPrimary = live_charStats.fov_targetInAttackRange;
     }
 
     private void CheckForTargetInSpellRange()
@@ -234,7 +234,7 @@ public class AIController : MonoBehaviour
     {
         if (!Physics.Raycast(live_charStats.gameObject.transform.position, live_charStats.gameObject.transform.forward, live_charStats.spell_MaxRadius * live_charStats.spell_AISpellRangeFromMax, live_charStats.fov_obstaclesLayerMask)) //raycast ¿eby nie bi³ przez œciany
         {
-            live_charStats.inputCasting = true;
+            live_charStats.inputSecondary = true;
             live_charStats.gameObject.transform.LookAt(live_charStats.fov_aquiredTargetGameObject.transform);
             live_charStats.currentNavMeshAgent.SetDestination(live_charStats.gameObject.transform.position);
         }
