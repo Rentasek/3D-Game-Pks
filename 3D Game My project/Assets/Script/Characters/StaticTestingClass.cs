@@ -10,6 +10,8 @@ using UnityEngine;
 /// </summary>
 public static class StaticTestingClass
 {
+    private static float localFloat;
+
     private static CharacterStatus local_live_charStats;
 
     //public SimpleDebugTestingClass(GameObject player) { this.live_charStats = player.GetComponent<CharacterStatus>(); }  
@@ -77,6 +79,25 @@ public static class StaticTestingClass
     {
         floatValueToAdd += addFloatValue*addFloatMultiplier;
         return floatValueToAdd;
+    }
+
+    /// <summary>
+    /// Metoda sprawdzająca czy zmienne lokalne w static class można modyfikować osobno dla każdej instancji metod z tej klasy 
+    /// <br>Po sprawdzeniu -> klasa Statyczna przetrzymuje zmienne lokalne GLOBALNIE!!!</br>
+    /// <br>Trzeba mieć loklany Object do przechowywania lokalnych dynamicznych zmiennych!!!</br>
+    /// </summary>
+    /// <param name="floatTarget"></param>
+    /// <param name="timeMultiplier"></param>
+    /// <param name=""></param>
+    public static void MoveTowardsLocalFloat(float floatTarget, float timeMultiplier)
+    {
+        localFloat = Mathf.MoveTowards(localFloat, floatTarget, timeMultiplier * Time.deltaTime);
+        Debug.Log("Zmienna lokalna w static class : " + localFloat);
+    }
+    
+    public static void ResetLocalFloat()
+    {
+        localFloat = 0f;
     }
 
     /*public static IEnumerator FOVRoutine(CharacterStatus live_charStats)
