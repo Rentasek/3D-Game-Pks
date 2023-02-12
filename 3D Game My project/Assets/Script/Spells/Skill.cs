@@ -1,5 +1,6 @@
 ﻿using Cinemachine;
 using JetBrains.Annotations;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Unity.VisualScripting;
@@ -20,10 +21,10 @@ public class Skill : MonoBehaviour
     [Tooltip("Aktualny progress Castowania (CastingType -> Castable)"), SerializeField] public float skill_currentCastingProgress;
     [Tooltip("Bool zwracany true jeśli progress castowania dojdzie do 100% (CastingType -> Castable)"), SerializeField] public bool skill_currentCastingFinished;
     [Tooltip("Bool zwracany true jeśli jest instantCast (CastingType -> Instant)"), SerializeField] public bool skill_currentCastingInstant;
-    
+
     [Header("Targets")]
-    [Tooltip("Zwracana lista colliderów zgodnych z parametrami(EnemyTag,InCurrentRadius,InCurrentAngle)"), CanBeNull, SerializeField] public List<Collider> skill_targetColliders;
-    [Tooltip("Enemies Array z klasy skill(do bazowego enemies array dopisane Destructibles, (Metoda EnemyArraySelector)"), SerializeField, TagField] public string[] skill_EnemiesArray; //Pozwala na wybór Enemies przy pomocy Tag     
+    [Tooltip("Enemies Array z klasy scr_skill(do bazowego enemies array dopisane Destructibles, (Metoda EnemyArraySelector)"), SerializeField, TagField] public string[] skill_EnemiesArray; //Pozwala na wybór Enemies przy pomocy Tag     
+    [Tooltip("Zwracana lista colliderów zgodnych z parametrami(EnemyTag,InCurrentRadius,InCurrentAngle)"), CanBeNull, SerializeField] public List<Collider> skill_targetColliders;    
     [Tooltip("GameObject skilla (castera) -> potrzebny do transform"), SerializeField] public GameObject skill_casterGameobject;
 
     [Header("Skill Cone Settings")]
@@ -48,88 +49,40 @@ public class Skill : MonoBehaviour
 
     private void OnValidate()
     {
+        //QuickSetup(); //Refresz SerializeFields -> inspector
+
         skill = this;
         skill_EnemiesArray = Static_SkillForge.EnemyArraySelector(live_charStats.currentEnemiesArray);
-
         
-
-        Skill_Prepare();
     }
 
     private void FixedUpdate()
-    {
-        Static_SkillForge.ResourceTypeSelector_In(scrObj_Skill, skill, live_charStats);
-
-        
-        //Skill_Prepare();
+    {        
         Skill_Casting(scrObj_Skill);
 
         Skill_Range(scrObj_Skill);
 
-        Skill_Effect(scrObj_Skill);
-
-        //if (live_charStats.isCasting) { ResourceTypeSelectorRefrence(); }
-
-        Static_SkillForge.ResourceTypeSelector_Out(scrObj_Skill, skill, live_charStats);
-
-
-
-    }
-
-    /*public void ResourceTypeSelector()
-    {
-        switch (scrObj_Skill.skill_ResourceType)
-        {
-            case ScrObj_skill.Skill_ResourceType.hp:
-                ResourceTypeRefrence(ref live_charStats.currentHP);
-                break;
-
-            case ScrObj_skill.Skill_ResourceType.mana:
-                ResourceTypeRefrence(ref live_charStats.currentMP);
-                break;
-
-            case ScrObj_skill.Skill_ResourceType.stamina:
-                ResourceTypeRefrence(ref live_charStats.currentStam);
-                break;
+        if (live_charStats.isCasting && live_charStats.skill_CanCast)
+        {     
+            Skill_Effect(scrObj_Skill);
         }
-    }
-
-
-    public void ResourceTypeSelectorRefrence()
-    {
-        switch(scrObj_Skill.skill_ResourceType)
-        {
-            case ScrObj_skill.Skill_ResourceType.hp:
-                skill.skill_currentResource = live_charStats.currentHP;
-            break;
-
-            case ScrObj_skill.Skill_ResourceType.mana:
-                skill.skill_currentResource = live_charStats.currentMP;
-            break;
-
-            case ScrObj_skill.Skill_ResourceType.stamina:
-                skill.skill_currentResource = live_charStats.currentStam;
-            break;
-        }
-    }
-
-    public void ResourceTypeRefrence(ref float skill_currentResource)
-    {
-        skill_currentResource = skill.skill_currentResource;
-    }*/
-
-    public void Skill_Prepare()
-    {        
         
-
-        Static_SkillForge.Skill_ValuesUpdate(scrObj_Skill, skill, live_charStats, currentCharacterBonusStats);
-
     }
+    
+    void QuickSetup()
+    {
+        live_charStats = GetComponentInParent<CharacterStatus>();
+        currentCharacterBonusStats= GetComponentInParent<CharacterBonusStats>();
+        skill_casterGameobject = gameObject;
+        skill_AudioSource= GetComponentInParent<AudioSource>();
+        skill_CastingVisualEffect= GetComponent<VisualEffect>();
+    }
+    
 
     public void Skill_Casting(ScrObj_skill scrObj_Skill)
-    { 
-        live_charStats.skill_CanCast = !skill.skill_otherInput && !live_charStats.isRunning && live_charStats.currentMoveSpeed != live_charStats.currentRunSpeed;
-        
+    {
+        live_charStats.skill_CanCast = /*!skill.skill_otherInput &&*/ !live_charStats.isRunning && live_charStats.currentMoveSpeed != live_charStats.currentRunSpeed;
+
         if (live_charStats.skill_CanCast)
         {
             switch (scrObj_Skill.skill_CastingType)
@@ -147,6 +100,7 @@ public class Skill : MonoBehaviour
                     break;
             }
         }
+        else Static_SkillForge.Skill_ResetAnyCasting(scrObj_Skill, skill, live_charStats);
     }    
 
     public void Skill_Range(ScrObj_skill scrObj_Skill)
@@ -186,8 +140,7 @@ public class Skill : MonoBehaviour
     {
         switch (scrObj_Skill.skill_EffectType)
         {
-            case ScrObj_skill.Skill_EffectType.hit:
-                Static_SkillForge.Skill_TargetList_DamageOverTime(skill, live_charStats);
+            case ScrObj_skill.Skill_EffectType.hit:                
                 break;
 
             case ScrObj_skill.Skill_EffectType.boom:
@@ -199,10 +152,11 @@ public class Skill : MonoBehaviour
             case ScrObj_skill.Skill_EffectType.chain:
                 break;
 
-            case ScrObj_skill.Skill_EffectType.dot:
+            case ScrObj_skill.Skill_EffectType.damageOverTime:
+                Static_SkillForge.Skill_DamageOverTime(scrObj_Skill, skill, live_charStats);
                 break;
 
-            case ScrObj_skill.Skill_EffectType.hot:
+            case ScrObj_skill.Skill_EffectType.healOverTime:
                 break;
 
             case ScrObj_skill.Skill_EffectType.heal:
@@ -212,10 +166,6 @@ public class Skill : MonoBehaviour
                 break;
         }
     }
-
-
-
-
 
 
 #if UNITY_EDITOR //zamiast skryptu w Editor
