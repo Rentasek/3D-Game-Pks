@@ -6,11 +6,11 @@ using UnityEngine.VFX;
 [CreateAssetMenu(fileName = "SpellInfo", menuName = "Chars/SpellInfo")]
 public class ScrObj_skill : ScriptableObject
 {
-    public enum Skill_InputCastingType
+    public enum Skill_InputType
     {
         primary, secondary
     }
-    [SerializeField] public Skill_InputCastingType skill_InputCastingType;
+    [SerializeField] public Skill_InputType skill_InputType;
 
     public enum Skill_CastingType
     {
@@ -26,24 +26,18 @@ public class ScrObj_skill : ScriptableObject
 
     public enum Skill_EffectType
     {
-        hit, boom, pierce, chain, dot, hot, heal, summon
+        hit, boom, pierce, chain, damageOverTime, healOverTime, heal, summon
     }
     [SerializeField] public Skill_EffectType skill_EffectType;
 
     public enum Skill_ResourceType
     {
-        hp, mana, stamina
+        health, mana, stamina
     }
     [SerializeField] public Skill_ResourceType skill_ResourceType;
 
 
     [Space]
-    //[Header("CastingTypes")]
-
-    /*[Tooltip("Skill input lokalny dla klasy skill"), SerializeField] public bool skill_input;
-    [Tooltip("Skill input Other lokalny dla klasy skill"), SerializeField] public bool skill_otherInput;*/
-
-
     [Header("SkillRange")]
     [Tooltip("Bazowy Minimalny Radius skilla"), SerializeField] public float skill_MinRadius;
     [Tooltip("Bazowy Minimalny Kąt skilla"), SerializeField] public float skill_MinAngle;
@@ -54,9 +48,7 @@ public class ScrObj_skill : ScriptableObject
     [Tooltip("Ile czasu potrzeba do Max/Min Radius"), SerializeField] public float skill_TimeMaxRadius;
     [Tooltip("Ile czasu potrzeba do Max/Min Angle"), SerializeField] public float skill_TimeMaxAngle;
     [Tooltip("Ile czasu potrzeba do Deploy Cast"), SerializeField] public float skill_TimeCast;
-
-    //[Header("EffectTypes")]
-
+    
     [Header("SkillDamage/Cost")]
     [Tooltip("Bazowy Resource cost skilla"), SerializeField] public float skill_BaseResourceCost;
     [Tooltip("Bazowy Damage skilla"), SerializeField] public float skill_BaseDamage;
@@ -65,7 +57,7 @@ public class ScrObj_skill : ScriptableObject
 
     [Header("SkillObstacles")]
     [Tooltip("Layer Mask z przeszkodami przez które nie da się atakować(z klasy skill)"), SerializeField] public LayerMask skill_ObstaclesMask; //Obstacles dla skilla
-
+    
     [Header("SkillAudio")]    
     [CanBeNull, Tooltip("AudioClip skilla -> Caster"), SerializeField] public AudioClip skill_CastingAudioClip;    
     [CanBeNull, Tooltip("AudioClip skilla -> Target"), SerializeField] public AudioClip skill_OnHitAudioClip;
