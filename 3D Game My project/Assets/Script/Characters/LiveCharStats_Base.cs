@@ -1,6 +1,5 @@
 ﻿using System.Collections;
 using System.Linq;
-using TMPro;
 using Unity.VisualScripting;
 using UnityEngine;
 
@@ -10,6 +9,8 @@ using UnityEngine;
 
 public static class LiveCharStats_Base
 {
+    #region FieldOfView
+
     //////FieldOfView//////
 
     /// <summary>
@@ -27,7 +28,7 @@ public static class LiveCharStats_Base
 
         CheckForTargetInDynamicSightRange(live_charStats);
         CheckForTargetInSpellRange(live_charStats);
-        CheckForTargetInAttackRange(live_charStats);        
+        CheckForTargetInAttackRange(live_charStats);
     }
 
     public static void CheckForTargetInDynamicSightRange(CharacterStatus live_charStats)
@@ -64,7 +65,18 @@ public static class LiveCharStats_Base
                     if (Vector3.Angle(live_charStats.gameObject.transform.forward, directionToTarget) < live_charStats.fov_CurrentDynamicSightAngle / 2) //sprawdzanie angle wektora forward charactera i direction to target
                                                                                                                                                          //target może być na + albo - od charactera dlatego w każdą stronę angle / 2
                     {
-                        if (!Physics.Raycast(live_charStats.gameObject.transform.position, directionToTarget, live_charStats.fov_CurrentDynamicSightRadius, live_charStats.fov_obstaclesLayerMask))
+                        if (!Physics.Raycast(live_charStats.gameObject.transform.position, directionToTarget, Vector3.Distance(live_charStats.gameObject.transform.position, collider.transform.position), live_charStats.fov_obstaclesLayerMask))  //zmiana DynamicRange na Distance ponieważ wysyłał Raycasta na taką odległość że patrząc na target -> patrzył w ziemie(Terrain / Environment LayerMask)
+                        /*                     OKO                                                  
+                                                |\                      Tak było, teraz Raycast zatrzymuje się na Targecie -> Vector3.Distance(( Char, Target)
+                                                | \  | < - Target       
+                                                |  \ |   
+                                                |   \|
+                                                |    \
+                                                |    |\
+                                                |    | \< - Raycast
+                                                |    |  \
+                        ________________________|____|___\____(ziemia(Terrain/Envrironment)) 
+                        */
                         {
                             //jeśli raycast do targetu nie jest zasłonięty przez jakiekolwiek obstacles!!
                             live_charStats.fov_aquiredTargetGameObject = collider.gameObject;           //ustawia znaleziony colliderem game objecta jako target
@@ -92,8 +104,9 @@ public static class LiveCharStats_Base
                     live_charStats.fov_targetAquired = false;
                 }*/
             }
-        }        
-        
+        }
+
+        #region Nie działa do końca i jest wolniejsze od foreach
         ///Nie działa do końca i jest wolniejsze od foreach !!!
         ///
         /*live_charStats.fov_enemyTargetsInDynamicSightRange.Clear; 
@@ -152,8 +165,7 @@ public static class LiveCharStats_Base
                 live_charStats.fov_targetAquired = false;
             }
         }*/
-
-
+        #endregion
     }
 
     private static void DynamicSightRangeScalling(CharacterStatus live_charStats)
@@ -209,6 +221,9 @@ public static class LiveCharStats_Base
         }
     }
 
+    #endregion
+
+    #region AI Controller
 
     ////////////////////////AIController//////////////////////////////////////
     /// <summary>
@@ -369,8 +384,12 @@ public static class LiveCharStats_Base
     {
         StopMovementNavMeshAgent(live_charStats);
     }
-    
-    
+
+    #endregion
+
+    #region Character Movement
+
+
     ////////////////////////CharacterMovement//////////////////////////////////////
     /// <summary>
     /// <br>Metoda obraca postacią przy pomocy myszki</br>
@@ -566,4 +585,6 @@ public static class LiveCharStats_Base
             live_charStats.currentMoveVector.y = 0f;
         }
     }
+
+    #endregion
 }
