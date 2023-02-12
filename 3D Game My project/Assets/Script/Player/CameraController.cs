@@ -20,6 +20,7 @@ public partial class CameraController : MonoBehaviour
     [SerializeField] public GameObject player;    
     [SerializeField] public CharacterStatus live_charStats;
     [SerializeField] public Player_Input player_Input;
+    [SerializeField] private Vector3 playerPassedPosition;
     [SerializeField] List<IPlayerUpdate> playerObjectsList;
 
     [SerializeField] private Vector3 standardCameraOffset;
@@ -122,6 +123,7 @@ public partial class CameraController : MonoBehaviour
         
         if (player != null)
         {
+            //player.transform.position = playerTransform.position; //Postaæ pojawia siê tam gdzie poprzednia
             playerTransform = player.transform;
 
             live_charStats = Camera.main.GetComponent<CameraController>().player.GetComponent<CharacterStatus>();
@@ -145,8 +147,19 @@ public partial class CameraController : MonoBehaviour
                     playerStatusBar.live_charStats = live_charStats;
                 }
             }
+
+            
         }
         Cursor.lockState = CursorLockMode.None; //Coby da³o siê klikaæ po zmianie chara
         Cursor.visible = true;
+    }
+
+    public void PlayerPassPosition()
+    {
+        playerPassedPosition = player.transform.position;
+    }
+    public void PlayerTakePosition()
+    {
+        player.transform.position = playerPassedPosition;
     }
 }
