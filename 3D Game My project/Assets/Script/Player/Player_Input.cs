@@ -47,8 +47,6 @@ public class Player_Input : MonoBehaviour
         //MeeleAttack
         live_charStats.inputPrimary = Input.GetKey(KeyCode.Mouse0);
 
-       
-
     }
     public void IsometricInputClass()
     {              
