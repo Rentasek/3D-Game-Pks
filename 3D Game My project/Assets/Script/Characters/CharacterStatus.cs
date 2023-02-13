@@ -2,7 +2,6 @@ using Cinemachine;
 using JetBrains.Annotations;
 using System;
 using System.Collections.Generic;
-//using UnityEditor.UIElements;
 using UnityEngine;
 using UnityEngine.AI;
 using UnityEngine.UIElements;
@@ -406,4 +405,42 @@ public class CharacterStatus : MonoBehaviour
         if (currentMP < currentMaxMP /*&& !inputSecondary*//*&& !isAttacking*/ /*&& currentMP < currentMaxMP*/) currentMP = Mathf.MoveTowards(currentMP, currentMaxMP, (scrObj_CharStats.regenMP + (scrObj_CharStats.regenMP * scrObj_CharStats.MP_Multiplier * currentCharLevel * 1f) + (currentMaxMP * 0.1f * scrObj_CharStats.MP_Multiplier)) * Time.deltaTime); //regeneruje f HP / sekunde
 
     }
+
+    /////////////////////////////////
+    
+    public void TakeDamgeInstant(float damageValue, CharacterStatus attacker)
+    {
+        currentHP -= damageValue;
+        if (currentHP <= 0f && isDead)
+        {
+            attacker.currentXP += currentXP_GainedFromKill;
+            if (gameObject.CompareTag("Monster")) { currentCharLevel = UnityEngine.Random.Range(attacker.currentCharLevel - 3, attacker.currentCharLevel + 3); }  //po œmierci ustawia level targetu na zbli¿ony do atakuj¹cego
+                                                                                                                                                                                                                                  //podbija lvl tylko Monsterów, Playera i Environment nie
+        }
+    }
+
+    public void TakeDamageOverTime(float damageValue, CharacterStatus attacker)
+    {
+        currentHP = Mathf.MoveTowards(currentHP, -damageValue, Time.deltaTime * damageValue);
+        if (currentHP <= 0f && isDead)
+        {
+            attacker.currentXP += currentXP_GainedFromKill;
+            if (gameObject.CompareTag("Monster")) { currentCharLevel = UnityEngine.Random.Range(attacker.currentCharLevel - 3, attacker.currentCharLevel + 3); }  //po œmierci ustawia level targetu na zbli¿ony do atakuj¹cego
+                                                                                                                                                                                                                                  //podbija lvl tylko Monsterów, Playera i Environment nie
+        }
+    }
+
+    public void TakeHealInstant(float healValue)
+    {
+        if (currentHP < currentMaxHP) currentHP += healValue;
+        else { currentHP = currentMaxHP; }
+    }
+
+    public void TakeHealOverTime(float healValue)
+    {
+        if (currentHP < currentMaxHP) { currentHP = Mathf.MoveTowards(currentHP, currentMaxHP, Time.deltaTime * healValue); }
+        else { currentHP = currentMaxHP; }
+    }
+
+
 }
