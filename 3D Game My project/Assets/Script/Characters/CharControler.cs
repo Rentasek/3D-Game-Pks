@@ -62,7 +62,7 @@ public class CharControler : MonoBehaviour
             }
 
             //MeeleAttack
-            if (live_charStats.inputPrimary) StartCoroutine(MeeleAttack());
+            //if (live_charStats.inputPrimary) StartCoroutine(MeeleAttack());
 
             //RotatePlayer
             if (live_charStats.playerInputEnable && live_charStats.isPlayer) { LiveCharStats_Base.RotatePlayer(live_charStats); }    //Rotate musi byæ w update bo inaczej dziej¹ siê cyrki            
