@@ -586,5 +586,16 @@ public static class LiveCharStats_Base
         }
     }
 
+    #region StopAllAnimatorMovement
+    /// <summary>
+    /// Klasa zatrzymująca cały movement postaci [Jump, Movement -> yAnim]
+    /// </summary>
+    /// <param name="live_charStats"></param>
+    public static void StopAllAnimatorMovement(CharacterStatus live_charStats)
+    {
+        live_charStats.currentAnimator.SetFloat("yAnim", 0);
+        live_charStats.currentAnimator.ResetTrigger("Jump");
+    } 
+    #endregion
     #endregion
 }
