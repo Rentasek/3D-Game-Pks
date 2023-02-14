@@ -55,11 +55,10 @@ public class Skill : MonoBehaviour
 
     private void OnValidate()
     {
-        //QuickSetup(); //Refresz SerializeFields -> inspector (trzeba włączyć player Skeletona inaczej wali nullException)
+        //QuickSetup();
 
         skill = this;
-        skill_EnemiesArray = Static_SkillForge.EnemyArraySelector(live_charStats.currentEnemiesArray);
-        
+        Static_SkillForge.Skill_EnemyArraySelector(skill, live_charStats);        
     }
 
     private void FixedUpdate()
@@ -82,7 +81,15 @@ public class Skill : MonoBehaviour
         }
         
     }
-    
+
+    /// <summary>
+    /// <br>Refresz SerializeFields -> inspector (trzeba włączyć player Skeletona (wszystkie disabled Chars) inaczej wali nullException)</br>
+    /// <br>live_charStats</br>
+    /// <br>currentCharacterBonusStats</br>
+    /// <br>skill_casterGameobject</br>
+    /// <br>skill_AudioSource</br>
+    /// <br>skill_CastingVisualEffect</br>
+    /// </summary>
     void QuickSetup()
     {
         live_charStats = GetComponentInParent<CharacterStatus>();
@@ -95,9 +102,9 @@ public class Skill : MonoBehaviour
 
     private void Skill_UniversalCasting(ScrObj_skill scrObj_Skill)
     {
-        live_charStats.skill_CanCast = /*!skill.skill_otherInput &&*/ !live_charStats.isRunning && live_charStats.currentMoveSpeed != live_charStats.currentRunSpeed && !live_charStats.isDead;
+        live_charStats.skill_CanCast = !skill.skill_otherInput && !live_charStats.isRunning && live_charStats.currentMoveSpeed != live_charStats.currentRunSpeed && !live_charStats.isDead;
 
-        if (live_charStats.skill_CanCast)
+        if (live_charStats.skill_CanCast)  //CanCast jest wykorzystane w inpucie więc warunkiem nie może być resource!!!
         {
             Static_SkillForge.Skill_CastingUniversal_VFX_Audio(scrObj_Skill, skill, live_charStats);
         }
@@ -130,15 +137,15 @@ public class Skill : MonoBehaviour
 
     private void Skill_EffectTypeArray(ScrObj_skill scrObj_Skill, Skill skill)
     {
-        for (int i = 0; i < scrObj_Skill.skill_EffectTypeArray.Length; i++)
+        for (int currentCastingIndex = 0; currentCastingIndex < scrObj_Skill.skill_EffectTypeArray.Length; currentCastingIndex++)
         {   
-            switch (scrObj_Skill.skill_EffectTypeArray[i])
+            switch (scrObj_Skill.skill_EffectTypeArray[currentCastingIndex])
             {
                 case ScrObj_skill.Skill_EffectTypeArray.none:
                     break;
 
                 case ScrObj_skill.Skill_EffectTypeArray.hit:
-                    Static_SkillForge.Skill_Hit(scrObj_Skill, skill, live_charStats, Static_SkillForge.CastingTypeCurrentFloatReadOnly(i, skill));
+                    Static_SkillForge.Skill_Hit(scrObj_Skill, skill, live_charStats, Static_SkillForge.Skill_CastingTypeCurrentFloatReadOnly(currentCastingIndex, skill));
                     break;
 
                 case ScrObj_skill.Skill_EffectTypeArray.boom:
@@ -151,15 +158,15 @@ public class Skill : MonoBehaviour
                     break;
 
                 case ScrObj_skill.Skill_EffectTypeArray.damageOverTime:
-                    Static_SkillForge.Skill_DamageOverTime(scrObj_Skill, skill, live_charStats, Static_SkillForge.CastingTypeCurrentFloatReadOnly(i, skill));
+                    Static_SkillForge.Skill_DamageOverTime(scrObj_Skill, skill, live_charStats, Static_SkillForge.Skill_CastingTypeCurrentFloatReadOnly(currentCastingIndex, skill));
                     break;
 
                 case ScrObj_skill.Skill_EffectTypeArray.healOverTime:
-                    Static_SkillForge.Skill_HealOverTime(scrObj_Skill, skill, live_charStats, Static_SkillForge.CastingTypeCurrentFloatReadOnly(i, skill));
+                    Static_SkillForge.Skill_HealOverTime(scrObj_Skill, skill, live_charStats, Static_SkillForge.Skill_CastingTypeCurrentFloatReadOnly(currentCastingIndex, skill));
                     break;
 
                 case ScrObj_skill.Skill_EffectTypeArray.heal:
-                    Static_SkillForge.Skill_HealOverTime(scrObj_Skill, skill, live_charStats, Static_SkillForge.CastingTypeCurrentFloatReadOnly(i, skill));
+                    Static_SkillForge.Skill_HealOverTime(scrObj_Skill, skill, live_charStats, Static_SkillForge.Skill_CastingTypeCurrentFloatReadOnly(currentCastingIndex, skill));
                     break;
 
                 case ScrObj_skill.Skill_EffectTypeArray.summon:
