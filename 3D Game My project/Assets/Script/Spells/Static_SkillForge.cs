@@ -19,9 +19,9 @@ public static class Static_SkillForge
     /// <param name="live_charStats">Live_charStats Castera</param>
     public static void Skill_CastingUniversal_VFX_Audio(ScrObj_skill scrObj_Skill, Skill skill, CharacterStatus live_charStats)
     {
-        InputSelector(scrObj_Skill, skill, live_charStats);
+        //InputSelector(scrObj_Skill, skill, live_charStats);
 
-        if (skill.skill_input && live_charStats.skill_CanCast && ResourceTypeCurrentFloatReadOnly(scrObj_Skill, live_charStats) >= skill.skill_currentResourceCost)
+        if (skill.skill_input && live_charStats.skill_CanCast && Skill_ResourceTypeCurrentFloatReadOnly(scrObj_Skill, live_charStats) >= skill.skill_currentResourceCost)
         {
             if (!live_charStats.isCasting) //Jeśli nie castuje i ma właśnie zacząć //Start Casting
             {
@@ -29,7 +29,14 @@ public static class Static_SkillForge
                 if (skill.skill_currentCooldownRemaining <= 0.05f)  //Jeśli zostało 0.05f lub mniej cooldownu może użyć instanta
                 {
                     if (skill.skill_CastingVisualEffect != null) skill.skill_CastingVisualEffect.Play(); //może się odpalić tylko raz przy każdym inpucie, nie może się nadpisać -> taki sam efekt jak przy GetKeyDown
-                    if (!skill.skill_AudioSource.isPlaying) skill.skill_AudioSource.PlayOneShot(scrObj_Skill.skill_CastingAudioClip, scrObj_Skill.skill_CastingAudioVolume);//clip audio    
+
+                    if (!skill.skill_AudioSource.isPlaying && skill.skill_AudioSource!=null) //clip audio jeśli jest i nie gra innego
+                    { 
+                        skill.skill_AudioSource.PlayOneShot(scrObj_Skill.skill_CastingAudioClip, scrObj_Skill.skill_CastingAudioVolume);
+                    }    
+                    
+                    Skill_StopAllAnimatorMovement(scrObj_Skill, live_charStats);
+
                     if (!string.IsNullOrWhiteSpace(scrObj_Skill.skill_AnimatorBoolName)) live_charStats.currentAnimator.SetBool(scrObj_Skill.skill_AnimatorBoolName, true);
                     if (!string.IsNullOrWhiteSpace(scrObj_Skill.skill_AnimatorTriggerName)) live_charStats.currentAnimator.SetTrigger(scrObj_Skill.skill_AnimatorTriggerName);
 
@@ -49,7 +56,18 @@ public static class Static_SkillForge
 
             skill.skill_currentCastingProgress = Mathf.MoveTowards(skill.skill_currentCastingProgress, 1f, Time.deltaTime / scrObj_Skill.skill_TimeCast); //casting progress rośnie do 1 w (1sek * 1/TimeCast ) czyli (sek * "n" [np.0.5f] = "n" część sekundy)
             skill.skill_IsCastingFinishedCastable = (skill.skill_currentCastingProgress >= 0.95f) ? true : false;
-            if (skill.skill_IsCastingFinishedCastable) skill.skill_currentCastingProgress = 0f; //reset progressu po wycastowaniu Skilla 
+            if (skill.skill_IsCastingFinishedCastable) 
+            { 
+                skill.skill_currentCastingProgress = 0f;    //reset progressu po wycastowaniu Skilla
+                
+                if (!string.IsNullOrWhiteSpace(scrObj_Skill.skill_AnimatorBoolName)) //reset AnimatorIsCastingBooleana i CastingAudioClipa przy IsCastingFinished <- najlepiej żeby był taki sam jak długość AudioClipa przy HOLD
+                {
+                    if (skill.skill_AudioSource != null) { skill.skill_AudioSource.Stop(); }  //Stop aktualnego Audio PlayOneShot 
+                    live_charStats.currentAnimator.SetBool(scrObj_Skill.skill_AnimatorBoolName, false);  
+                }
+                if (!string.IsNullOrWhiteSpace(scrObj_Skill.skill_AnimatorTriggerOnFinishedCastingName)) live_charStats.currentAnimator.SetTrigger(scrObj_Skill.skill_AnimatorTriggerOnFinishedCastingName);  //Animacja po wykonaniu casta                                           
+                skill.skill_currentCooldownRemaining = 1f;  //Ustawia cooldown po wycastowaniu żeby nie castował znów zbyt szybko, przydatnie jeśli mamy animację po wystrzeleniu
+            } 
 
             #endregion            
         }
@@ -121,9 +139,9 @@ public static class Static_SkillForge
     /// <param name="live_charStats">Live_charStats Castera</param>
     public static void Skill_Castable_VFX_Audio(ScrObj_skill scrObj_Skill, Skill skill, CharacterStatus live_charStats)
     {
-        InputSelector(scrObj_Skill, skill, live_charStats);
+        Skill_InputSelector(scrObj_Skill, skill, live_charStats);
 
-        if (skill.skill_input && live_charStats.skill_CanCast && ResourceTypeCurrentFloatReadOnly(scrObj_Skill, live_charStats) >= skill.skill_currentResourceCost)
+        if (skill.skill_input && live_charStats.skill_CanCast && Skill_ResourceTypeCurrentFloatReadOnly(scrObj_Skill, live_charStats) >= skill.skill_currentResourceCost)
         {
             if (!live_charStats.isCasting)
             {
@@ -193,9 +211,9 @@ public static void Skill_Instant_VFX_Audio(bool skill_input, bool isCasting, boo
     /// <param name="live_charStats">Live_charStats Castera</param>
     public static void Skill_Instant_VFX_Audio(ScrObj_skill scrObj_Skill, Skill skill, CharacterStatus live_charStats)
     {
-        InputSelector(scrObj_Skill, skill, live_charStats);
+        Skill_InputSelector(scrObj_Skill, skill, live_charStats);
 
-        if (skill.skill_input && live_charStats.skill_CanCast && ResourceTypeCurrentFloatReadOnly(scrObj_Skill, live_charStats) >= skill.skill_currentResourceCost)
+        if (skill.skill_input && live_charStats.skill_CanCast && Skill_ResourceTypeCurrentFloatReadOnly(scrObj_Skill, live_charStats) >= skill.skill_currentResourceCost)
         {
             if (!live_charStats.isCasting)
             {
@@ -268,9 +286,9 @@ public static void Skill_Instant_VFX_Audio(bool skill_input, bool isCasting, boo
     /// <param name="live_charStats">Live_charStats Castera</param> 
     public static void Skill_Hold_VFX_Audio(ScrObj_skill scrObj_Skill, Skill skill, CharacterStatus live_charStats)
     {
-        InputSelector(scrObj_Skill, skill, live_charStats);
+        Skill_InputSelector(scrObj_Skill, skill, live_charStats);
 
-        if (skill.skill_input && live_charStats.skill_CanCast && ResourceTypeCurrentFloatReadOnly(scrObj_Skill, live_charStats) >= skill.skill_currentResourceCost)
+        if (skill.skill_input && live_charStats.skill_CanCast && Skill_ResourceTypeCurrentFloatReadOnly(scrObj_Skill, live_charStats) >= skill.skill_currentResourceCost)
         {
             if (!live_charStats.isCasting)
             {
@@ -768,24 +786,38 @@ public static void Skill_Cone_AttackConeCheck(bool isCasting, float skill_curren
     /////////////////// UTILS ///////////////////
     /////////////////////////////////////////////
 
-    #region EnemyArraySelector
-    /// <summary>
+    #region Skill_EnemyArraySelector
+    /*/// <summary>OLD CODE
     /// Pobiera EnemiesArray, dokłada Destructibles jako cel skilla
     /// <br>Zwraca skill_EnemiesArray (return (skill_EnemiesArray))
     /// <br><i>Może być wykorzystany currentEnemiesArray z live_CharStats</i></br>
     /// </summary>
     /// <param name="enemiesArray">Pobierany EnemiesArray z live_CharStats</param>
     /// <returns></returns>
-    public static string[] EnemyArraySelector(string[] enemiesArray)
+    public static string[] Skill_EnemyArraySelector(string[] enemiesArray)
     {
         string[] skill_EnemiesArray = new string[enemiesArray.Length + 1];              //tworzy array +1 od current enemies arraya
         enemiesArray.CopyTo(skill_EnemiesArray, 0);                                     //kopiuje current enemies arraya od indexu 0
         skill_EnemiesArray[skill_EnemiesArray.Length - 1] = "Destructibles";            //wstawia jako ostatni index Destructibles żeby zawsze można było go zniszczyć
         return (skill_EnemiesArray);
+    }*/
+
+    /// <summary>
+    /// <br>Pobiera EnemiesArray z live_charStats, dokłada Destructibles jako cel skilla</br>
+    /// <br>Wypełnia skill_EnemiesArray jako ref objectu, czyli zwraca bezpośredio do SkillObjectu nie trzeba przypisywać</br>
+    /// </summary>
+    /// <param name="skill">Ten GameObject skill</param>
+    /// <param name="live_charStats">Live_charStats Castera</param>
+    public static void Skill_EnemyArraySelector(Skill skill, CharacterStatus live_charStats)
+    {
+        skill.skill_EnemiesArray = new string[live_charStats.currentEnemiesArray.Length + 1];              //tworzy array +1 od current enemies arraya
+        live_charStats.currentEnemiesArray.CopyTo(skill.skill_EnemiesArray, 0);                                     //kopiuje current enemies arraya od indexu 0
+        skill.skill_EnemiesArray[skill.skill_EnemiesArray.Length - 1] = "Destructibles";                                  //wstawia jako ostatni index Destructibles żeby zawsze można było go zniszczyć           
     }
+
     #endregion
 
-    #region InputSelector
+    #region Skill_InputSelector
 
     /*/// <summary> OLD CODE
     /// Update skill_input i skill_otherInput w zależności od ustawień w scriptableObjecie
@@ -808,31 +840,9 @@ public static void Skill_Cone_AttackConeCheck(bool isCasting, float skill_curren
                 skill_otherInput= inputPrimary;
                 break;
         }
-    }*/
-
-    /// <summary>
-    /// Update skill_input i skill_otherInput w zależności od ustawień w scriptableObjecie
-    /// Użyty w skill_Castings
-    /// </summary>
-    /// <param name="scrObj_Skill">Scriptable Object Skilla</param>
-    /// <param name="skill">Ten GameObject skill</param>
-    /// <param name="live_charStats">Live_charStats Castera</param>
-    public static void InputSelector(ScrObj_skill scrObj_Skill, Skill skill, CharacterStatus live_charStats)
-    {
-        switch (scrObj_Skill.skill_InputType)
-        {
-            case ScrObj_skill.Skill_InputType.primary:
-                skill.skill_input = live_charStats.inputPrimary;
-                skill.skill_otherInput = live_charStats.inputSecondary;
-                break;
-            case ScrObj_skill.Skill_InputType.secondary:
-                skill.skill_input = live_charStats.inputSecondary;
-                skill.skill_otherInput = live_charStats.inputPrimary;
-                break;
-        }
     }
-
-    /// <summary>
+    
+    /// <summary> OLD Returning InputSelector
     /// Update skill_input i skill_otherInput w zależności od ustawień w scriptableObjecie
     /// Użyty w skill_Castings
     /// <br>Zwraca Arraya booleanów ponieważ można returnować tylko 1 zmienną a potrzeba input i other input</br>
@@ -858,9 +868,34 @@ public static void Skill_Cone_AttackConeCheck(bool isCasting, float skill_curren
         }
         return inputs;
     }
+     
+     */
+
+    /// <summary>
+    /// Update skill_input i skill_otherInput w zależności od ustawień w scriptableObjecie
+    /// Użyty w skill_Castings
+    /// </summary>
+    /// <param name="scrObj_Skill">Scriptable Object Skilla</param>
+    /// <param name="skill">Ten GameObject skill</param>
+    /// <param name="live_charStats">Live_charStats Castera</param>
+    public static void Skill_InputSelector(ScrObj_skill scrObj_Skill, Skill skill, CharacterStatus live_charStats)
+    {
+        switch (scrObj_Skill.skill_InputType)
+        {
+            case ScrObj_skill.Skill_InputType.primary:
+                skill.skill_input = live_charStats.inputPrimary;
+                skill.skill_otherInput = live_charStats.inputSecondary;
+                break;
+            case ScrObj_skill.Skill_InputType.secondary:
+                skill.skill_input = live_charStats.inputSecondary;
+                skill.skill_otherInput = live_charStats.inputPrimary;
+                break;
+        }
+    }
+
     #endregion
 
-    #region ResourceTypeCurrentFloatReadOnly
+    #region Skill_ResourceTypeCurrentFloatReadOnly
 
     /*/// <summary> OLD CODE
     /// Update Resource Type w zależności od ustawień w scriptableObjecie
@@ -943,7 +978,7 @@ public static void Skill_Cone_AttackConeCheck(bool isCasting, float skill_curren
     /// <param name="scrObj_Skill">Scriptable Object Skilla</param>
     /// <param name="skill">Ten GameObject skill</param>
     /// <param name="live_charStats">Live_charStats Castera</param>
-    public static float ResourceTypeCurrentFloatReadOnly(ScrObj_skill scrObj_Skill, CharacterStatus live_charStats)
+    public static float Skill_ResourceTypeCurrentFloatReadOnly(ScrObj_skill scrObj_Skill, CharacterStatus live_charStats)
     {
         float currentResource = new();
 
@@ -1014,12 +1049,14 @@ public static void Skill_Cone_AttackConeCheck(bool isCasting, float skill_curren
     /// <param name="live_charStats">Live_charStats Castera</param>
     public static void Skill_EveryFrameValuesUpdate(ScrObj_skill scrObj_Skill, Skill skill, CharacterStatus live_charStats, CharacterBonusStats currentCharacterBonusStats)
     {
+        Skill_InputSelector(scrObj_Skill, skill, live_charStats);
 
         skill.skill_currentCooldownRemaining = Mathf.MoveTowards(skill.skill_currentCooldownRemaining, 0f, Time.deltaTime / scrObj_Skill.skill_BaseCooldown); //cooldown remaining spada do zera w czasie (1sek * 1/basecooldown ) czyli 30f -> 0f w 10sek
         skill.skill_currentComboProgress = Mathf.MoveTowards(skill.skill_currentComboProgress, 0f, Time.deltaTime / scrObj_Skill.skill_BaseCooldown / 2f);   //aktualny combo progress spada do zera w czasie (1sek * (1/basecooldown/2)) czyli 30f -> 0f w 20sek
 
         if (skill.skill_currentCooldownRemaining >= 0.06f) { skill.skill_IsCastingInstant = false; } //Reset Instanta na początku każdej klatki jeśli jest na cooldown
-        }
+
+    }
     #endregion
 
     #region Skill_Cone_DynamicCone
@@ -1089,6 +1126,36 @@ public static void Skill_Cone_AttackConeCheck(bool isCasting, float skill_curren
     }
     #endregion
 
+    #region Skill_Melee_DynamicCone
+
+    /// <summary>
+    /// Mechanika Dynamicznego Range/Angle Cone dla TargetType Melee
+    /// <br><i>Dynamicznie skaluje zasięg i kąt Skilla</i></br>
+    /// </summary>
+    /// <param name="scrObj_Skill">Scriptable Object Skilla</param>
+    /// <param name="skill">Ten GameObject skill</param>
+    /// <param name="live_charStats">Live_charStats Castera</param>
+    public static void Skill_Melee_DynamicCone(ScrObj_skill scrObj_Skill, Skill skill, CharacterStatus live_charStats)
+    {
+        if (live_charStats.isCasting)
+        {
+            skill.skill_currentRadius = Mathf.SmoothDamp(skill.skill_currentRadius, scrObj_Skill.skill_MaxRadius, ref skill.skill_currentVectorRadius, scrObj_Skill.skill_TimeMaxRadius);
+            //dynamiczny BreathCone radius -> ++ on input
+
+            skill.skill_currentAngle = Mathf.SmoothDamp(skill.skill_currentAngle, scrObj_Skill.skill_MaxAngle, ref skill.skill_currentVectorAngle, scrObj_Skill.skill_TimeMaxAngle);
+            //dynamiczny BreathCone Angle -> ++ on input
+        }
+        else
+        {
+            skill.skill_currentRadius = Mathf.SmoothDamp(skill.skill_currentRadius, scrObj_Skill.skill_MinRadius, ref skill.skill_currentVectorRadius, scrObj_Skill.skill_TimeMaxRadius);
+            //dynamiczny BreathCone radius -> -- off input
+
+            skill.skill_currentAngle = Mathf.SmoothDamp(skill.skill_currentAngle, scrObj_Skill.skill_MinAngle, ref skill.skill_currentVectorAngle, scrObj_Skill.skill_TimeMaxAngle);
+            //dynamiczny BreathCone Angle -> -- off 
+        }
+    }
+    #endregion
+
     #region Skill_Target_ConeReset
     /// <summary>
     /// Resetuje Boole targetInRange/Angle oraz listę Colliderów
@@ -1115,6 +1182,9 @@ public static void Skill_Cone_AttackConeCheck(bool isCasting, float skill_curren
         if (skill.skill_CastingVisualEffect != null) skill.skill_CastingVisualEffect.Stop();
         if (!string.IsNullOrWhiteSpace(scrObj_Skill.skill_AnimatorBoolName)) live_charStats.currentAnimator.SetBool(scrObj_Skill.skill_AnimatorBoolName, false);
         if (!string.IsNullOrWhiteSpace(scrObj_Skill.skill_AnimatorTriggerName)) live_charStats.currentAnimator.ResetTrigger(scrObj_Skill.skill_AnimatorTriggerName);
+
+        if (skill.skill_AudioSource != null) { skill.skill_AudioSource.Stop(); }
+
         live_charStats.isCasting = false;
         
         skill.skill_IsCastingInstant = false;
@@ -1128,11 +1198,21 @@ public static void Skill_Cone_AttackConeCheck(bool isCasting, float skill_curren
     }
     #endregion
 
-    public static bool CastingTypeCurrentFloatReadOnly(int currentIndex, Skill skill)
+    #region Skill_CastingTypeCurrentFloatReadOnly
+    /// <summary>
+    /// <br>Przyjmuje currentCastingIndex z arraya EffetType [i] oraz tego Skilla</br>
+    /// <br>Zwraca Boola IsCastingType [FinishedCastable / Instant / Hold]</br>
+    /// <br>Bool IsCastingType [FinishedCastable / Instant / Hold] przekazywany jest dalej do wybranej przez switcha Static metody z EffectType</br>
+    /// <br>Metoda wykorzystana w "for" CastingTypeArray Skill script</br> 
+    /// </summary>
+    /// <param name="currentCastingIndex">currentCastingIndex z arraya EffetType [i]</param>
+    /// <param name="skill">Ten GameObject skill</param>
+    /// <returns></returns>
+    public static bool Skill_CastingTypeCurrentFloatReadOnly(int currentCastingIndex, Skill skill)
     {
         bool currentCastingType = new();
 
-        switch (currentIndex)
+        switch (currentCastingIndex)
         {
             case 0:
                 currentCastingType = skill.skill_IsCastingFinishedCastable;
@@ -1145,9 +1225,26 @@ public static void Skill_Cone_AttackConeCheck(bool isCasting, float skill_curren
             case 2:
                 currentCastingType = skill.skill_IsCastingHold;
                 break;
-        }        
+        }
         return currentCastingType;
+    } 
+    #endregion
+
+    #region Skill_StopAllAnimatorMovementOnCast
+    /// <summary>
+    /// <br>>Klasa zatrzymująca cały movement postaci (Movement -> [yAnim = 0], ResetRrigger -> [Jump], Animator bool -> [false])</br
+    /// <br>>Nazwy Zmiennych animatora pobierane ze scrObj_Skilla</br
+    /// </summary>
+    /// <param name="scrObj_Skill">Scriptable Object Skilla</param>
+    /// <param name="live_charStats"></param>
+    public static void Skill_StopAllAnimatorMovement(ScrObj_skill scrObj_Skill, CharacterStatus live_charStats)
+    {
+        if (!string.IsNullOrWhiteSpace(scrObj_Skill.skill_StopOnCastFloatNameAnimator)) live_charStats.currentAnimator.SetFloat(scrObj_Skill.skill_StopOnCastFloatNameAnimator, 0);
+        if (!string.IsNullOrWhiteSpace(scrObj_Skill.skill_StopOnCastTriggerNameAnimator)) live_charStats.currentAnimator.ResetTrigger(scrObj_Skill.skill_StopOnCastTriggerNameAnimator);
+        if (!string.IsNullOrWhiteSpace(scrObj_Skill.skill_StopOnCastBoolNameAnimator)) live_charStats.currentAnimator.SetBool(scrObj_Skill.skill_StopOnCastBoolNameAnimator, false);
+        
     }
+    #endregion
 
     #endregion Utils
 
