@@ -45,7 +45,7 @@ public class Player_Input : MonoBehaviour
         live_charStats.inputRotateHorizontal = Input.GetAxis("Horizontal") * live_charStats.inputRotateSensivity * Time.deltaTime;
 
         //MeeleAttack
-        live_charStats.inputPrimary = Input.GetKey(KeyCode.Mouse0);
+        live_charStats.inputPrimary = Input.GetKey(KeyCode.Mouse0) && !live_charStats.isRunning;
 
     }
     public void IsometricInputClass()
@@ -62,12 +62,13 @@ public class Player_Input : MonoBehaviour
             }
             live_charStats.navMeAge_walkPointSet = true;
             
-            if (live_charStats.inputMouseCurrentMoving)  //jeœli poruszamy siê myszk¹ 
+            if (live_charStats.inputMouseCurrentMoving)  //jeœli poruszamy siê myszk¹ (Œrodkowy przycisk) 
             {                
                 live_charStats.fov_targetInAttackRange = false;      //debugging ¿eby nie blokowa³ siê przy atakowaniu
                 live_charStats.fov_targetInDynamicSightRange = false;      //debugging ¿eby nie blokowa³ siê przy atakowaniu
                 live_charStats.isAttacking = false;                     //debugging ¿eby nie blokowa³ siê przy atakowaniu
                 live_charStats.inputPrimary = false;                  //debugging ¿eby nie blokowa³ siê przy atakowaniu
+                live_charStats.inputSecondary = false;                  //debugging ¿eby nie blokowa³ siê przy atakowaniu
                 live_charStats.fov_targetAquired = true;             //debugging ¿eby nie blokowa³ siê przy atakowaniu                
             }
         }
@@ -86,7 +87,7 @@ public class Player_Input : MonoBehaviour
             live_charStats.inputPrimary = false;                  //debugging ¿eby nie blokowa³ siê przy atakowaniu
             live_charStats.fov_targetAquired = true;             //debugging ¿eby nie blokowa³ siê przy atakowaniu
             live_charStats.isRunning= false;
-            live_charStats.skill_CanCast = live_charStats.inputSecondary;
+            live_charStats.skill_CanCast = live_charStats.inputSecondary;  //tylko dla gracza w isometric -> Mo¿na canCastowaæ przerywaj¹c wszystko inne
             live_charStats.currentNavMeshAgent.isStopped = true;
 
         }
