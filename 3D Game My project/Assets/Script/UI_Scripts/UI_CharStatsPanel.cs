@@ -60,11 +60,11 @@ public class UI_CharStatsPanel : MonoBehaviour, IPlayerUpdate
         StatsTextBoxDestroy();
     }
 
-    private void Start()
+    /*private void Start()
     {
         //if(Input.GetKeyUp(KeyCode.G)) { StatsTextBox(); }
 
-    }
+    }*/
 
 
     public void StatsFillIn()
@@ -77,32 +77,32 @@ public class UI_CharStatsPanel : MonoBehaviour, IPlayerUpdate
             switch (charStat[i])
             {
                 case CharStat.CharLevel:
-                    selectedStatCurrentFloat[i] = live_charStats.currentCharLevel;
+                    selectedStatCurrentFloat[i] = live_charStats.charInfo.currentCharLevel;
                     selectedStatCurrentName[i] = "Character Level";
                     break;
 
                 case CharStat.WalkSpeed:
-                    selectedStatCurrentFloat[i] = live_charStats.currentWalkSpeed;
+                    selectedStatCurrentFloat[i] = live_charStats.currentCharMove.currentWalkSpeed;
                     selectedStatCurrentName[i] = "Walk Speed";
                     break;
 
                 case CharStat.RunSpeed:
-                    selectedStatCurrentFloat[i] = live_charStats.currentRunSpeed;
+                    selectedStatCurrentFloat[i] = live_charStats.currentCharMove.currentRunSpeed;
                     selectedStatCurrentName[i] = "Run Speed";
                     break;
 
                 case CharStat.AttCooldown:
-                    selectedStatCurrentFloat[i] = live_charStats.currentAttackCooldown;
+                    selectedStatCurrentFloat[i] = live_charStats.charSkillCombat.currentAttackCooldown;
                     selectedStatCurrentName[i] = "Melee Attack Cooldown";
                     break;
 
                 case CharStat.AttDamage:
-                    selectedStatCurrentFloat[i] = live_charStats.currentDamageCombo;
+                    selectedStatCurrentFloat[i] = live_charStats.charSkillCombat.currentDamageCombo;
                     selectedStatCurrentName[i] = "Melee Attack Damage";
                     break;
 
                 case CharStat.AttStaminaCost:
-                    selectedStatCurrentFloat[i] = live_charStats.currentAttackStamCost;
+                    selectedStatCurrentFloat[i] = live_charStats.charSkillCombat.currentAttackStamCost;
                     selectedStatCurrentName[i] = "Melee Attack Stamina Cost";
                     break;
 
@@ -117,7 +117,7 @@ public class UI_CharStatsPanel : MonoBehaviour, IPlayerUpdate
                     break;
 
                 case CharStat.HealthMultiplierStat:
-                    selectedStatCurrentFloat[i] = live_charStats.scrObj_CharStats.HP_Multiplier * live_charStats.currentCharLevel;
+                    selectedStatCurrentFloat[i] = live_charStats.scrObj_CharStats.HP_Multiplier * live_charStats.charInfo.currentCharLevel;
                     selectedStatCurrentName[i] = "Health Multiplier ";
                     break;
 
@@ -132,7 +132,7 @@ public class UI_CharStatsPanel : MonoBehaviour, IPlayerUpdate
                     break;
 
                 case CharStat.ManaMultiplierStat:
-                    selectedStatCurrentFloat[i] = live_charStats.scrObj_CharStats.MP_Multiplier * live_charStats.currentCharLevel;
+                    selectedStatCurrentFloat[i] = live_charStats.scrObj_CharStats.MP_Multiplier * live_charStats.charInfo.currentCharLevel;
                     selectedStatCurrentName[i] = "Mana Multiplier";
                     break;
 
@@ -148,7 +148,7 @@ public class UI_CharStatsPanel : MonoBehaviour, IPlayerUpdate
                     break;
 
                 case CharStat.StaminaMultiplierStat:
-                    selectedStatCurrentFloat[i] = live_charStats.scrObj_CharStats.Stam_Multiplier * live_charStats.currentCharLevel;
+                    selectedStatCurrentFloat[i] = live_charStats.scrObj_CharStats.Stam_Multiplier * live_charStats.charInfo.currentCharLevel;
                     selectedStatCurrentName[i] = "Stamina Multiplier";
 
                     break;

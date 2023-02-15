@@ -27,7 +27,7 @@ public class MeeleAttack : MonoBehaviour
     {
         live_charStats = GetComponentInParent<CharacterStatus>();        //automatyczny serialize dla wygody
         scrObj_CharStats = live_charStats.scrObj_CharStats;     //automatyczny serialize dla wygody    
-        enemiesArray = live_charStats.currentEnemiesArray;      //przypisanie enemieArraya z characterStats
+        enemiesArray = live_charStats.charInfo.currentEnemiesArray;      //przypisanie enemieArraya z characterStats
         
     }
     private void Start()
@@ -37,7 +37,7 @@ public class MeeleAttack : MonoBehaviour
     }
     private void Update()
     {
-        if(live_charStats.isAttacking && live_charStats.currentComboMeele == onCombo) //W³¹czanie colliderów tylko dla aktualnego combo
+        if(live_charStats.currentCharStatus.isAttacking && live_charStats.charSkillCombat.currentComboMeele == onCombo) //W³¹czanie colliderów tylko dla aktualnego combo
         {
             gameObject.GetComponent<Collider>().enabled = true;
         }
@@ -59,12 +59,12 @@ public class MeeleAttack : MonoBehaviour
 
             other.GetComponent<Animator>().SetTrigger("IsHit");  //Trigger Hit Animatora
 
-            other.GetComponent<CharacterStatus>().currentHP -= GetComponentInParent<CharacterStatus>().currentDamageCombo;
+            other.GetComponent<CharacterStatus>().currentHP -= GetComponentInParent<CharacterStatus>().charSkillCombat.currentDamageCombo;
 
-            if (other.GetComponent<CharacterStatus>().currentHP <= 0f && !other.GetComponent<CharacterStatus>().isDead)
+            if (other.GetComponent<CharacterStatus>().currentHP <= 0f && !other.GetComponent<CharacterStatus>().currentCharStatus.isDead)
 
             {
-                other.GetComponent<CharacterStatus>().currentCharLevel = UnityEngine.Random.Range(live_charStats.currentCharLevel - 3, live_charStats.currentCharLevel + 3);  //po œmierci ustawia level targetu na zbli¿ony do atakuj¹cego
+                other.GetComponent<CharacterStatus>().charInfo.currentCharLevel = UnityEngine.Random.Range(live_charStats.charInfo.currentCharLevel - 3, live_charStats.charInfo.currentCharLevel + 3);  //po œmierci ustawia level targetu na zbli¿ony do atakuj¹cego
                 live_charStats.currentXP += other.GetComponent<CharacterStatus>().currentXP_GainedFromKill;
 
                 /* // --> co sie dzieje przy spadku hp do 0 // (animacja znikania jak czacha)
@@ -74,15 +74,15 @@ public class MeeleAttack : MonoBehaviour
             i++;  //zmienna testing only
 
         }
-        else if (other.CompareTag("Destructibles") && live_charStats.isAttacking && live_charStats.currentComboMeele == onCombo) 
+        else if (other.CompareTag("Destructibles") && live_charStats.currentCharStatus.isAttacking && live_charStats.charSkillCombat.currentComboMeele == onCombo) 
         {
             audioSource.PlayOneShot(other.GetComponent<CharacterStatus>().scrObj_CharStats.damagedDestructibles, 1);
 
             //other.GetComponent<Animator>().SetTrigger("IsHit");   animacja hit dla environment -> in da progress
 
-            other.GetComponent<CharacterStatus>().currentHP -= GetComponentInParent<CharacterStatus>().currentDamageCombo;
+            other.GetComponent<CharacterStatus>().currentHP -= GetComponentInParent<CharacterStatus>().charSkillCombat.currentDamageCombo;
 
-            if (other.GetComponent<CharacterStatus>().currentHP <= 0f && !other.GetComponent<CharacterStatus>().isDead)
+            if (other.GetComponent<CharacterStatus>().currentHP <= 0f && !other.GetComponent<CharacterStatus>().currentCharStatus.isDead)
             {
                 live_charStats.currentXP += other.GetComponent<CharacterStatus>().currentXP_GainedFromKill;                
             } 

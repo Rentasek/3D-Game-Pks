@@ -37,33 +37,33 @@ public class UI_ButtonActive : MonoBehaviour, IPlayerUpdate
         switch (ui_button)
         {
             case ui_Button.AttackButton:
-                if (live_charStats.inputPrimary) currentButton.interactable = true;
+                if (live_charStats.characterInput.inputPrimary) currentButton.interactable = true;
                 else currentButton.interactable = false;
                 break;
 
             case ui_Button.SpecialAttackButton:
-                if (live_charStats.inputSecondary) currentButton.interactable = true;
+                if (live_charStats.characterInput.inputSecondary) currentButton.interactable = true;
                 else currentButton.interactable = false;
                 break;
 
             case ui_Button.MouseMovementButton:
-                if (live_charStats.inputMouseCurrentMoving) currentButton.interactable = true;
+                if (live_charStats.characterInput.inputMouseCurrentMoving) currentButton.interactable = true;
                 else currentButton.interactable = false;
                 break;
             case ui_Button.MouseRotateButton:
-                if (!live_charStats.inputEnableMouseRotate || !live_charStats.playerInputEnable) currentButton.interactable = false;
+                if (!live_charStats.characterInput.inputEnableMouseRotate || !live_charStats.charInfo.playerInputEnable) currentButton.interactable = false;
                 else currentButton.interactable = true;
                 break;
             case ui_Button.IsometricButton:
-                if (live_charStats.playerInputEnable) currentButton.interactable = false;
+                if (live_charStats.charInfo.playerInputEnable) currentButton.interactable = false;
                 else currentButton.interactable = true;
                 break;
             case ui_Button.ThirdPersonButton:
-                if (live_charStats.playerInputEnable) currentButton.interactable = true;
+                if (live_charStats.charInfo.playerInputEnable) currentButton.interactable = true;
                 else currentButton.interactable = false;
                 break;
             case ui_Button.SprintButton:
-                if (live_charStats.inputRunning) currentButton.interactable = true;
+                if (live_charStats.characterInput.inputRunning) currentButton.interactable = true;
                 else currentButton.interactable = false;
                 break;
         }

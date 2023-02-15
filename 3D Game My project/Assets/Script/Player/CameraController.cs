@@ -51,7 +51,7 @@ public partial class CameraController : MonoBehaviour
         CameraDistance();
 
         if (Input.GetKeyDown(KeyCode.X)) SwitchCursorOptions();
-        if (live_charStats.inputEnableMouseRotate) MouseRotate();
+        if (live_charStats.characterInput.inputEnableMouseRotate) MouseRotate();
 
         CameraFollowPlayer();
     }
@@ -70,7 +70,7 @@ public partial class CameraController : MonoBehaviour
 
         //transform.position = Vector3.MoveTowards(transform.position, (playerTransform.position - playerTransform.forward * zOffset + playerTransform.up * yOffset), timeFollowOffset * Time.deltaTime);
 
-        if (live_charStats.playerInputEnable)
+        if (live_charStats.charInfo.playerInputEnable)
         {
             transform.position = Vector3.SmoothDamp(transform.position, (playerTransform.right * standardCameraOffset.x + (playerTransform.position - playerTransform.forward * standardCameraOffset.z) + playerTransform.up * standardCameraOffset.y), ref currentCameraVelocity, timeFollowOffset);
             // smoothDamp jest p³ynniejsze od MoveTowards
@@ -85,13 +85,13 @@ public partial class CameraController : MonoBehaviour
 
     public void SwitchCursorOptions()
     {
-        if (live_charStats.isPlayer)
+        if (live_charStats.charInfo.isPlayer)
         {
-            if (live_charStats.playerInputEnable) //jesli 3rd person view
+            if (live_charStats.charInfo.playerInputEnable) //jesli 3rd person view
             {
-                live_charStats.inputEnableMouseRotate = !live_charStats.inputEnableMouseRotate; //w³¹czanie i wy³¹czanie booleana przyciskiem on/off
+                live_charStats.characterInput.inputEnableMouseRotate = !live_charStats.characterInput.inputEnableMouseRotate; //w³¹czanie i wy³¹czanie booleana przyciskiem on/off
 
-                if (live_charStats.inputEnableMouseRotate) Cursor.lockState = CursorLockMode.Locked; //kursor zablokwany na œrodku ekranu
+                if (live_charStats.characterInput.inputEnableMouseRotate) Cursor.lockState = CursorLockMode.Locked; //kursor zablokwany na œrodku ekranu
                 else { Cursor.lockState = CursorLockMode.None; Cursor.visible = true; }
             }
             else //jeœli isometric
@@ -105,8 +105,8 @@ public partial class CameraController : MonoBehaviour
     void CameraDistance()
     {
         //Mouse Roll zmienie odleg³oœæ kamery
-        float mouseScroll = -1 * live_charStats.inputMouseScroll; //InvertScrollMouse
-        if (live_charStats.playerInputEnable)
+        float mouseScroll = -1 * live_charStats.characterInput.inputMouseScroll; //InvertScrollMouse
+        if (live_charStats.charInfo.playerInputEnable)
         {
             standardCameraOffset.y = Mathf.Clamp(standardCameraOffset.y + (cameraDistanceYMax - cameraDistanceYMin) * mouseScroll, cameraDistanceYMin, cameraDistanceYMax);
             standardCameraOffset.z = Mathf.Clamp(standardCameraOffset.z + (cameraDistanceZMax - cameraDistanceZMin) * mouseScroll, cameraDistanceZMin, cameraDistanceZMax);
@@ -136,7 +136,7 @@ public partial class CameraController : MonoBehaviour
                 playerUpdate.PlayerUpdate();
             }
 
-            live_charStats.isPlayer = true;
+            live_charStats.charInfo.isPlayer = true;
             player.GetComponent<CharControler>().PlayerUpdate();
             
             //Podmianka UI Status barów na aktulnego playera

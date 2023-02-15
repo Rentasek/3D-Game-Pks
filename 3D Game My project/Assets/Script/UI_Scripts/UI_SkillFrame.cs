@@ -29,7 +29,7 @@ public class UI_SkillFrame : MonoBehaviour, IPlayerUpdate
         HealthMaxStat, ManaMaxStat, StaminaMaxStat, WalkSpeed, AttMeleeDamage, AttSpellDamage, SkillPTS /*,
         XPCurrentStat, XPNeededStat, CharLevel, RunSpeed, AttCooldown, AttStaminaCost, HealthRegenStat, HealthMultiplierStat, ManaRegenStat,ManaMultiplierStat, StaminaRegenStat, StaminaMultiplierStat*/
     };
-    [SerializeField] CharStat charStat = new CharStat();          //enumerator, tworzy nowy obiekt CharStat dla ka¿dego elementu z listy 
+    [SerializeField] CharStat charStat = new();          //enumerator, tworzy nowy obiekt CharStat dla ka¿dego elementu z listy 
     [SerializeField] Sprite[] skillImagesList;
 
     private void OnEnable()
@@ -106,21 +106,21 @@ public class UI_SkillFrame : MonoBehaviour, IPlayerUpdate
 
             case CharStat.WalkSpeed:
                 skill_BonusFloat = currentCharacterBonusStats.bonus_currentWalkSpeed;
-                skill_OutputFloat = live_charStats.currentWalkSpeed;
+                skill_OutputFloat = live_charStats.currentCharMove.currentWalkSpeed;
                 skill_selectedName = "Walk Speed";
                 skill_Image.GetComponent<Image>().sprite = skillImagesList[3];                
                 break;
 
             case CharStat.AttMeleeDamage:
                 skill_BonusFloat = currentCharacterBonusStats.bonus_currentDamageCombo;
-                skill_OutputFloat = live_charStats.currentDamageCombo;
+                skill_OutputFloat = live_charStats.charSkillCombat.currentDamageCombo;
                 skill_selectedName = "Melee Damage";
                 skill_Image.GetComponent<Image>().sprite = skillImagesList[4];
                 break;
 
             case CharStat.AttSpellDamage:
                 skill_BonusFloat = currentCharacterBonusStats.bonus_Skill_Damage;
-                skill_OutputFloat = live_charStats.currentSpell_Damage;
+                skill_OutputFloat = live_charStats.charSkillCombat.currentSpell_Damage;
                 skill_selectedName = "Spell Damage";
                 skill_Image.GetComponent<Image>().sprite = skillImagesList[5];
                 break;
@@ -161,18 +161,18 @@ public class UI_SkillFrame : MonoBehaviour, IPlayerUpdate
 
             case CharStat.WalkSpeed:
                 skill_BonusFloat = currentCharacterBonusStats.bonus_currentWalkSpeed;
-                skill_OutputFloat = live_charStats.currentWalkSpeed;
+                skill_OutputFloat = live_charStats.currentCharMove.currentWalkSpeed;
                 break;
 
             case CharStat.AttMeleeDamage:
                 skill_BonusFloat = currentCharacterBonusStats.bonus_currentDamageCombo;
-                skill_OutputFloat = live_charStats.currentDamageCombo;
+                skill_OutputFloat = live_charStats.charSkillCombat.currentDamageCombo;
                 skill_Image.GetComponent<Image>().sprite = skillImagesList[4];
                 break;
 
             case CharStat.AttSpellDamage:
                 skill_BonusFloat = currentCharacterBonusStats.bonus_Skill_Damage;
-                skill_OutputFloat = live_charStats.currentSpell_Damage;
+                skill_OutputFloat = live_charStats.charSkillCombat.currentSpell_Damage;
                 break;
 
             case CharStat.SkillPTS:
@@ -193,7 +193,7 @@ public class UI_SkillFrame : MonoBehaviour, IPlayerUpdate
 
     public void SkillUp()
     {
-        if (live_charStats.inputRunning && currentCharacterBonusStats.bonus_SkillPoints >= 10)
+        if (live_charStats.characterInput.inputRunning && currentCharacterBonusStats.bonus_SkillPoints >= 10)
         {
             skill_BonusFloat += 10;
             currentCharacterBonusStats.bonus_SkillPoints -= 10;
@@ -207,7 +207,7 @@ public class UI_SkillFrame : MonoBehaviour, IPlayerUpdate
     }
     public void SkillDown()
     {
-        if (live_charStats.inputRunning && skill_BonusFloat >= 10)
+        if (live_charStats.characterInput.inputRunning && skill_BonusFloat >= 10)
         {
             skill_BonusFloat -= 10;
             currentCharacterBonusStats.bonus_SkillPoints += 10;

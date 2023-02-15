@@ -72,15 +72,15 @@ public class Spell_FireBreath : MonoBehaviour
         live_charStats = GetComponentInParent<CharacterStatus>();
         breath_AudioSource = GetComponentInParent<AudioSource>();//debugg jeœli nie ustawione w inspectorze
         breath_VisualEffect = GetComponentInParent<VisualEffect>();
-        live_charStats.spell = GetComponent<Spell_FireBreath>();
-        live_charStats.spell_MaxRadius = breath_MaxFireRadius;
+        //live_charStats.skill_secondarySkill = GetComponent<Spell_FireBreath>();
+        live_charStats.charSkillCombat.spell_MaxRadius = breath_MaxFireRadius;
         EnemyArraySelector();
     }
 
     private void EnemyArraySelector()
     {
-        breath_EnemiesArray = new string[live_charStats.currentEnemiesArray.Length + 1];    //tworzy array +1 od current enemies arraya
-        live_charStats.currentEnemiesArray.CopyTo(breath_EnemiesArray, 0);                  //kopiuje current enemies arraya od indexu 0
+        breath_EnemiesArray = new string[live_charStats.charInfo.currentEnemiesArray.Length + 1];    //tworzy array +1 od current enemies arraya
+        live_charStats.charInfo.currentEnemiesArray.CopyTo(breath_EnemiesArray, 0);                  //kopiuje current enemies arraya od indexu 0
         breath_EnemiesArray[breath_EnemiesArray.Length - 1] = "Destructibles";              //wstawia jako ostatni index Destructibles ¿eby zawsze mo¿na by³o go zniszczyæ
     }
 
@@ -88,14 +88,14 @@ public class Spell_FireBreath : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        breath_input = live_charStats.inputSecondary; //testing inspector
-        live_charStats.skill_CanCast = !live_charStats.inputPrimary && !live_charStats.isRunning && live_charStats.currentMoveSpeed != live_charStats.currentRunSpeed;
+        breath_input = live_charStats.characterInput.inputSecondary; //testing inspector
+        live_charStats.charSkillCombat.skill_CanCast = !live_charStats.characterInput.inputPrimary && !live_charStats.currentCharStatus.isRunning && live_charStats.currentCharMove.currentMoveSpeed != live_charStats.currentCharMove.currentRunSpeed;
     }
     private void FixedUpdate()
     {
-        audioVolume = GetComponentInParent<AudioSource>(live_charStats.inputSecondary).volume;    //testing inspector
+        audioVolume = GetComponentInParent<AudioSource>(live_charStats.characterInput.inputSecondary).volume;    //testing inspector
 
-        if (!live_charStats.isDead) //tylko dla ¿ywych :P
+        if (!live_charStats.currentCharStatus.isDead) //tylko dla ¿ywych :P
         {
             FireBreathVFX_Audio();
 
@@ -113,9 +113,9 @@ public class Spell_FireBreath : MonoBehaviour
     private void FireBreathVFX_Audio()
     {
 
-        if (live_charStats.inputSecondary && live_charStats.skill_CanCast && live_charStats.currentMP >= 1f) 
+        if (live_charStats.characterInput.inputSecondary && live_charStats.charSkillCombat.skill_CanCast && live_charStats.currentMP >= 1f) 
         {
-            if (!live_charStats.isCasting)
+            if (!live_charStats.currentCharStatus.isCasting)
             {
                 breath_VisualEffect.Play(); //mo¿e siê odpaliæ tylko raz przy ka¿dym inpucie, nie mo¿e siê nadpisaæ -> taki sam efekt jak przy GetKeyDown
                 breath_AudioSource.PlayOneShot(fireBreathAudioClip, 0.5f);//clip audio
@@ -125,8 +125,8 @@ public class Spell_FireBreath : MonoBehaviour
 
 
             }
-            live_charStats.isCasting = true;
-            live_charStats.currentAnimator.SetBool("IsCasting", live_charStats.isCasting);
+            live_charStats.currentCharStatus.isCasting = true;
+            live_charStats.currentAnimator.SetBool("IsCasting", live_charStats.currentCharStatus.isCasting);
         }
         else
         {
@@ -134,8 +134,8 @@ public class Spell_FireBreath : MonoBehaviour
             //GetComponentInParent<AudioSource>(live_charStats.inputCasting).Stop();//stop audio jeœli nie ma inputa
             //GetComponentInParent<AudioSource>(live_charStats.inputCasting).volume -= audioLerpDecrease * Time.deltaTime;//volume down audio jeœli nie ma inputa
 
-            live_charStats.isCasting = false;
-            live_charStats.currentAnimator.SetBool("IsCasting", live_charStats.isCasting);
+            live_charStats.currentCharStatus.isCasting = false;
+            live_charStats.currentAnimator.SetBool("IsCasting", live_charStats.currentCharStatus.isCasting);
         }
 
 
@@ -149,7 +149,7 @@ public class Spell_FireBreath : MonoBehaviour
     private void FireBreathDynamicCone()
     {
 
-        if (live_charStats.isCasting)
+        if (live_charStats.currentCharStatus.isCasting)
         {
             breath_currentFireRadius = Mathf.SmoothDamp(breath_currentFireRadius, breath_MaxFireRadius, ref breath_currentVectorFireRadius, breath_TimeFireRadius);
             //dynamiczny BreathCone radius -> ++ on input
@@ -171,7 +171,7 @@ public class Spell_FireBreath : MonoBehaviour
     {
         FireBreathDynamicCone();
 
-        if (live_charStats.isCasting)
+        if (live_charStats.currentCharStatus.isCasting)
         {            
             for (int i = 0; i < Physics.OverlapSphere(transform.position, breath_currentFireRadius).Length; i++)
             {
@@ -217,23 +217,23 @@ public class Spell_FireBreath : MonoBehaviour
 
     private void FireBreathDamage()
     {
-        if (live_charStats.isCasting)
+        if (live_charStats.currentCharStatus.isCasting)
         {
             for (int i = 0; i < breath_targetColliders.Count; i++)
             {                
-                breath_targetColliders[i].GetComponent<CharacterStatus>().currentHP = Mathf.MoveTowards(breath_targetColliders[i].GetComponent<CharacterStatus>().currentHP, -live_charStats.currentSpell_Damage, live_charStats.currentSpell_Damage * Time.deltaTime);  // DMG / Sek
+                breath_targetColliders[i].GetComponent<CharacterStatus>().currentHP = Mathf.MoveTowards(breath_targetColliders[i].GetComponent<CharacterStatus>().currentHP, -live_charStats.charSkillCombat.currentSpell_Damage, live_charStats.charSkillCombat.currentSpell_Damage * Time.deltaTime);  // DMG / Sek
 
-                if (breath_targetColliders[i].GetComponent<CharacterStatus>().currentHP <= 0f && !breath_targetColliders[i].GetComponent<CharacterStatus>().isDead)
+                if (breath_targetColliders[i].GetComponent<CharacterStatus>().currentHP <= 0f && !breath_targetColliders[i].GetComponent<CharacterStatus>().currentCharStatus.isDead)
 
                 {
                     live_charStats.currentXP += breath_targetColliders[i].GetComponent<CharacterStatus>().currentXP_GainedFromKill;
-                    if (breath_targetColliders[i].CompareTag("Monster")) { breath_targetColliders[i].GetComponent<CharacterStatus>().currentCharLevel = Random.Range(live_charStats.currentCharLevel - 3, live_charStats.currentCharLevel + 3); }  //po œmierci ustawia level targetu na zbli¿ony do atakuj¹cego
+                    if (breath_targetColliders[i].CompareTag("Monster")) { breath_targetColliders[i].GetComponent<CharacterStatus>().charInfo.currentCharLevel = Random.Range(live_charStats.charInfo.currentCharLevel - 3, live_charStats.charInfo.currentCharLevel + 3); }  //po œmierci ustawia level targetu na zbli¿ony do atakuj¹cego
                     //podbija lvl tylko Monsterów, Playera i Environment nie
                 }
 
             }
             //live_charStats.currentMP = Mathf.SmoothStep(live_charStats.currentMP, -live_charStats.currentSpell_MPCost, Time.deltaTime);  // MPCost / Sek
-            live_charStats.currentMP = Mathf.MoveTowards(live_charStats.currentMP, -live_charStats.currentSpell_MPCost, live_charStats.currentSpell_MPCost * Time.deltaTime);    // MPCost / Sek
+            live_charStats.currentMP = Mathf.MoveTowards(live_charStats.currentMP, -live_charStats.charSkillCombat.currentSpell_MPCost, live_charStats.charSkillCombat.currentSpell_MPCost * Time.deltaTime);    // MPCost / Sek
         }        
     }
 
@@ -257,16 +257,16 @@ public class Spell_FireBreath : MonoBehaviour
     private void GizmosDrawer()
     {
 
-        Handles.color = live_charStats.spell_breathAngleColor;
+        Handles.color = live_charStats.charSkillCombat.spell_breathAngleColor;
         Handles.DrawSolidArc(transform.position, Vector3.up, Quaternion.AngleAxis(-(breath_currentFireAngle / 2), Vector3.up) * transform.forward, breath_currentFireAngle, breath_currentFireRadius); //rysuje coneAngle view               
 
 
         if (breath_targetInBreathRange && breath_targetInBreathAngle)
         {
-            Handles.color = live_charStats.spell_breathRaycastColor;
+            Handles.color = live_charStats.charSkillCombat.spell_breathRaycastColor;
             for (int i = 0; i < breath_targetColliders.Count; i++)
             {
-                Handles.DrawLine(transform.position, breath_targetColliders[i].transform.position, live_charStats.fov_editorLineThickness); //rysowanie lini w kierunku targetów breatha jeœli nie zas³ania go obstacle Layer
+                Handles.DrawLine(transform.position, breath_targetColliders[i].transform.position, live_charStats.fov.fov_editorLineThickness); //rysowanie lini w kierunku targetów breatha jeœli nie zas³ania go obstacle Layer
             }
 
         }

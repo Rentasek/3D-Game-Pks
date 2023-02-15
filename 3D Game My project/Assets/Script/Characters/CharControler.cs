@@ -16,7 +16,7 @@ public class CharControler : MonoBehaviour
     {
         live_charStats = GetComponent<CharacterStatus>();
 
-        if (live_charStats.isPlayer) live_charStats.LoadLevel();
+        if (live_charStats.charInfo.isPlayer) live_charStats.LoadLevel();
         live_charStats.LoadCharStats();
         
         live_charStats.SetCharacterPosition();
@@ -26,7 +26,7 @@ public class CharControler : MonoBehaviour
 
     private void Start()
     {
-        if (live_charStats.isPlayer) live_charStats.LoadLevel();
+        if (live_charStats.charInfo.isPlayer) live_charStats.LoadLevel();
         live_charStats.LoadCharStats();
     }
 
@@ -34,7 +34,7 @@ public class CharControler : MonoBehaviour
     {
         //live_charStats = GetComponent<CharacterStatus>();
         
-        if (live_charStats.isPlayer) live_charStats.LoadLevel();
+        if (live_charStats.charInfo.isPlayer) live_charStats.LoadLevel();
         live_charStats.LoadCharStats();
 
         if (live_charStats.currentAnimator != null)
@@ -53,10 +53,10 @@ public class CharControler : MonoBehaviour
             live_charStats.currentPlayer_Input.InputClass();
         }
 
-        if (!live_charStats.isDead) //Jeœli ¿yje
+        if (!live_charStats.currentCharStatus.isDead) //Jeœli ¿yje
         {
             //AIController
-            if (live_charStats.currentNavMeshAgent != null && !live_charStats.playerInputEnable) //Jeœli PplayerInput (3rd person view) nie jest w³¹czony
+            if (live_charStats.currentNavMeshAgent != null && !live_charStats.charInfo.playerInputEnable) //Jeœli PplayerInput (3rd person view) nie jest w³¹czony
             {
                 StartCoroutine(AIControllerRoutine());
             }
@@ -65,19 +65,19 @@ public class CharControler : MonoBehaviour
             //if (live_charStats.inputPrimary) StartCoroutine(MeeleAttack());
 
             //RotatePlayer
-            if (live_charStats.playerInputEnable && live_charStats.isPlayer) { LiveCharStats_Base.RotatePlayer(live_charStats); }    //Rotate musi byæ w update bo inaczej dziej¹ siê cyrki            
+            if (live_charStats.charInfo.playerInputEnable && live_charStats.charInfo.isPlayer) { LiveCharStats_Base.RotatePlayer(live_charStats); }    //Rotate musi byæ w update bo inaczej dziej¹ siê cyrki            
             //if (live_charStats.playerInputEnable && live_charStats.isPlayer) { live_charStats.currentcharacterMovement.RotatePlayer(); }    //Rotate musi byæ w update bo inaczej dziej¹ siê cyrki
 
             //Reset/SetPosition
-            if (live_charStats.inputSetBackupPosition && live_charStats.isPlayer) live_charStats.SetCharacterPosition();
-            if (live_charStats.inputResetPosition) live_charStats.ResetCharacterPosition();
+            if (live_charStats.characterInput.inputSetBackupPosition && live_charStats.charInfo.isPlayer) live_charStats.SetCharacterPosition();
+            if (live_charStats.characterInput.inputResetPosition) live_charStats.ResetCharacterPosition();
 
         }
 
         //Death
         if (live_charStats.currentHP <= 0f)
         {
-            if (!live_charStats.isDead)
+            if (!live_charStats.currentCharStatus.isDead)
             {
                 StartCoroutine(DeathAction());
             }
@@ -91,10 +91,10 @@ public class CharControler : MonoBehaviour
     }
     private void FixedUpdate()
     {
-        if (!live_charStats.isDead)
+        if (!live_charStats.currentCharStatus.isDead)
         {
             //Character Movement
-            if (live_charStats.currentCharacterController != null && !live_charStats.inputPrimary) { LiveCharStats_Base.Movement(live_charStats); }
+            if (live_charStats.currentCharacterController != null && !live_charStats.characterInput.inputPrimary) { LiveCharStats_Base.Movement(live_charStats); }
             //if (live_charStats.currentCharacterController != null) { live_charStats.currentcharacterMovement.Movement(); }
 
             //Resource Regen
@@ -104,7 +104,7 @@ public class CharControler : MonoBehaviour
 
     void LateUpdate()
     {        
-        if (live_charStats.currentXP >= live_charStats.currentNeededXP && live_charStats.isPlayer) live_charStats.LevelGain();
+        if (live_charStats.currentXP >= live_charStats.currentNeededXP && live_charStats.charInfo.isPlayer) live_charStats.LevelGain();
     }
 
 
@@ -115,10 +115,10 @@ public class CharControler : MonoBehaviour
     /// <returns></returns>
     public void PlayerUpdate()
     {
-        if (live_charStats.isPlayer)
+        if (live_charStats.charInfo.isPlayer)
         {            
             
-            if (live_charStats.isPlayer) live_charStats.LoadLevel();
+            if (live_charStats.charInfo.isPlayer) live_charStats.LoadLevel();
             live_charStats.LoadCharStats();
 
             if (live_charStats.currentAnimator != null)
@@ -137,19 +137,19 @@ public class CharControler : MonoBehaviour
     /// <returns></returns>
     private IEnumerator FOVRoutine()
     {
-        if (live_charStats.fov_isSearchingForTarget)
+        if (live_charStats.fov.fov_isSearchingForTarget)
         {
             yield break; // ¿eby nie nadpisywa³ coroutine co klatke
         }
         else
         {
-            live_charStats.fov_isSearchingForTarget = true;
+            live_charStats.fov.fov_isSearchingForTarget = true;
 
-            yield return new WaitForSeconds(live_charStats.fov_RoutineDelay);
+            yield return new WaitForSeconds(live_charStats.fov.fov_RoutineDelay);
 
             LiveCharStats_Base.FieldOfViewTarget(live_charStats);
 
-            live_charStats.fov_isSearchingForTarget = false;
+            live_charStats.fov.fov_isSearchingForTarget = false;
         }
     }
 
@@ -161,18 +161,18 @@ public class CharControler : MonoBehaviour
     /// <returns></returns>
     public IEnumerator AIControllerRoutine()
     {
-        if (live_charStats.navMeAge_isCheckingAIRoutine)
+        if (live_charStats.navMeshAge.navMeAge_isCheckingAIRoutine)
         {
             yield break; // ¿eby nie nadpisywa³ coroutine co klatke
         }
         else
         {
-            live_charStats.navMeAge_isCheckingAIRoutine = true;
+            live_charStats.navMeshAge.navMeAge_isCheckingAIRoutine = true;
 
-            yield return new WaitForSeconds(live_charStats.navMeAge_AIRoutineDelay);
+            yield return new WaitForSeconds(live_charStats.navMeshAge.navMeAge_AIRoutineDelay);
 
             LiveCharStats_Base.AIControllerCheck(live_charStats);
-            live_charStats.navMeAge_isCheckingAIRoutine = false;
+            live_charStats.navMeshAge.navMeAge_isCheckingAIRoutine = false;
         }
     }
 
@@ -182,7 +182,7 @@ public class CharControler : MonoBehaviour
     /// <returns></returns>
     private IEnumerator MeeleAttack()
     {   //warunki ustalone tak ¿eby przerwaæ coroutine
-        if (live_charStats.isAttacking || live_charStats.currentStam <= live_charStats.currentAttackStamCost)
+        if (live_charStats.currentCharStatus.isAttacking || live_charStats.currentStam <= live_charStats.charSkillCombat.currentAttackStamCost)
         {
             //Debug.Log("CoroutineBreak");
             yield break;
@@ -190,16 +190,16 @@ public class CharControler : MonoBehaviour
         else
         {
             //jeœli nie spe³ni warunków przerwania coroutine
-            live_charStats.isAttacking = true;
+            live_charStats.currentCharStatus.isAttacking = true;
             live_charStats.currentAnimator.ResetTrigger("Jump"); //¿eby nie czeka³ z jumpem w trakcie ataku w powietrzu
-            live_charStats.currentAnimator.SetFloat("AttackCombo", live_charStats.currentComboMeele);
+            live_charStats.currentAnimator.SetFloat("AttackCombo", live_charStats.charSkillCombat.currentComboMeele);
             live_charStats.currentAnimator.SetTrigger("MeeleAttack");
-            live_charStats.currentStam -= live_charStats.currentAttackStamCost; //Koszt Stamy przy ataku
-            yield return new WaitForSeconds(live_charStats.currentAttackCooldown); //cooldown pomiêdzy pojedynczymi atakami
-            live_charStats.isAttacking = false;
-            live_charStats.currentComboMeele += 0.5f;   //combo do animatora
+            live_charStats.currentStam -= live_charStats.charSkillCombat.currentAttackStamCost; //Koszt Stamy przy ataku
+            yield return new WaitForSeconds(live_charStats.charSkillCombat.currentAttackCooldown); //cooldown pomiêdzy pojedynczymi atakami
+            live_charStats.currentCharStatus.isAttacking = false;
+            live_charStats.charSkillCombat.currentComboMeele += 0.5f;   //combo do animatora
 
-            if (live_charStats.currentComboMeele > 1.0f) live_charStats.currentComboMeele = 0;  //reset combo po combo3
+            if (live_charStats.charSkillCombat.currentComboMeele > 1.0f) live_charStats.charSkillCombat.currentComboMeele = 0;  //reset combo po combo3
         }
     }
 
@@ -209,13 +209,13 @@ public class CharControler : MonoBehaviour
     /// <returns></returns>
     IEnumerator DeathAction()
     {
-        live_charStats.isDead = true;
+        live_charStats.currentCharStatus.isDead = true;
         SpawnResourceOrb();
 
         if (live_charStats.currentAnimator != null)
         {
             ResetAllTriggers();
-            live_charStats.currentAnimator.SetBool("ISDead", live_charStats.isDead);
+            live_charStats.currentAnimator.SetBool("ISDead", live_charStats.currentCharStatus.isDead);
         }
 
         //if (live_charStats.inputEnableMouseRotate && live_charStats.isPlayer) { Camera.main.GetComponent<CameraController>().SwitchCursorOptions(); }
@@ -251,16 +251,16 @@ public class CharControler : MonoBehaviour
 
         live_charStats.currentHP = live_charStats.currentMaxHP;
 
-        live_charStats.isDead = false;
+        live_charStats.currentCharStatus.isDead = false;
 
         if (live_charStats.GetComponent<Animator>() != null)
         {
-            live_charStats.currentAnimator.SetBool("ISDead", live_charStats.isDead);
+            live_charStats.currentAnimator.SetBool("ISDead", live_charStats.currentCharStatus.isDead);
         }
 
         if (live_charStats != null )
         {
-            if (live_charStats.isPlayer) live_charStats.LoadGame();
+            if (live_charStats.charInfo.isPlayer) live_charStats.LoadGame();
             else
             {
                 live_charStats.ResetCharacterPosition();
@@ -291,24 +291,24 @@ public class CharControler : MonoBehaviour
     /// </summary>
     public void ResetInputsAndStates()  //resetuje inputy i statsy przy œmierci ¿eby nie skaka³ / uderza³ po respwanie
     {        
-        live_charStats.inputMoving = false;
-        live_charStats.inputRunning = false;
-        live_charStats.inputJumping = false;
-        live_charStats.inputPrimary = false;
-        live_charStats.inputSecondary = false;       
+        live_charStats.characterInput.inputMoving = false;
+        live_charStats.characterInput.inputRunning = false;
+        live_charStats.characterInput.inputJumping = false;
+        live_charStats.characterInput.inputPrimary = false;
+        live_charStats.characterInput.inputSecondary = false;       
 
-        live_charStats.isMoving = false;
-        live_charStats.isJumping = false;
-        live_charStats.isAttacking = false;
-        live_charStats.isRunning = false;
-        live_charStats.isWalking = false;
-        live_charStats.isIdle = false;
-        live_charStats.isCasting = false;
+        live_charStats.currentCharStatus.isMoving = false;
+        live_charStats.currentCharStatus.isJumping = false;
+        live_charStats.currentCharStatus.isAttacking = false;
+        live_charStats.currentCharStatus.isRunning = false;
+        live_charStats.currentCharStatus.isWalking = false;
+        live_charStats.currentCharStatus.isIdle = false;
+        live_charStats.currentCharStatus.isCasting = false;
 
-        live_charStats.fov_isSearchingForTarget = false;
-        live_charStats.navMeAge_isCheckingAIRoutine= false;
+        live_charStats.fov.fov_isSearchingForTarget = false;
+        live_charStats.navMeshAge.navMeAge_isCheckingAIRoutine = false;
 
-        live_charStats.spell_OnCoroutine = false;
+        live_charStats.charSkillCombat.spell_OnCoroutine = false;
 
         //if (live_charStats.isPlayer) live_charStats.inputEnableMouseRotate = true;
     }
@@ -319,7 +319,7 @@ public class CharControler : MonoBehaviour
     private void Testing()
     {
         //live_charStats.Testing_Z_Key = !live_charStats.Testing_Z_Key;  //w³¹czanie i wy³¹czanie booleana przyciskiem ON/OFF
-        if (live_charStats.isPlayer)
+        if (live_charStats.charInfo.isPlayer)
         {
             if (Input.GetKeyDown(KeyCode.Comma)) //Testing class get / set 
             {
@@ -334,7 +334,7 @@ public class CharControler : MonoBehaviour
             {
                 live_charStats.currentHP = StaticTestingClass.AddCurrentFloat(live_charStats.currentHP, -100f);
             }
-            if (Input.GetKeyDown(KeyCode.KeypadMinus) && live_charStats.inputRunning)
+            if (Input.GetKeyDown(KeyCode.KeypadMinus) && live_charStats.characterInput.inputRunning)
             {
                 live_charStats.currentHP = StaticTestingClass.AddCurrentFloat(live_charStats.currentHP, -100f, 1.2f);
             }
@@ -371,34 +371,34 @@ public class CharControler : MonoBehaviour
 
     private void GizmosDrawer()
     {
-        Handles.color = live_charStats.fov_editorRadiusColor;
+        Handles.color = live_charStats.fov.fov_editorRadiusColor;
         //Handles.DrawWireArc(transform.position, Vector3.up, Vector3.forward, 360, live_charStats.fov_coneRadius, live_charStats.fov_editorLineThickness); //rysowanie lini po okrêgu
-        Handles.DrawSolidArc(transform.position, Vector3.up, Vector3.forward, 360, live_charStats.fov_MaxSightRadius);  //rysowanie solid okrêgu
+        Handles.DrawSolidArc(transform.position, Vector3.up, Vector3.forward, 360, live_charStats.fov.fov_MaxSightRadius);  //rysowanie solid okrêgu
 
-        Handles.color = live_charStats.fov_editorDynamicRadiusColor; //closeSightRadius      
-        Handles.DrawSolidArc(transform.position, Vector3.up, Vector3.forward, 360, live_charStats.fov_CurrentDynamicSightRadius);  //rysowanie solid okrêgu
+        Handles.color = live_charStats.fov.fov_editorDynamicRadiusColor; //closeSightRadius      
+        Handles.DrawSolidArc(transform.position, Vector3.up, Vector3.forward, 360, live_charStats.fov.fov_CurrentDynamicSightRadius);  //rysowanie solid okrêgu
 
-        Handles.color = live_charStats.spell_editorAISpellRadiusColor; //SpellAIRange      
-        Handles.DrawSolidArc(transform.position, Vector3.up, Vector3.forward, 360, live_charStats.spell_MaxRadius * live_charStats.spell_AISpellRangeFromMax);  //rysowanie solid okrêgu
+        Handles.color = live_charStats.charSkillCombat.spell_editorAISpellRadiusColor; //SpellAIRange      
+        Handles.DrawSolidArc(transform.position, Vector3.up, Vector3.forward, 360, live_charStats.charSkillCombat.spell_MaxRadius * live_charStats.charSkillCombat.spell_AISpellRangeFromMax);  //rysowanie solid okrêgu
 
-        Handles.color = live_charStats.fov_editorAngleLineColor;
-        Handles.DrawLine(transform.position, transform.position + Quaternion.AngleAxis(-(live_charStats.fov_CurrentDynamicSightAngle / 2), Vector3.up) * transform.forward * live_charStats.fov_MaxSightRadius, live_charStats.fov_editorLineThickness);//rysowanie lini left
-        Handles.DrawLine(transform.position, transform.position + Quaternion.AngleAxis((live_charStats.fov_CurrentDynamicSightAngle / 2), Vector3.up) * transform.forward * live_charStats.fov_MaxSightRadius, live_charStats.fov_editorLineThickness);//rysowanie lini right
+        Handles.color = live_charStats.fov.fov_editorAngleLineColor;
+        Handles.DrawLine(transform.position, transform.position + Quaternion.AngleAxis(-(live_charStats.fov.fov_CurrentDynamicSightAngle / 2), Vector3.up) * transform.forward * live_charStats.fov.fov_MaxSightRadius, live_charStats.fov.fov_editorLineThickness);//rysowanie lini left
+        Handles.DrawLine(transform.position, transform.position + Quaternion.AngleAxis((live_charStats.fov.fov_CurrentDynamicSightAngle / 2), Vector3.up) * transform.forward * live_charStats.fov.fov_MaxSightRadius, live_charStats.fov.fov_editorLineThickness);//rysowanie lini right
 
-        Handles.color = live_charStats.fov_editorAngleColor;
-        Handles.DrawSolidArc(transform.position, Vector3.up, /*viewAngleLeft*/Quaternion.AngleAxis(-(live_charStats.fov_CurrentDynamicSightAngle / 2), Vector3.up) * transform.forward, live_charStats.fov_CurrentDynamicSightAngle, live_charStats.fov_CurrentDynamicSightRadius); //rysuje coneAngle view               
+        Handles.color = live_charStats.fov.fov_editorAngleColor;
+        Handles.DrawSolidArc(transform.position, Vector3.up, /*viewAngleLeft*/Quaternion.AngleAxis(-(live_charStats.fov.fov_CurrentDynamicSightAngle / 2), Vector3.up) * transform.forward, live_charStats.fov.fov_CurrentDynamicSightAngle, live_charStats.fov.fov_CurrentDynamicSightRadius); //rysuje coneAngle view               
                                                                                                                                                                                                                                                                                                           //Quaternion.AngleAxis korzysta z lokalnego transforma zamiast skomplikowanego Mathf.sin/cos
 
-        if (live_charStats.navMeAge_walkPointSet)
+        if (live_charStats.navMeshAge.navMeAge_walkPointSet)
         {
-            Handles.color = live_charStats.fov_editorRaycastColor;
-            Handles.DrawLine(transform.position, live_charStats.navMeAge_walkPoint, live_charStats.fov_editorLineThickness);
+            Handles.color = live_charStats.fov.fov_editorRaycastColor;
+            Handles.DrawLine(transform.position, live_charStats.navMeshAge.navMeAge_walkPoint, live_charStats.fov.fov_editorLineThickness);
         }
 
-        if (live_charStats.fov_targetAquired && live_charStats.fov_aquiredTargetGameObject != null)
+        if (live_charStats.fov.fov_targetAquired && live_charStats.fov.fov_aquiredTargetGameObject != null)
         {
-            Handles.color = live_charStats.fov_editorRaycastColor;
-            Handles.DrawLine(transform.position, live_charStats.fov_aquiredTargetGameObject.transform.position, live_charStats.fov_editorLineThickness); //rysowanie lini w kierunku playera jeœli nie zas³ania go obstacle Layer
+            Handles.color = live_charStats.fov.fov_editorRaycastColor;
+            Handles.DrawLine(transform.position, live_charStats.fov.fov_aquiredTargetGameObject.transform.position, live_charStats.fov.fov_editorLineThickness); //rysowanie lini w kierunku playera jeœli nie zas³ania go obstacle Layer
         }
     }
 #endif

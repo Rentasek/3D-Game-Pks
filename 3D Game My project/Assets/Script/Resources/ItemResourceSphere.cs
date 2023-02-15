@@ -43,7 +43,7 @@ public class ItemResourceSphere : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
-        if (other.CompareTag("Player") && !other.GetComponent<CharacterStatus>().isDead) //Tylko dla ¿ywych
+        if (other.CompareTag("Player") && !other.GetComponent<CharacterStatus>().currentCharStatus.isDead) //Tylko dla ¿ywych
         {
             switch (resourceType)
             {
