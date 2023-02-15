@@ -26,8 +26,8 @@ public class MeeleAttack : MonoBehaviour
     private void OnEnable()
     {
         live_charStats = GetComponentInParent<CharacterStatus>();        //automatyczny serialize dla wygody
-        scrObj_CharStats = live_charStats.scrObj_CharStats;     //automatyczny serialize dla wygody    
-        enemiesArray = live_charStats.charInfo.currentEnemiesArray;      //przypisanie enemieArraya z characterStats
+        scrObj_CharStats = live_charStats.charComponents._scrObj_CharStats;     //automatyczny serialize dla wygody    
+        enemiesArray = live_charStats.charInfo._enemiesArray;      //przypisanie enemieArraya z characterStats
         
     }
     private void Start()
@@ -37,7 +37,7 @@ public class MeeleAttack : MonoBehaviour
     }
     private void Update()
     {
-        if(live_charStats.currentCharStatus.isAttacking && live_charStats.charSkillCombat.currentComboMeele == onCombo) //W³¹czanie colliderów tylko dla aktualnego combo
+        if(live_charStats.charStatus._isAttacking && live_charStats.fov._closeRangeSkill.skill_currentComboProgress == onCombo) //W³¹czanie colliderów tylko dla aktualnego combo
         {
             gameObject.GetComponent<Collider>().enabled = true;
         }
@@ -55,17 +55,17 @@ public class MeeleAttack : MonoBehaviour
                                                                                                                            //dodatkowo sprawdza parametr OnCombo na ka¿dym Collider i porównuje go do aktualnego combo, ¿eby nie atakowaæ ogonem przy scratch 
         {
             
-            audioSource.PlayOneShot(other.GetComponent<CharacterStatus>().scrObj_CharStats.damagedEnemy, 1);    //audio Play
+            audioSource.PlayOneShot(other.GetComponent<CharacterStatus>().charComponents._scrObj_CharStats.damagedEnemy, 1);    //audio Play
 
             other.GetComponent<Animator>().SetTrigger("IsHit");  //Trigger Hit Animatora
 
-            other.GetComponent<CharacterStatus>().currentHP -= GetComponentInParent<CharacterStatus>().charSkillCombat.currentDamageCombo;
+            other.GetComponent<CharacterStatus>().charStats._hp -= GetComponentInParent<CharacterStatus>().fov._closeRangeSkill.skill_currentDamage;
 
-            if (other.GetComponent<CharacterStatus>().currentHP <= 0f && !other.GetComponent<CharacterStatus>().currentCharStatus.isDead)
+            if (other.GetComponent<CharacterStatus>().charStats._hp <= 0f && !other.GetComponent<CharacterStatus>().charStatus._isDead)
 
             {
-                other.GetComponent<CharacterStatus>().charInfo.currentCharLevel = UnityEngine.Random.Range(live_charStats.charInfo.currentCharLevel - 3, live_charStats.charInfo.currentCharLevel + 3);  //po œmierci ustawia level targetu na zbli¿ony do atakuj¹cego
-                live_charStats.currentXP += other.GetComponent<CharacterStatus>().currentXP_GainedFromKill;
+                other.GetComponent<CharacterStatus>().charInfo._charLevel = UnityEngine.Random.Range(live_charStats.charInfo._charLevel - 3, live_charStats.charInfo._charLevel + 3);  //po œmierci ustawia level targetu na zbli¿ony do atakuj¹cego
+                live_charStats.charStats._xp += other.GetComponent<CharacterStatus>().charStats._xp_GainedFromKill;
 
                 /* // --> co sie dzieje przy spadku hp do 0 // (animacja znikania jak czacha)
                  other.GetComponent<CharacterStatus>().currentHP = 0f;  //trik ¿eby nie zmniejszyæ hp poni¿ej 0*/ // zbêdne
@@ -74,17 +74,17 @@ public class MeeleAttack : MonoBehaviour
             i++;  //zmienna testing only
 
         }
-        else if (other.CompareTag("Destructibles") && live_charStats.currentCharStatus.isAttacking && live_charStats.charSkillCombat.currentComboMeele == onCombo) 
+        else if (other.CompareTag("Destructibles") && live_charStats.charStatus._isAttacking && live_charStats.fov._closeRangeSkill.skill_currentComboProgress == onCombo) 
         {
-            audioSource.PlayOneShot(other.GetComponent<CharacterStatus>().scrObj_CharStats.damagedDestructibles, 1);
+            audioSource.PlayOneShot(other.GetComponent<CharacterStatus>().charComponents._scrObj_CharStats.damagedDestructibles, 1);
 
             //other.GetComponent<Animator>().SetTrigger("IsHit");   animacja hit dla environment -> in da progress
 
-            other.GetComponent<CharacterStatus>().currentHP -= GetComponentInParent<CharacterStatus>().charSkillCombat.currentDamageCombo;
+            other.GetComponent<CharacterStatus>().charStats._hp -= GetComponentInParent<CharacterStatus>().fov._closeRangeSkill.skill_currentDamage;
 
-            if (other.GetComponent<CharacterStatus>().currentHP <= 0f && !other.GetComponent<CharacterStatus>().currentCharStatus.isDead)
+            if (other.GetComponent<CharacterStatus>().charStats._hp <= 0f && !other.GetComponent<CharacterStatus>().charStatus._isDead)
             {
-                live_charStats.currentXP += other.GetComponent<CharacterStatus>().currentXP_GainedFromKill;                
+                live_charStats.charStats._xp += other.GetComponent<CharacterStatus>().charStats._xp_GainedFromKill;                
             } 
 
         }

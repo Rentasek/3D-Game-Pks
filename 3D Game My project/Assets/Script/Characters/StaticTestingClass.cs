@@ -30,17 +30,17 @@ public static class StaticTestingClass
 
     private static void Attacking()
     {
-        if (local_live_charStats.currentAnimator != null)
+        if (local_live_charStats.charComponents._Animator != null)
         {
-            local_live_charStats.currentAnimator.SetTrigger("MeeleAttack");
+            local_live_charStats.charComponents._Animator.SetTrigger("MeeleAttack");
         }
     }
 
     public static void Attacking2(CharacterStatus characterStatus)
     {
-        if (characterStatus.currentAnimator != null)
+        if (characterStatus.charComponents._Animator != null)
         {
-            characterStatus.currentAnimator.SetTrigger("MeeleAttack");
+            characterStatus.charComponents._Animator.SetTrigger("MeeleAttack");
         }
     }
 
@@ -51,7 +51,7 @@ public static class StaticTestingClass
     /// <param name="addFloatValue">Add value / Dodawana wartość</param>
     public static void AddCurrentHP(CharacterStatus live_charStats, float addFloatValue)
     {        
-        live_charStats.currentHP += addFloatValue;
+        live_charStats.charStats._hp += addFloatValue;
     }
 
 

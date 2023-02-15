@@ -15,7 +15,7 @@ public class UI_DebugConsole : MonoBehaviour, IPlayerUpdate
     {
         live_charStats = Camera.main.GetComponent<CameraController>().player.GetComponent<CharacterStatus>();        
         player_Input = Camera.main.GetComponent<CameraController>().player.GetComponent<Player_Input>();
-        secondarySkill = Camera.main.GetComponent<CameraController>().player.GetComponent<CharacterStatus>().charSkillCombat.skill_secondarySkill;
+        secondarySkill = Camera.main.GetComponent<CameraController>().player.GetComponent<CharacterStatus>().charSkillCombat._secondarySkill;
         
     }
 
@@ -23,7 +23,7 @@ public class UI_DebugConsole : MonoBehaviour, IPlayerUpdate
     {
         live_charStats = Camera.main.GetComponent<CameraController>().player.GetComponent<CharacterStatus>();
         player_Input = Camera.main.GetComponent<CameraController>().player.GetComponent<Player_Input>();
-        secondarySkill = Camera.main.GetComponent<CameraController>().player.GetComponent<CharacterStatus>().charSkillCombat.skill_secondarySkill;
+        secondarySkill = Camera.main.GetComponent<CameraController>().player.GetComponent<CharacterStatus>().charSkillCombat._secondarySkill;
     }
 
     // Start is called before the first frame update
@@ -37,21 +37,20 @@ public class UI_DebugConsole : MonoBehaviour, IPlayerUpdate
     private void LateUpdate()
     {
         GetComponent<TextMeshProUGUI>().SetText(
-            "Player Input Enable [P] " + live_charStats.charInfo.playerInputEnable + ".\n" +
-            "Enable Mouse Rotate [X] " + live_charStats.characterInput.inputEnableMouseRotate + ".\n" +
-            "Switch Jump Mode [J] " + live_charStats.currentCharMove.currentJumpMode_J_ + " .\n" +
+            "Player Input Enable [P] " + live_charStats.charInfo._playerInputEnable + ".\n" +
+            "Enable Mouse Rotate [X] " + live_charStats.charInput._enableMouseRotate + ".\n" +
             "Options Panel [0] " + player_Input.optionsActivated + " .\n" +
             "Save Game [5] .\n" +
             "Load Game [6] .\n" +
             "Reset Position [R] .\n" +
             "Set Position [B] .\n" +
-            "Mouse movement [Middle mouse]" + !live_charStats.characterInput.inputEnableMouseRotate + ".\n" +
+            "Mouse movement [Middle mouse]" + !live_charStats.charInput._enableMouseRotate + ".\n" +
             "Normal Attack [Left mouse]" + ".\n" +
             "Special Attack [Right mouse]" + secondarySkill + ".\n" +
-            "MoveSpeed " + live_charStats.currentCharMove.currentMoveSpeed + ".\n" +
-            "IsGrounded " + live_charStats.currentCharStatus.isGrounded + ".\n" +
-            "input_Testing " + live_charStats.characterInput.inputJumping + ".\n" +
-            "Char Level: " + live_charStats.charInfo.currentCharLevel + "  Reset Level [L]" + ".\n"
+            "MoveSpeed " + live_charStats.charMove._moveSpeed + ".\n" +
+            "IsGrounded " + live_charStats.charStatus._isGrounded + ".\n" +
+            "input_Testing " + live_charStats.charInput._jumping + ".\n" +
+            "Char Level: " + live_charStats.charInfo._charLevel + "  Reset Level [L]" + ".\n"
             ); 
     }
 }

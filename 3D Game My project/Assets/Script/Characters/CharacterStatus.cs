@@ -12,74 +12,75 @@ public class CharacterStatus : MonoBehaviour
     [Serializable]
     public class CharInfo
     {
-        public string currentCharName;
-        public int currentCharLevel;
-        [Tooltip("Pozwala na wybór Enemies przy pomocy Tag !!!nie ustawiaæ Environment!!!"), TagField] public string[] currentEnemiesArray;
-        public bool playerInputEnable;
-        public bool isPlayer;
+        public string _charName;
+        public int _charLevel;
+        [Tooltip("Pozwala na wybór Enemies przy pomocy Tag \n !!!nie ustawiaæ Environment!!! \n !!!Musi byæ ustawione na ka¿dej postacji Box te¿!!!"),  TagField] public string[] _enemiesArray;
+        public bool _playerInputEnable;
+        public bool _isPlayer;
     }   
     [Tooltip("Character Info")]public CharInfo charInfo;
     #endregion
 
     #region Current Char Status
     [Serializable]
-    public class CurrentCharStatus
+    public class CharStatus
     {
-        public bool isMoving = false;
-        public bool isGrounded = false;
-        public bool isJumping = false;
-        public bool isAttacking = false;
-        public bool isRunning = false;
-        public bool isWalking = false;
-        public bool isIdle = false;
-        public bool isDead = false;
-        public bool isCasting = false;
+        public bool _isMoving = false;
+        public bool _isGrounded = false;
+        public bool _isJumping = false;
+        public bool _isAttacking = false;
+        public bool _isRunning = false;
+        public bool _isWalking = false;
+        public bool _isIdle = false;
+        public bool _isDead = false;
+        public bool _isCasting = false;        
+        
     }
     
-    [Tooltip("Current Character Status - Booleany Statusowe")] public CurrentCharStatus currentCharStatus;
+    [Tooltip("Current Character Status - Booleany Statusowe")] public CharStatus charStatus;
     #endregion
 
     #region CharacterInput
     [Serializable]
-    public class CharacterInput
+    public class CharInput
     {
-        public Vector3 inputMovingVector;
-        public float inputRotateHorizontal;
-        public bool inputMoving;
-        public bool inputRunning;
-        public bool inputJumping;
-        public bool inputPrimary;
-        public float inputRotateSensivity;
-        public bool inputEnableMouseRotate;
-        public bool inputMouseCurrentMoving;
-        public bool inputSecondary;
+        public Vector3 _movingVector;
+        public float _rotateHorizontal;
+        public bool _moving;
+        public bool _running;
+        public bool _jumping;
+        public bool _primary;
+        public bool _secondary;
+        public float _rotateSensivity;
+        public bool _enableMouseRotate;
+        public bool _mouseCurrentMoving;     
 
         [Space]
-        public bool inputSaveGame;
-        public bool inputLoadGame;
-        public bool inputResetPosition;
-        public bool inputSetBackupPosition;
-        public float inputMouseScroll;
-        public bool Testing_Z_Key;
+        public bool _saveGame;
+        public bool _loadGame;
+        public bool _resetPosition;
+        public bool _setBackupPosition;
+        public float _mouseScroll;
+        public bool _testing_Z_Key;
     }
-    [Tooltip("Booleany/Vectory z klasy Input")] public CharacterInput characterInput;
+    [Tooltip("Booleany/Vectory z klasy Input")] public CharInput charInput;
     #endregion
 
     #region NavMeshAge
     [Serializable]
     public class NavMeshAge
     {
-        public float navMeAge_wanderingRange;
-        public Vector3 navMeAge_spawnPoint;
-        public Vector3 navMeAge_walkPoint;
-        public Vector3 navMeAge_mouseWalkPoint;
-        public bool navMeAge_walkPointSet;
-        public float navMeAge_walkPointRange;
-        public LayerMask navMeAge_whatIsGround;
-        public int navMeAge_failsafeCounter;
-        public float navMeAge_patrollingDelay;
-        public float navMeAge_AIRoutineDelay;
-        public bool navMeAge_isCheckingAIRoutine;
+        public float _wanderingRange;
+        public Vector3 _spawnPoint;
+        public Vector3 _walkPoint;
+        public Vector3 _mouseWalkPoint;
+        public bool _walkPointSet;
+        public float _walkPointRange;
+        public LayerMask _whatIsGround;
+        public int _failsafeCounter;
+        public float _patrollingDelay;
+        public float _AIRoutineDelay;
+        public bool _isCheckingAIRoutine;
     }
     [Tooltip("Zmienne z NavMeshAgenta")] public NavMeshAge navMeshAge;
     #endregion
@@ -89,268 +90,253 @@ public class CharacterStatus : MonoBehaviour
     public class FoV
     {        
         [Header("Angle")]
-        [Range(0, 360)] public float fov_CurrentDynamicSightAngle;
-        [Range(0, 360)] public float fov_MaxSightAngle;
-        [Range(0, 360)] public float fov_MinSightAngle;
-        public float fov_CurrentVectorDynamicSightAngle;   //wektor aktualnej zmiany wartoœci +/-
-                
+        [Tooltip("Aktualny DynamicSightAngle"), Range(0, 360)] public float _currentDynamicSightAngle;        
+        [Tooltip("Min DynamicSightAngle"), Range(0, 360)] public float _minSightAngle;
+        [Tooltip("Max DynamicSightAngle"), Range(0, 360)] public float _maxSightAngle;
+        [Tooltip("Aktualny wektor zmiany wartoœci +/- na DynamicSightAngle")] public float _currentVectorDynamicSightAngle;   
+        [Tooltip("ile sekund na ca³y ruch (MAX -> MAX)"), Range(0, 1)] public float _timeDynamicSightAngle;
+                                                           
         [Header("Radius")]
-        [Range(0, 1)] public float fov_TimeDynamicSightAngle; //ile sekund na ca³y ruch (90->360)
-        [Range(0, 100)] public float fov_MinSightRadius;
-        [Range(0, 100)] public float fov_MaxSightRadius;
-        [Range(0, 100)] public float fov_CurrentDynamicSightRadius;
-        public float fov_lerpedDistance;
-        public float fov_CurrentVectorDynamicSightRadius;   //wektor aktualnej zmiany wartoœci +/-
-        [Range(0, 5)] public float fov_TimeDynamicSightRadius;
+        [Tooltip("Aktualny DynamicSightRadius"), Range(0, 20)] public float _currentDynamicSightRadius;
+        [Tooltip("Min DynamicSightRadius"), Range(0, 20)] public float _minSightRadius;
+        [Tooltip("Max DynamicSightRadius"), Range(0, 20)] public float _maxSightRadius;                
+        [Tooltip("Aktualny wektor zmiany wartoœci +/- na DynamicSightRadius")] public float _currentVectorDynamicSightRadius;
+        [Tooltip("ile sekund na ca³y ruch (MAX -> MAX)"), Range(0, 5)] public float _timeDynamicSightRadius;
 
+        [Header("Range Booleans / Floats / Skills / Taget")]
+        [Tooltip("Podaje true jeœli target wogóle znajduje siê w dynamic SightRange")] public bool _targetInDynamicSightRange;        
+        [Space]
+        [Tooltip("Podaje true jeœli target jest Aquired i znajduje siê w zasiêgu (MaxRadius) spellRangeSkilla (zmodyfikowanieg przez multiplier _AISpellRangeFromMax)")] public bool _targetInSpellRange;
+        [Tooltip("Multiplier do (MaxRadius) spellRangeSkilla"), Range(0.1f, 1f)] public float _AISpellRangeSkillRadiusFromMax;
+        [Tooltip("Aktualny spellRange pobrany z closeRangeSkill")] public float _spellRangeSkillMaxRadius;
+        [CanBeNull, Tooltip("SpellRangeSkill przekazany z klasy Skill")] public Skill _spellRangeSkill;
+        [Space]
+        [Tooltip("Aktualny attackRange pobrany z closeRangeSkill")] public float _attackRangeSkillMaxRadius;
+        [Tooltip("Podaje true jeœli target jest Aquired i znajduje siê w zasiêgu (MaxRadius) closeRangeSkilla")] public bool _targetInAttackRange;
+        [CanBeNull, Tooltip("CloseRangeSkill przekazany z klasy Skill")] public Skill _closeRangeSkill;
+        [Space]
+        [Tooltip("Podaje true jeœli target znajduje siê w dynamic SightRange && Angle && !Raycast(obstaclesLayerMask)")] public bool _targetAquired;
+        [CanBeNull, Tooltip("Aktualnie znaleziony (DynamicSightRange) && goniony (Chasing) aquiredTargetGameObject")] public GameObject _aquiredTargetGameObject;
         
-        [Header("GizmosColor")]
-        [Range(0, 10)] public float fov_editorLineThickness;
-        [ColorUsageAttribute(true, true)] public Color fov_editorAngleLineColor; //kolor HDR picker
-        [ColorUsageAttribute(true, true)] public Color fov_editorAngleColor; //kolor HDR picker
-        [ColorUsageAttribute(true, true)] public Color fov_editorRadiusColor;
-        [ColorUsageAttribute(true, true)] public Color fov_editorDynamicRadiusColor;
-        [ColorUsageAttribute(true, true)] public Color fov_editorRaycastColor;
-                
-        [Header("Range")]
-        public bool fov_targetInAttackRange;
-        public float fov_attackRange;
-        public Skill closeRangeSkill;
-        public bool fov_targetInDynamicSightRange;
-        public bool fov_inSpellRange;
-        public Skill spellRangeSkill;
-
         [Header("Utils")]
-        public Collider[] fov_allTargetsInDynamicSightRange;
+        [Tooltip("Wszystkie Collidery z DunamicSightRange (Physics.OverlapCapsuleNonAlloc) (Uwaga na MAX iloœæ elementów w Array)")] public Collider[] _allTargetsInDynamicSightRange = new Collider[30];
         [Space]
-        public List<Collider> fov_enemyTargetsInDynamicSightRange;
+        [Tooltip("Obstacles LayerMask dla FieldOfView")] public LayerMask _obstaclesLayerMask;
         [Space]
-        public float fov_RoutineDelay;
-        public LayerMask fov_obstaclesLayerMask;
-        public GameObject fov_aquiredTargetGameObject;
-        public bool fov_isSearchingForTarget;
-        public bool fov_targetAquired;
+        [Tooltip("Podaje true jeœli target wogóle znajduje siê w dynamic SightRange")] public float _routineDelay;
+        [Tooltip("Podaje true jeœli target wogóle znajduje siê w dynamic SightRange")] public bool _isSearchingForTarget;
+        [Space]
+        [Header("GizmosColor")]
+        [Tooltip("Gruboœæ lini Gizmos"), Range(0, 10)] public float _editorLineThickness;
+        [Tooltip("Kolor Gizmos - AngleLineColor (kolor HDR picker)"), ColorUsageAttribute(true, true)] public Color _editorAngleLineColor; 
+        [Tooltip("Kolor Gizmos - AngleColor (kolor HDR picker)"), ColorUsageAttribute(true, true)] public Color _editorAngleColor;
+        [Tooltip("Kolor  Gizmos - MaxRadius"), ColorUsageAttribute(true, true)] public Color _editorMaxRadiusColor;
+        [Tooltip("Kolor  Gizmos - DynamicRadius"), ColorUsageAttribute(true, true)] public Color _editorDynamicRadiusColor;
+        [Tooltip("Kolor  Gizmos - Raycast"), ColorUsageAttribute(true, true)] public Color _editorRaycastColor;
     }
     [Tooltip("Field of View")] public FoV fov;
     #endregion
 
     #region CurrentCharMovement
     [Serializable]
-    public class CurrentCharMovement
+    public class CharMovement
     {
         [Header("Character Movement variables")]
-        public float currentMoveSpeed;
-        public float currentWalkSpeed;
-        public float currentRunSpeed;
-        public float currentJumpPower;
-        public float currentJumpStamCost;
-        public bool currentJumpMode_J_ = true;
-        public float currentJumpDeltaTime;
-        public bool currentGravityEnabled = true;
-        public float currentGravity;
-        public Vector3 currentBackupPosition;
-        public Quaternion currentBackupRotation;
-        public Vector3 currentMoveVector;
-        public Vector3 currentMoveInputDirection;
+        public float _moveSpeed;
+        public float _walkSpeed;
+        public float _runSpeed;
+        public float _jumpPower;
+        public float _jumpStamCost;
+        public float _jumpDeltaTime;
+        [Tooltip("Grawitacja ON/Off, mo¿na mechanikê gravity guna zrobiæ :D")]public bool _gravityEnabled = true;
+        public float _gravity;
+        public Vector3 _backupPosition;
+        public Quaternion _backupRotation;
+        public Vector3 _moveVector;
+        public Vector3 _moveInputDirection;
 
         [Header("Character GroundMask")]
         public LayerMask currentGroundMask;
         public float currentGroundDistance;
     }
-    [Tooltip("Current Character Movement")] public CurrentCharMovement currentCharMove;
+    [Tooltip("Current Character Movement")] public CharMovement charMove;
     #endregion
 
-
-    #region CharPrimaryCombat
+    #region CharSkillCombat
     [Serializable]
     public class CharSkillCombat
     {
         [Header("Character Primary/Melee Combat")]
-        [CanBeNull] public Skill skill_primarySkill;
-        public float currentAttackCooldown;
-        public float currentDamageCombo;
-        public float currentAttackStamCost;
-        public float currentComboMeele;
-        [CanBeNull] public Skill currentCloseRangeSkill;
+        [Tooltip("Skill pod LMB"), CanBeNull] public Skill _primarySkill;        
 
         [Header("Character Secondary/Magic Combat")]
-        [CanBeNull] public Skill skill_secondarySkill;
-        public bool skill_CanCast;
-        public float spell_coroutineDelay;
-        public bool spell_OnCoroutine;
-        [Range(0.2f, 1f)] public float spell_AISpellRangeFromMax;
-        public bool spell_targetInSpellRange;
-        [ColorUsageAttribute(true, true)] public Color spell_editorAISpellRadiusColor; //kolor HDR picker
-        [ColorUsageAttribute(true, true)] public Color spell_breathAngleColor;
-        [ColorUsageAttribute(true, true)] public Color spell_breathRaycastColor;
-        public float spell_MaxRadius;
-        public float currentSpell_Damage;
-        public float currentSpell_MPCost;
-        [CanBeNull] public Skill currentSpellRangeSkill;
+        [Tooltip("Skill pod RMB"), CanBeNull] public Skill _secondarySkill;
+
+        [Tooltip("Kolor Gizmos - AISpellRadius (kolor HDR picker)"), ColorUsageAttribute(true, true)] public Color _editorAISpellRadiusColor;
+        [Tooltip("Kolor Gizmos - SkillAngle (kolor HDR picker)"), ColorUsageAttribute(true, true)] public Color _skillAngleColor;
+        [Tooltip("Kolor Gizmos - SkillRaycast (kolor HDR picker)"), ColorUsageAttribute(true, true)] public Color _skillRaycastColor;          
     }
-    [Tooltip("Character Primary/Melee Combat")] public CharSkillCombat charSkillCombat;
-    #endregion        
-    
+    [Tooltip("Character Primary/Secondary Combat")] public CharSkillCombat charSkillCombat;
+    #endregion
 
-    [Space]
-    [Header("Current character Stats")]
-    public float currentHP;
-    public float currentMaxHP;
+    #region CharStats
+    [Serializable]
+    public class CharStats
+    {
+        [Tooltip("Aktualne Health Points postaci")] public float _hp;
+        [Tooltip("Aktualne Maxymalne Health Points postaci")] public float _maxHP;
 
-    [Space]
-    public float currentMP;
-    public float currentMaxMP;
+        [Space]
+        [Tooltip("Aktualne Mana Points postaci")] public float _mp;
+        [Tooltip("Aktualne Maxymalne Mana Points postaci")] public float _maxMP;
 
-    [Space]
-    public float currentStam;
-    public float currentMaxStam;
+        [Space]
+        [Tooltip("Aktualne Stamina Points postaci")] public float _stam;
+        [Tooltip("Aktualne Maxymalne Stamin Points postaci")] public float _maxStam;
 
-    [Space]
-    public float currentXP;
-    public float currentNeededXP;
-    public float currentXP_GainedFromKill;
+        [Space]
+        [Tooltip("Aktualne ExP postaci")] public float _xp;
+        [Tooltip("Aktualne ExP potrzebne do nastêpnego levela")] public float _neededXP;
+        [Tooltip("Ile ExP dostaje przeciwnik za zabicie tej postaci?")] public float _xp_GainedFromKill;
 
-    [Space]
-    public float corpseTime;
-    public float respawnTime;    
+        [Space]
+        [Tooltip("Czas jako corpse po œmierci")] public float _corpseTime;
+        [Tooltip("CZas respawnu po œmierci")] public float _respawnTime;
 
-    [Space]
-    [Header("Character Components")]
-    [CanBeNull] public Animator currentAnimator;
-    [CanBeNull] public CharacterController currentCharacterController;
-    [CanBeNull] public Player_Input currentPlayer_Input;
-    [CanBeNull] public NavMeshAgent currentNavMeshAgent;
-    [CanBeNull] public AudioSource currentAudioSource;
-    public ScrObj_charStats scrObj_CharStats;
-    [CanBeNull] public MeeleAttack[] currentMeeleColliders;
-    public CharacterBonusStats currentCharacterBonusStats;
+    }
+    [Tooltip("Aktualne statysytyki postaci")] public CharStats charStats;
+    #endregion
+
+    #region CharComponents
+    [Serializable]
+    public class CharComponents
+    {
+        [CanBeNull] public Animator _Animator;
+        [CanBeNull] public CharacterController _characterController;
+        [CanBeNull] public Player_Input _player_Input;
+        [CanBeNull] public NavMeshAgent _navMeshAgent;
+        [CanBeNull] public AudioSource _audioSource;
+        public ScrObj_charStats _scrObj_CharStats;
+        public CharacterBonusStats _characterBonusStats;
+    }
+    [Tooltip("Komponenty podpiête pod live_charStats")]public CharComponents charComponents;
+    #endregion
 
     public void LoadCharStats()
     {
+        //Objects
+        if (GetComponent<Animator>() != null) charComponents._Animator = GetComponent<Animator>();                     //ci¹gnie componenty z przypiêtych do chara
+        if (GetComponent<CharacterController>() != null) charComponents._characterController = GetComponent<CharacterController>();
+        if (GetComponent<Player_Input>() != null) charComponents._player_Input = GetComponent<Player_Input>();
+        if (GetComponent<NavMeshAgent>() != null)
+        {
+            charComponents._navMeshAgent = GetComponent<NavMeshAgent>();
+            charComponents._navMeshAgent.stoppingDistance = fov._attackRangeSkillMaxRadius;
+        }
+        if (GetComponent<AudioSource>() != null) charComponents._audioSource = GetComponent<AudioSource>();
+        if (GetComponent<CharacterBonusStats>() != null) charComponents._characterBonusStats = GetComponent<CharacterBonusStats>();
+
+        Utils_BoxSpellsReset();
+
+
         //Info
-        charInfo.currentCharName = scrObj_CharStats.charName;
-        charInfo.isPlayer = Camera.main.GetComponent<CameraController>().player == gameObject;
+        charInfo._charName = charComponents._scrObj_CharStats.charName;
+        charInfo._isPlayer = Camera.main.GetComponent<CameraController>().player == gameObject;
 
         //Movement
-        currentCharMove.currentMoveSpeed = scrObj_CharStats.moveSpeed;
-        currentCharMove.currentWalkSpeed = scrObj_CharStats.walkSpeed + (currentCharacterBonusStats.bonus_currentWalkSpeed * 0.1f);     //+bonus
-        currentCharMove.currentRunSpeed = scrObj_CharStats.runSpeed + (currentCharacterBonusStats.bonus_currentWalkSpeed * 2f * 0.1f); //+bonus
-        currentCharMove.currentJumpPower = scrObj_CharStats.jumpPower;
-        currentCharMove.currentJumpStamCost = scrObj_CharStats.jumpStamCost;
-        currentCharMove.currentJumpDeltaTime = scrObj_CharStats.JumpDeltaTime;
-        currentCharMove.currentGravity = scrObj_CharStats.gravity;
+        charMove._moveSpeed = charComponents._scrObj_CharStats.moveSpeed;
+        charMove._walkSpeed = charComponents._scrObj_CharStats.walkSpeed + (charComponents._characterBonusStats.bonus_currentWalkSpeed * 0.1f);     //+bonus
+        charMove._runSpeed = charComponents._scrObj_CharStats.runSpeed + (charComponents._characterBonusStats.bonus_currentWalkSpeed * 2f * 0.1f); //+bonus
+        charMove._jumpPower = charComponents._scrObj_CharStats.jumpPower;
+        charMove._jumpStamCost = charComponents._scrObj_CharStats.jumpStamCost;
+        charMove._jumpDeltaTime = charComponents._scrObj_CharStats.JumpDeltaTime;
+        charMove._gravity = charComponents._scrObj_CharStats.gravity;
 
         //Input
-        characterInput.inputRotateSensivity = scrObj_CharStats.inputRotateSensivity;
+        charInput._rotateSensivity = charComponents._scrObj_CharStats.inputRotateSensivity;
 
-        //NavMesh
-        fov.fov_attackRange = scrObj_CharStats.navMeAge_attackRange;
-        navMeshAge.navMeAge_wanderingRange = scrObj_CharStats.navMeAge_wanderingRange;
-        navMeshAge.navMeAge_walkPointRange = scrObj_CharStats.navMeAge_walkPointRange;
-        navMeshAge.navMeAge_whatIsGround = scrObj_CharStats.navMeAge_whatIsGround;
-        navMeshAge.navMeAge_patrollingDelay = scrObj_CharStats.navMeAge_patrollingDelay;
+        //NavMesh        
+        navMeshAge._wanderingRange = charComponents._scrObj_CharStats.navMeAge_wanderingRange;
+        navMeshAge._walkPointRange = charComponents._scrObj_CharStats.navMeAge_walkPointRange;
+        navMeshAge._whatIsGround = charComponents._scrObj_CharStats.navMeAge_whatIsGround;
+        navMeshAge._patrollingDelay = charComponents._scrObj_CharStats.navMeAge_patrollingDelay;
 
         //FoV NavMesh
-        fov.fov_MaxSightAngle = scrObj_CharStats.fov_MaxSightAngle;
-        fov.fov_MinSightAngle = scrObj_CharStats.fov_MinSightAngle;
-        fov.fov_TimeDynamicSightAngle = scrObj_CharStats.fov_TimeDynamicSightAngle;
-        fov.fov_MinSightRadius = scrObj_CharStats.fov_MinSightRadius;
-        fov.fov_MaxSightRadius = scrObj_CharStats.fov_MaxSightRadius;
-        fov.fov_TimeDynamicSightRadius = scrObj_CharStats.fov_TimeDynamicSightRadius;
-        fov.fov_editorLineThickness = scrObj_CharStats.fov_editorLineThickness;
-        fov.fov_editorAngleLineColor = scrObj_CharStats.fov_editorAngleLineColor;
-        fov.fov_editorAngleColor = scrObj_CharStats.fov_editorAngleColor;
-        fov.fov_editorRadiusColor = scrObj_CharStats.fov_editorRadiusColor;
-        fov.fov_editorDynamicRadiusColor = scrObj_CharStats.fov_editorDynamicRadiusColor;
-        fov.fov_editorRaycastColor = scrObj_CharStats.fov_editorRaycastColor;
-        fov.fov_RoutineDelay = scrObj_CharStats.fov_coneRoutineDelay;
-        fov.fov_obstaclesLayerMask = scrObj_CharStats.fov_obstaclesLayerMask;
+        fov._maxSightAngle = charComponents._scrObj_CharStats.fov_MaxSightAngle;
+        fov._minSightAngle = charComponents._scrObj_CharStats.fov_MinSightAngle;
+        fov._timeDynamicSightAngle = charComponents._scrObj_CharStats.fov_TimeDynamicSightAngle;
+        fov._minSightRadius = charComponents._scrObj_CharStats.fov_MinSightRadius;
+        fov._maxSightRadius = charComponents._scrObj_CharStats.fov_MaxSightRadius;
+        fov._timeDynamicSightRadius = charComponents._scrObj_CharStats.fov_TimeDynamicSightRadius;
+
+        fov._routineDelay = charComponents._scrObj_CharStats.fov_coneRoutineDelay;
+        fov._obstaclesLayerMask = charComponents._scrObj_CharStats.fov_obstaclesLayerMask;
+
+        fov._editorLineThickness = charComponents._scrObj_CharStats.fov_editorLineThickness;
+        fov._editorAngleLineColor = charComponents._scrObj_CharStats.fov_editorAngleLineColor;
+        fov._editorAngleColor = charComponents._scrObj_CharStats.fov_editorAngleColor;
+        fov._editorMaxRadiusColor = charComponents._scrObj_CharStats.fov_editorRadiusColor;
+        fov._editorDynamicRadiusColor = charComponents._scrObj_CharStats.fov_editorDynamicRadiusColor;
+        fov._editorRaycastColor = charComponents._scrObj_CharStats.fov_editorRaycastColor;
 
         //Mask
-        currentCharMove.currentGroundMask = scrObj_CharStats.groundMask;
-        currentCharMove.currentGroundDistance = scrObj_CharStats.groundDistance;
+        charMove.currentGroundMask = charComponents._scrObj_CharStats.groundMask;
+        charMove.currentGroundDistance = charComponents._scrObj_CharStats.groundDistance;
 
         //HP,MP,STAM,XP
-        currentMaxHP = scrObj_CharStats.baseHP + (scrObj_CharStats.baseHP * (charInfo.currentCharLevel * scrObj_CharStats.HP_Multiplier)) + (scrObj_CharStats.baseHP * (currentCharacterBonusStats.bonus_currentMaxHP * scrObj_CharStats.HP_Multiplier));   //current staty po przeliczenu multipliera * CharLevel  +bonus
-        currentMaxMP = scrObj_CharStats.baseMP + (scrObj_CharStats.baseMP * (charInfo.currentCharLevel * scrObj_CharStats.MP_Multiplier)) + (scrObj_CharStats.baseMP * (currentCharacterBonusStats.bonus_currentMaxMP * scrObj_CharStats.MP_Multiplier));   //+bonus     
-        currentMaxStam = scrObj_CharStats.baseStam + (scrObj_CharStats.baseStam * (charInfo.currentCharLevel * scrObj_CharStats.Stam_Multiplier)) + (scrObj_CharStats.baseStam * (currentCharacterBonusStats.bonus_currentMaxStam * scrObj_CharStats.Stam_Multiplier)); //+bonus        
-        currentNeededXP = scrObj_CharStats.baseNeedXP + (scrObj_CharStats.baseNeedXP * (charInfo.currentCharLevel * scrObj_CharStats.XP_Multiplier));       
-        currentXP_GainedFromKill = scrObj_CharStats.XP_GainedFromKill + (scrObj_CharStats.XP_GainedFromKill * (charInfo.currentCharLevel * scrObj_CharStats.XP_Multiplier));
-        corpseTime = scrObj_CharStats.corpseTime;
-        respawnTime = scrObj_CharStats.respawnTime;
+        charStats._maxHP = charComponents._scrObj_CharStats.baseHP + (charComponents._scrObj_CharStats.baseHP * (charInfo._charLevel * charComponents._scrObj_CharStats.HP_Multiplier)) + (charComponents._scrObj_CharStats.baseHP * (charComponents._characterBonusStats.bonus_currentMaxHP * charComponents._scrObj_CharStats.HP_Multiplier));   //current staty po przeliczenu multipliera * CharLevel  +bonus        
+        charStats._maxMP = charComponents._scrObj_CharStats.baseMP + (charComponents._scrObj_CharStats.baseMP * (charInfo._charLevel * charComponents._scrObj_CharStats.MP_Multiplier)) + (charComponents._scrObj_CharStats.baseMP * (charComponents._characterBonusStats.bonus_currentMaxMP * charComponents._scrObj_CharStats.MP_Multiplier));   //+bonus            
+        charStats._maxStam = charComponents._scrObj_CharStats.baseStam + (charComponents._scrObj_CharStats.baseStam * (charInfo._charLevel * charComponents._scrObj_CharStats.Stam_Multiplier)) + (charComponents._scrObj_CharStats.baseStam * (charComponents._characterBonusStats.bonus_currentMaxStam * charComponents._scrObj_CharStats.Stam_Multiplier)); //+bonus  
+        charStats._neededXP = charComponents._scrObj_CharStats.baseNeedXP + (charComponents._scrObj_CharStats.baseNeedXP * (charInfo._charLevel * charComponents._scrObj_CharStats.XP_Multiplier));        
+        charStats._xp_GainedFromKill = charComponents._scrObj_CharStats.XP_GainedFromKill + (charComponents._scrObj_CharStats.XP_GainedFromKill * (charInfo._charLevel * charComponents._scrObj_CharStats.XP_Multiplier));
+        charStats._corpseTime = charComponents._scrObj_CharStats.corpseTime;
+        charStats._respawnTime = charComponents._scrObj_CharStats.respawnTime;
 
-
-        //Damage
-        charSkillCombat.currentAttackCooldown = scrObj_CharStats.attackCooldown;
-        charSkillCombat.currentDamageCombo = scrObj_CharStats.baseDamageCombo + (scrObj_CharStats.baseDamageCombo * (charInfo.currentCharLevel * scrObj_CharStats.MultiplierDamageCombo)) + (scrObj_CharStats.baseDamageCombo * (currentCharacterBonusStats.bonus_currentDamageCombo * scrObj_CharStats.MultiplierDamageCombo)); //+bonus
-        charSkillCombat.currentAttackStamCost = scrObj_CharStats.attackStamCost + (scrObj_CharStats.attackStamCost * (charInfo.currentCharLevel /2f * scrObj_CharStats.MultiplierDamageCombo));
-        charSkillCombat.currentSpell_Damage = scrObj_CharStats.baseSpell_Damage + (scrObj_CharStats.baseSpell_Damage * (charInfo.currentCharLevel * scrObj_CharStats.MultiplierSpell_Damage)) + (scrObj_CharStats.baseSpell_Damage * (currentCharacterBonusStats.bonus_Skill_Damage * scrObj_CharStats.MultiplierSpell_Damage)); //+bonus
-        charSkillCombat.currentSpell_MPCost = scrObj_CharStats.baseSpell_MPCost + (scrObj_CharStats.baseSpell_Damage * (charInfo.currentCharLevel * scrObj_CharStats.MultiplierSpell_Damage));
-        charSkillCombat.spell_editorAISpellRadiusColor = scrObj_CharStats.spell_editorAISpellRadiusColor;
-        charSkillCombat.spell_breathAngleColor = scrObj_CharStats.spell_breathAngleColor;
-        charSkillCombat.spell_breathRaycastColor = scrObj_CharStats.spell_breathRaycastColor;
-
-        //Skills Select By MaxRange
-        if (charSkillCombat.skill_primarySkill != null && charSkillCombat.skill_secondarySkill != null)
-        {
-            if (charSkillCombat.skill_primarySkill.scrObj_Skill.skill_MaxRadius < charSkillCombat.skill_secondarySkill.scrObj_Skill.skill_MaxRadius)
-            {
-                charSkillCombat.currentCloseRangeSkill = charSkillCombat.skill_primarySkill;
-                charSkillCombat.currentSpellRangeSkill = charSkillCombat.skill_secondarySkill;
-            }
-            else
-            {
-                charSkillCombat.currentCloseRangeSkill = charSkillCombat.skill_secondarySkill;
-                charSkillCombat.currentSpellRangeSkill = charSkillCombat.skill_primarySkill;
-            }
-        }
         
-
-        //Objects
-        if (GetComponent<Animator>() != null) currentAnimator = GetComponent<Animator>();                     //ci¹gnie componenty z przypiêtych do chara
-        if (GetComponent<CharacterController>() != null) currentCharacterController = GetComponent<CharacterController>();
-        if (GetComponent<Player_Input>() != null) currentPlayer_Input = GetComponent<Player_Input>();
-        if (GetComponent<NavMeshAgent>() != null) 
-        {
-            currentNavMeshAgent = GetComponent<NavMeshAgent>();
-            currentNavMeshAgent.stoppingDistance = fov.fov_attackRange;
-        }
-        if (GetComponent<AudioSource>() != null) currentAudioSource = GetComponent<AudioSource>();        
-        if (GetComponentInChildren<MeeleAttack>() != null) currentMeeleColliders = GetComponentsInChildren<MeeleAttack>();
-        if (GetComponent<CharacterBonusStats>() != null) currentCharacterBonusStats = GetComponent<CharacterBonusStats>();
-
+        //Damage        
+        /*unused Old_DamageVars
+         * charSkillCombat.currentDamageCombo = scrObj_CharStats.baseDamageCombo + (scrObj_CharStats.baseDamageCombo * (charInfo.currentCharLevel * scrObj_CharStats.MultiplierDamageCombo)) + (scrObj_CharStats.baseDamageCombo * (currentCharacterBonusStats.bonus_currentDamageCombo * scrObj_CharStatsbo)); //+bonus
+        charSkillCombat.currentAttackStamCost = scrObj_CharStats.attackStamCost + (scrObj_CharStats.attackStamCost * (charInfo.currentCharLevel /2f * scrObj_CharStats.MultiplierDamageCombo));
+        charSkillCombat.currentSpell_Damage =seSpell_Damage + (scrObj_CharStats.baseSpell_Damage * (charInfo.currentCharLevel * scrObj_CharStats.MultiplierSpell_Damage)) + (scrObj_CharStats.baseSpell_Damage * (currentCharacterBonusStats.bonus_Skill_Damage * scrObj_CharStats.MultiplierSpell_Damage)); //+bonus
+        charSkillCombat.currentSpell_MPCost = scrObj_CharStats.baseSpell_MPCost + (scrObj_CharStats.baseSpell_Damage * (charInfo.currentCharLevel * scrObj_CharStats.MultiplierSpell_Damage));
+        */
+        charSkillCombat._editorAISpellRadiusColor = charComponents._scrObj_CharStats.spell_editorAISpellRadiusColor;
+        charSkillCombat._skillAngleColor = charComponents._scrObj_CharStats.spell_breathAngleColor;
+        charSkillCombat._skillRaycastColor = charComponents._scrObj_CharStats.spell_breathRaycastColor;
     }
 
     public void UpdateBonusStats()
     {
         //Movement
-        currentCharMove.currentWalkSpeed = scrObj_CharStats.walkSpeed + (currentCharacterBonusStats.bonus_currentWalkSpeed * 0.1f);     //+bonus
-        currentCharMove.currentRunSpeed = scrObj_CharStats.runSpeed + (currentCharacterBonusStats.bonus_currentWalkSpeed * 2f * 0.1f); //+bonus
+        charMove._walkSpeed = charComponents._scrObj_CharStats.walkSpeed + (charComponents._characterBonusStats.bonus_currentWalkSpeed * 0.1f);     //+bonus
+        charMove._runSpeed = charComponents._scrObj_CharStats.runSpeed + (charComponents._characterBonusStats.bonus_currentWalkSpeed * 2f * 0.1f); //+bonus
 
         //HP,MP,STAM,XP
-        currentMaxHP = scrObj_CharStats.baseHP + (scrObj_CharStats.baseHP * (charInfo.currentCharLevel * scrObj_CharStats.HP_Multiplier)) + (scrObj_CharStats.baseHP * (currentCharacterBonusStats.bonus_currentMaxHP * scrObj_CharStats.HP_Multiplier));   //current staty po przeliczenu multipliera * CharLevel  +bonus
-        currentMaxMP = scrObj_CharStats.baseMP + (scrObj_CharStats.baseMP * (charInfo.currentCharLevel * scrObj_CharStats.MP_Multiplier)) + (scrObj_CharStats.baseMP * (currentCharacterBonusStats.bonus_currentMaxMP * scrObj_CharStats.MP_Multiplier));   //+bonus     
-        currentMaxStam = scrObj_CharStats.baseStam + (scrObj_CharStats.baseStam * (charInfo.currentCharLevel * scrObj_CharStats.Stam_Multiplier)) + (scrObj_CharStats.baseStam * (currentCharacterBonusStats.bonus_currentMaxStam * scrObj_CharStats.Stam_Multiplier)); //+bonus        
+        charStats._maxHP = charComponents._scrObj_CharStats.baseHP + (charComponents._scrObj_CharStats.baseHP * (charInfo._charLevel * charComponents._scrObj_CharStats.HP_Multiplier)) + (charComponents._scrObj_CharStats.baseHP * (charComponents._characterBonusStats.bonus_currentMaxHP * charComponents._scrObj_CharStats.HP_Multiplier));   //current staty po przeliczenu multipliera * CharLevel  +bonus
+        charStats._maxMP = charComponents._scrObj_CharStats.baseMP + (charComponents._scrObj_CharStats.baseMP * (charInfo._charLevel * charComponents._scrObj_CharStats.MP_Multiplier)) + (charComponents._scrObj_CharStats.baseMP * (charComponents._characterBonusStats.bonus_currentMaxMP * charComponents._scrObj_CharStats.MP_Multiplier));   //+bonus
+        charStats._maxStam = charComponents._scrObj_CharStats.baseStam + (charComponents._scrObj_CharStats.baseStam * (charInfo._charLevel * charComponents._scrObj_CharStats.Stam_Multiplier)) + (charComponents._scrObj_CharStats.baseStam * (charComponents._characterBonusStats.bonus_currentMaxStam * charComponents._scrObj_CharStats.Stam_Multiplier)); //+bonus    
 
-        //Damage
-        charSkillCombat.currentDamageCombo = scrObj_CharStats.baseDamageCombo + (scrObj_CharStats.baseDamageCombo * (charInfo.currentCharLevel * scrObj_CharStats.MultiplierDamageCombo)) + (scrObj_CharStats.baseDamageCombo * (currentCharacterBonusStats.bonus_currentDamageCombo * scrObj_CharStats.MultiplierDamageCombo)); //+bonus
-        charSkillCombat.currentAttackStamCost = scrObj_CharStats.attackStamCost + (scrObj_CharStats.attackStamCost * (charInfo.currentCharLevel / 2f * scrObj_CharStats.MultiplierDamageCombo));
-        charSkillCombat.currentSpell_Damage = scrObj_CharStats.baseSpell_Damage + (scrObj_CharStats.baseSpell_Damage * (charInfo.currentCharLevel * scrObj_CharStats.MultiplierSpell_Damage)) + (scrObj_CharStats.baseSpell_Damage * (currentCharacterBonusStats.bonus_Skill_Damage * scrObj_CharStats.MultiplierSpell_Damage)); //+bonus
-        charSkillCombat.currentSpell_MPCost = scrObj_CharStats.baseSpell_MPCost + (scrObj_CharStats.baseSpell_Damage * (charInfo.currentCharLevel * scrObj_CharStats.MultiplierSpell_Damage));
+        /*//Damage Old unused
+        //charSkillCombat.currentDamageCombo = scrObj_CharStats.baseDamageCombo + (scrObj_CharStats.baseDamageCombo * (charInfo.currentCharLevel * scrObj_CharStats.MultiplierDamageCombo)) + (scrObj_CharStats.baseDamageCombo * (currentCharacterBonusStats.bonus_currentDamageCombo * scrObj_CharStats.MultiplierDamageCombo)); //+bonus
+        //charSkillCombat.currentAttackStamCost = scrObj_CharStats.attackStamCost + (scrObj_CharStats.attackStamCost * (charInfo.currentCharLevel / 2f * scrObj_CharStats.MultiplierDamageCombo));
+        //charSkillCombat.currentSpell_Damage = scrObj_CharStats.baseSpell_Damage + (scrObj_CharStats.baseSpell_Damage * (charInfo.currentCharLevel * scrObj_CharStats.MultiplierSpell_Damage)) + (scrObj_CharStats.baseSpell_Damage * (currentCharacterBonusStats.bonus_Skill_Damage * scrObj_CharStats.MultiplierSpell_Damage)); //+bonus
+        //charSkillCombat.currentSpell_MPCost = scrObj_CharStats.baseSpell_MPCost + (scrObj_CharStats.baseSpell_Damage * (charInfo.currentCharLevel * scrObj_CharStats.MultiplierSpell_Damage));
+        */
+        
         SaveBonusStats();
     }
 
     public void LevelGain()
     {
-        currentXP -= currentNeededXP; //przerzuca nadwy¿ke xp na next level
-        charInfo.currentCharLevel ++;
+        charStats._xp -= charStats._neededXP; //przerzuca nadwy¿ke xp na next level
+        charInfo._charLevel ++;
         LoadCharStats();
     }
 
     ///////////LOAD GAME///////////
     public void LoadGame()
     {
-        if (charInfo.isPlayer)
+        if (charInfo._isPlayer)
         {
             LoadLevel();
             LoadCharStats();
@@ -361,8 +347,8 @@ public class CharacterStatus : MonoBehaviour
     public void LoadLevel()
     {
         //PlayerPrefs CharacterLevel
-        charInfo.currentCharLevel = PlayerPrefs.GetInt("CharacterLevel", 0);  //PlayerPrefs przechowuje dane w rejestrze Unity, taki prosty save stat 
-        currentXP = PlayerPrefs.GetInt("CharacterCurrentXP", 0);
+        charInfo._charLevel = PlayerPrefs.GetInt("CharacterLevel", 0);  //PlayerPrefs przechowuje dane w rejestrze Unity, taki prosty save stat 
+        charStats._xp = PlayerPrefs.GetInt("CharacterCurrentXP", 0);
         LoadBonusStats();
         UpdateBonusStats();
     } 
@@ -371,7 +357,7 @@ public class CharacterStatus : MonoBehaviour
     ///////////SAVE GAME///////////
     public void SaveGame()
     {
-        if (charInfo.isPlayer)
+        if (charInfo._isPlayer)
         {
             {
                 SaveState();
@@ -382,12 +368,12 @@ public class CharacterStatus : MonoBehaviour
 
     public void SaveState()
     {
-        if (charInfo.isPlayer)
+        if (charInfo._isPlayer)
         {
-            currentCharMove.currentBackupPosition = new Vector3(transform.position.x, transform.position.y + 0.5f, transform.position.z); //y+0.5f ¿eby zrespi³ siê powy¿ej terrain
-            currentCharMove.currentBackupRotation = transform.rotation;
-            PlayerPrefs.SetInt("CharacterLevel", charInfo.currentCharLevel);
-            PlayerPrefs.SetInt("CharacterCurrentXP", (int)currentXP);
+            charMove._backupPosition = new Vector3(transform.position.x, transform.position.y + 0.5f, transform.position.z); //y+0.5f ¿eby zrespi³ siê powy¿ej terrain
+            charMove._backupRotation = transform.rotation;
+            PlayerPrefs.SetInt("CharacterLevel", charInfo._charLevel);
+            PlayerPrefs.SetInt("CharacterCurrentXP", (int)charStats._xp);
             SaveBonusStats();
         }
 
@@ -395,48 +381,48 @@ public class CharacterStatus : MonoBehaviour
 
     public void SaveBonusStats()
     {
-        if (charInfo.isPlayer)
+        if (charInfo._isPlayer)
         {
-            PlayerPrefs.SetInt("BonusWalkSpeed", (int)currentCharacterBonusStats.bonus_currentWalkSpeed);
-            PlayerPrefs.SetInt("BonusDamageCombo", (int)currentCharacterBonusStats.bonus_currentDamageCombo);
-            PlayerPrefs.SetInt("BonusSpellDamage", (int)currentCharacterBonusStats.bonus_Skill_Damage);
-            PlayerPrefs.SetInt("BonusMaxHP", (int)currentCharacterBonusStats.bonus_currentMaxHP);
-            PlayerPrefs.SetInt("BonusMaxMP", (int)currentCharacterBonusStats.bonus_currentMaxMP);
-            PlayerPrefs.SetInt("BonusMaxStam", (int)currentCharacterBonusStats.bonus_currentMaxStam);
-            PlayerPrefs.SetInt("BonusSkillPoints", (int)currentCharacterBonusStats.bonus_SkillPoints);
+            PlayerPrefs.SetInt("BonusWalkSpeed", (int)charComponents._characterBonusStats.bonus_currentWalkSpeed);
+            PlayerPrefs.SetInt("BonusDamageCombo", (int)charComponents._characterBonusStats.bonus_currentDamageCombo);
+            PlayerPrefs.SetInt("BonusSpellDamage", (int)charComponents._characterBonusStats.bonus_Skill_Damage);
+            PlayerPrefs.SetInt("BonusMaxHP", (int)charComponents._characterBonusStats.bonus_currentMaxHP);
+            PlayerPrefs.SetInt("BonusMaxMP", (int)charComponents._characterBonusStats.bonus_currentMaxMP);
+            PlayerPrefs.SetInt("BonusMaxStam", (int)charComponents._characterBonusStats.bonus_currentMaxStam);
+            PlayerPrefs.SetInt("BonusSkillPoints", (int)charComponents._characterBonusStats.bonus_SkillPoints);
         }
     }
 
     public void LoadBonusStats()
     {
-        if (charInfo.isPlayer)
+        if (charInfo._isPlayer)
         {
-            currentCharacterBonusStats.bonus_currentWalkSpeed = PlayerPrefs.GetInt("BonusWalkSpeed", 0);
-            currentCharacterBonusStats.bonus_currentDamageCombo = PlayerPrefs.GetInt("BonusDamageCombo", 0);
-            currentCharacterBonusStats.bonus_Skill_Damage = PlayerPrefs.GetInt("BonusSpellDamage", 0);
-            currentCharacterBonusStats.bonus_currentMaxHP = PlayerPrefs.GetInt("BonusMaxHP", 0);
-            currentCharacterBonusStats.bonus_currentMaxMP = PlayerPrefs.GetInt("BonusMaxMP", 0);
-            currentCharacterBonusStats.bonus_currentMaxStam = PlayerPrefs.GetInt("BonusMaxStam", 0);
-            currentCharacterBonusStats.bonus_SkillPoints = PlayerPrefs.GetInt("BonusSkillPoints", 0);
+            charComponents._characterBonusStats.bonus_currentWalkSpeed = PlayerPrefs.GetInt("BonusWalkSpeed", 0);
+            charComponents._characterBonusStats.bonus_currentDamageCombo = PlayerPrefs.GetInt("BonusDamageCombo", 0);
+            charComponents._characterBonusStats.bonus_Skill_Damage = PlayerPrefs.GetInt("BonusSpellDamage", 0);
+            charComponents._characterBonusStats.bonus_currentMaxHP = PlayerPrefs.GetInt("BonusMaxHP", 0);
+            charComponents._characterBonusStats.bonus_currentMaxMP = PlayerPrefs.GetInt("BonusMaxMP", 0);
+            charComponents._characterBonusStats.bonus_currentMaxStam = PlayerPrefs.GetInt("BonusMaxStam", 0);
+            charComponents._characterBonusStats.bonus_SkillPoints = PlayerPrefs.GetInt("BonusSkillPoints", 0);
         }
     }
 
 
     public void SetCharacterPosition()
     {
-        currentCharMove.currentBackupPosition = new Vector3(transform.position.x, transform.position.y + 0.5f, transform.position.z); //y+0.5f ¿eby zrespi³ siê powy¿ej terrain
-        currentCharMove.currentBackupRotation = transform.rotation;
-        navMeshAge.navMeAge_spawnPoint = transform.position;
+        charMove._backupPosition = new Vector3(transform.position.x, transform.position.y + 0.5f, transform.position.z); //y+0.5f ¿eby zrespi³ siê powy¿ej terrain
+        charMove._backupRotation = transform.rotation;
+        navMeshAge._spawnPoint = transform.position;
     }
 
     ///////////////////////////////
     public void ResetLevel()
     {
-        if (charInfo.isPlayer)
+        if (charInfo._isPlayer)
         {
-            charInfo.currentCharLevel = 0;
-            currentXP = 0;
-            currentCharacterBonusStats.bonus_SkillPoints = 0;
+            charInfo._charLevel = 0;
+            charStats._xp = 0;
+            charComponents._characterBonusStats.bonus_SkillPoints = 0;
             //PlayerPrefs.SetInt("CharacterLevel", currentCharLevel);
             //PlayerPrefs.SetInt("CharacterCurrentXP", (int)currentXP);
             LoadCharStats();
@@ -446,17 +432,17 @@ public class CharacterStatus : MonoBehaviour
 
     public void ResetCharacterPosition()
     {
-        transform.SetPositionAndRotation(currentCharMove.currentBackupPosition, currentCharMove.currentBackupRotation);        
+        transform.SetPositionAndRotation(charMove._backupPosition, charMove._backupRotation);        
     }
 
     public void ResourcesRegen()
     {
         //Stam Regen
-        if (currentStam < currentMaxStam && !currentCharStatus.isRunning /*&& !isAttacking *//*&& currentStam<currentMaxStam*/) currentStam = Mathf.MoveTowards(currentStam, currentMaxStam, (scrObj_CharStats.regenStam + (scrObj_CharStats.regenStam * scrObj_CharStats.Stam_Multiplier * charInfo.currentCharLevel * 1f) + (currentMaxStam * 0.1f * scrObj_CharStats.Stam_Multiplier)) * Time.deltaTime); //regeneruje f stamy / sekunde
+        if (charStats._stam < charStats._maxStam && !charStatus._isRunning /*&& !isAttacking *//*&& currentStam<currentMaxStam*/) charStats._stam = Mathf.MoveTowards(charStats._stam, charStats._maxStam, (charComponents._scrObj_CharStats.regenStam + (charComponents._scrObj_CharStats.regenStam * charComponents._scrObj_CharStats.Stam_Multiplier * charInfo._charLevel * 1f) + (charStats._maxStam * 0.1f * charComponents._scrObj_CharStats.Stam_Multiplier)) * Time.deltaTime); //regeneruje f stamy / sekunde
         //HP Regen
-        if (currentHP < currentMaxHP) currentHP = Mathf.MoveTowards(currentHP, currentMaxHP, (scrObj_CharStats.regenHP + (scrObj_CharStats.regenHP * scrObj_CharStats.HP_Multiplier * charInfo.currentCharLevel * 1f) + (currentMaxHP * 0.1f * scrObj_CharStats.HP_Multiplier)) * Time.deltaTime); //regeneruje f HP / sekunde
+        if (charStats._hp < charStats._maxHP) charStats._hp = Mathf.MoveTowards(charStats._hp, charStats._maxHP, (charComponents._scrObj_CharStats.regenHP + (charComponents._scrObj_CharStats.regenHP * charComponents._scrObj_CharStats.HP_Multiplier * charInfo._charLevel * 1f) + (charStats._maxHP * 0.1f * charComponents._scrObj_CharStats.HP_Multiplier)) * Time.deltaTime); //regeneruje f HP / sekunde
         //MP Regen
-        if (currentMP < currentMaxMP /*&& !inputSecondary*//*&& !isAttacking*/ /*&& currentMP < currentMaxMP*/) currentMP = Mathf.MoveTowards(currentMP, currentMaxMP, (scrObj_CharStats.regenMP + (scrObj_CharStats.regenMP * scrObj_CharStats.MP_Multiplier * charInfo.currentCharLevel * 1f) + (currentMaxMP * 0.1f * scrObj_CharStats.MP_Multiplier)) * Time.deltaTime); //regeneruje f HP / sekunde
+        if (charStats._mp < charStats._maxMP /*&& !inputSecondary*//*&& !isAttacking*/ /*&& currentMP < currentMaxMP*/) charStats._mp = Mathf.MoveTowards(charStats._mp, charStats._maxMP, (charComponents._scrObj_CharStats.regenMP + (charComponents._scrObj_CharStats.regenMP * charComponents._scrObj_CharStats.MP_Multiplier * charInfo._charLevel * 1f) + (charStats._maxMP * 0.1f * charComponents._scrObj_CharStats.MP_Multiplier)) * Time.deltaTime); //regeneruje f HP / sekunde
 
     }
 
@@ -464,37 +450,59 @@ public class CharacterStatus : MonoBehaviour
     
     public void TakeDamgeInstant(float damageValue, CharacterStatus attacker)
     {
-        currentHP -= damageValue;
-        if (currentHP <= 0f && !currentCharStatus.isDead) //zadzia³a tylko raz
+        charStats._hp -= damageValue;
+        if (charStats._hp <= 0f && !charStatus._isDead) //zadzia³a tylko raz
         {
-            attacker.currentXP += currentXP_GainedFromKill;
-            if (gameObject.CompareTag("Monster")) { charInfo.currentCharLevel = UnityEngine.Random.Range(attacker.charInfo.currentCharLevel - 3, attacker.charInfo.currentCharLevel + 3); }  //po œmierci ustawia level targetu na zbli¿ony do atakuj¹cego
+            attacker.charStats._xp += charStats._xp_GainedFromKill;
+            if (gameObject.CompareTag("Monster")) { charInfo._charLevel = UnityEngine.Random.Range(attacker.charInfo._charLevel - 3, attacker.charInfo._charLevel + 3); }  //po œmierci ustawia level targetu na zbli¿ony do atakuj¹cego
                                                                                                                                                                                                                                   //podbija lvl tylko Monsterów, Playera i Environment nie
         }
     }
 
     public void TakeDamageOverTime(float damageValue, CharacterStatus attacker)
     {
-        currentHP = Mathf.MoveTowards(currentHP, -damageValue, Time.deltaTime * damageValue);
-        if (currentHP <= 0f && !currentCharStatus.isDead) //zadzia³a tylko raz
+        charStats._hp = Mathf.MoveTowards(charStats._hp, -damageValue, Time.deltaTime * damageValue);
+        if (charStats._hp <= 0f && !charStatus._isDead) //zadzia³a tylko raz
         {
-            attacker.currentXP += currentXP_GainedFromKill;
-            if (gameObject.CompareTag("Monster")) { charInfo.currentCharLevel = UnityEngine.Random.Range(attacker.charInfo.currentCharLevel - 3, attacker.charInfo.currentCharLevel + 3); }  //po œmierci ustawia level targetu na zbli¿ony do atakuj¹cego
+            attacker.charStats._xp += charStats._xp_GainedFromKill;
+            if (gameObject.CompareTag("Monster")) { charInfo._charLevel = UnityEngine.Random.Range(attacker.charInfo._charLevel - 3, attacker.charInfo._charLevel + 3); }  //po œmierci ustawia level targetu na zbli¿ony do atakuj¹cego
                                                                                                                                                                                                                                   //podbija lvl tylko Monsterów, Playera i Environment nie
         }
     }
 
     public void TakeHealInstant(float healValue)
     {
-        if (currentHP < currentMaxHP) currentHP += healValue;
-        else { currentHP = currentMaxHP; }
+        if (charStats._hp < charStats._maxHP) charStats._hp += healValue;
+        else { charStats._hp = charStats._maxHP; }
     }
 
     public void TakeHealOverTime(float healValue)
     {
-        if (currentHP < currentMaxHP) { currentHP = Mathf.MoveTowards(currentHP, currentMaxHP, Time.deltaTime * healValue); }
-        else { currentHP = currentMaxHP; }
+        if (charStats._hp < charStats._maxHP) { charStats._hp = Mathf.MoveTowards(charStats._hp, charStats._maxHP, Time.deltaTime * healValue); }
+        else { charStats._hp = charStats._maxHP; }
     }
 
 
+    /// <summary>
+    /// Specjalna klasa s³u¿¹ca do resetu spelli na Destructibles poniewa¿ mimo ¿e nie widaæ czasami mo¿e przypisaæ próbowaæ spell (niby sk¹d?)
+    /// Wina tego ¿e Destructiblesy i czary s¹ na tym samym skrypcie 
+    /// </summary>
+    public void Utils_BoxSpellsReset()
+    {
+        if (charInfo._charName == "Box" || gameObject.tag == "Destructibles")
+        {
+            charSkillCombat._primarySkill = null;
+            charSkillCombat._secondarySkill = null;
+            fov._closeRangeSkill = null;
+            fov._spellRangeSkill = null;
+        }
+    }
+
+    public void Utils_RestoreResourcesToAll()
+    {
+        charStats._hp = charStats._maxHP;
+        charStats._mp = charStats._maxMP;
+        charStats._stam = charStats._maxStam;
+        fov._AISpellRangeSkillRadiusFromMax = 0.5f;
+    }
 }

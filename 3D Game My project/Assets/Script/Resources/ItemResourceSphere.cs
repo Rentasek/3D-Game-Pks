@@ -43,7 +43,7 @@ public class ItemResourceSphere : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
-        if (other.CompareTag("Player") && !other.GetComponent<CharacterStatus>().currentCharStatus.isDead) //Tylko dla ¿ywych
+        if (other.CompareTag("Player") && !other.GetComponent<CharacterStatus>().charStatus._isDead) //Tylko dla ¿ywych
         {
             switch (resourceType)
             {
@@ -51,30 +51,30 @@ public class ItemResourceSphere : MonoBehaviour
                     other.gameObject.GetComponent<CharacterBonusStats>().bonus_SkillPoints++;
                     break;
                 case ResourceType.HP:
-                    if(other.gameObject.GetComponent<CharacterStatus>().currentHP >= other.GetComponent<CharacterStatus>().currentMaxHP)
+                    if(other.gameObject.GetComponent<CharacterStatus>().charStats._hp >= other.GetComponent<CharacterStatus>().charStats._maxHP)
                     {
-                        other.gameObject.GetComponent<CharacterStatus>().currentHP = other.GetComponent<CharacterStatus>().currentMaxHP;
+                        other.gameObject.GetComponent<CharacterStatus>().charStats._hp = other.GetComponent<CharacterStatus>().charStats._maxHP;
                         break;
                     }
-                    other.gameObject.GetComponent<CharacterStatus>().currentHP += other.GetComponent<CharacterStatus>().currentMaxHP * other.GetComponent<CharacterBonusStats>().percentRegen;
+                    other.gameObject.GetComponent<CharacterStatus>().charStats._hp += other.GetComponent<CharacterStatus>().charStats._maxHP * other.GetComponent<CharacterBonusStats>().percentRegen;
                     break;
 
                 case ResourceType.MP:
-                    if (other.gameObject.GetComponent<CharacterStatus>().currentMP >= other.GetComponent<CharacterStatus>().currentMaxMP)
+                    if (other.gameObject.GetComponent<CharacterStatus>().charStats._mp >= other.GetComponent<CharacterStatus>().charStats._maxMP)
                     {
-                        other.gameObject.GetComponent<CharacterStatus>().currentMP = other.GetComponent<CharacterStatus>().currentMaxMP;
+                        other.gameObject.GetComponent<CharacterStatus>().charStats._mp = other.GetComponent<CharacterStatus>().charStats._maxMP;
                         break;
                     }
-                    other.gameObject.GetComponent<CharacterStatus>().currentMP += other.GetComponent<CharacterStatus>().currentMaxMP * other.GetComponent<CharacterBonusStats>().percentRegen;
+                    other.gameObject.GetComponent<CharacterStatus>().charStats._mp += other.GetComponent<CharacterStatus>().charStats._maxMP * other.GetComponent<CharacterBonusStats>().percentRegen;
                     break;
 
                 case ResourceType.Stamina:
-                    if (other.gameObject.GetComponent<CharacterStatus>().currentStam >= other.GetComponent<CharacterStatus>().currentMaxStam)
+                    if (other.gameObject.GetComponent<CharacterStatus>().charStats._stam >= other.GetComponent<CharacterStatus>().charStats._maxStam)
                     {
-                        other.gameObject.GetComponent<CharacterStatus>().currentStam = other.GetComponent<CharacterStatus>().currentMaxStam;
+                        other.gameObject.GetComponent<CharacterStatus>().charStats._stam = other.GetComponent<CharacterStatus>().charStats._maxStam;
                         break;
                     }
-                    other.gameObject.GetComponent<CharacterStatus>().currentStam += other.GetComponent<CharacterStatus>().currentMaxStam * other.GetComponent<CharacterBonusStats>().percentRegen;
+                    other.gameObject.GetComponent<CharacterStatus>().charStats._stam += other.GetComponent<CharacterStatus>().charStats._maxStam * other.GetComponent<CharacterBonusStats>().percentRegen;
                     break;
             }
             Debug.Log("Collision!! "+"Resource type: "+resourceType);            

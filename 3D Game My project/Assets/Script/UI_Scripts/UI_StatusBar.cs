@@ -40,29 +40,29 @@ public class UI_StatusBar : MonoBehaviour
             switch (statusBar)
             {
                 case StatusBar.HealthStat:
-                    selectedBarCurrentFloat = Mathf.Clamp(live_charStats.currentHP,0f, live_charStats.currentMaxHP);             //Enum na switchu odnosi siê tylko do jednej zmiennej w charStats zamiast wszystkich na raz, wiêc nie obci¹¿a procka
-                    selectedBarMaxFloat = live_charStats.currentMaxHP;                    
+                    selectedBarCurrentFloat = Mathf.Clamp(live_charStats.charStats._hp,0f, live_charStats.charStats._maxHP);             //Enum na switchu odnosi siê tylko do jednej zmiennej w charStats zamiast wszystkich na raz, wiêc nie obci¹¿a procka
+                    selectedBarMaxFloat = live_charStats.charStats._maxHP;                    
                     break;
 
 
                 case StatusBar.ManaStat:
 
-                selectedBarCurrentFloat = Mathf.Clamp(live_charStats.currentMP, 0f, live_charStats.currentMaxMP);
-                    selectedBarMaxFloat = live_charStats.currentMaxMP;
+                selectedBarCurrentFloat = Mathf.Clamp(live_charStats.charStats._mp, 0f, live_charStats.charStats._maxMP);
+                    selectedBarMaxFloat = live_charStats.charStats._maxMP;
                     break;
 
 
                 case StatusBar.StaminaStat:
 
-                selectedBarCurrentFloat = Mathf.Clamp(live_charStats.currentStam, 0f, live_charStats.currentMaxStam);
-                    selectedBarMaxFloat = live_charStats.currentMaxStam;
+                selectedBarCurrentFloat = Mathf.Clamp(live_charStats.charStats._stam, 0f, live_charStats.charStats._maxStam);
+                    selectedBarMaxFloat = live_charStats.charStats._maxStam;
                     break;
 
 
                 case StatusBar.XPStat:
 
-                    selectedBarCurrentFloat = Mathf.Clamp(live_charStats.currentXP, 0f, live_charStats.currentNeededXP);
-                    selectedBarMaxFloat = live_charStats.currentNeededXP;
+                    selectedBarCurrentFloat = Mathf.Clamp(live_charStats.charStats._xp, 0f, live_charStats.charStats._neededXP);
+                    selectedBarMaxFloat = live_charStats.charStats._neededXP;
                     break;
 
             }        

@@ -25,9 +25,9 @@ public static class Static_SkillForge
         {
             //InputSelector(scrObj_Skill, skill, live_charStats);
 
-            if (skill.skill_input && live_charStats.charSkillCombat.skill_CanCast && Utils.Skill_ResourceTypeCurrentFloatReadOnly(scrObj_Skill, live_charStats) >= skill.skill_currentResourceCost)
+            if (skill.skill_input && skill.skill_CanCast && Utils.Skill_ResourceTypeCurrentFloatReadOnly(scrObj_Skill, live_charStats) >= skill.skill_currentResourceCost)
             {
-                if (!live_charStats.currentCharStatus.isCasting) //Jeśli nie castuje i ma właśnie zacząć //Start Casting
+                if (!live_charStats.charStatus._isCasting) //Jeśli nie castuje i ma właśnie zacząć //Start Casting
                 {
                     #region IsCasting -> Instant
                     if (skill.skill_currentCooldownRemaining <= 0.05f)  //Jeśli zostało 0.05f lub mniej cooldownu może użyć instanta
@@ -41,20 +41,20 @@ public static class Static_SkillForge
 
                         Utils.Skill_StopAllAnimatorMovement(scrObj_Skill, live_charStats);
 
-                        if (!string.IsNullOrWhiteSpace(scrObj_Skill.skill_AnimatorBoolName)) live_charStats.currentAnimator.SetBool(scrObj_Skill.skill_AnimatorBoolName, true);
-                        if (!string.IsNullOrWhiteSpace(scrObj_Skill.skill_AnimatorTriggerName)) live_charStats.currentAnimator.SetTrigger(scrObj_Skill.skill_AnimatorTriggerName);
+                        if (!string.IsNullOrWhiteSpace(scrObj_Skill.skill_AnimatorBoolName)) live_charStats.charComponents._Animator.SetBool(scrObj_Skill.skill_AnimatorBoolName, true);
+                        if (!string.IsNullOrWhiteSpace(scrObj_Skill.skill_AnimatorTriggerName)) live_charStats.charComponents._Animator.SetTrigger(scrObj_Skill.skill_AnimatorTriggerName);
 
                         skill.skill_IsCastingInstant = true;
                         skill.skill_currentCooldownRemaining = 1f; //Ustawia cooldown czyli IsCastingInstant wychodzi z true (raz) ale przy następnej klatce już nie wejdzie do if bo ma cooldown
 
-                        if (!string.IsNullOrWhiteSpace(scrObj_Skill.skill_AnimatorFloatName)) live_charStats.currentAnimator.SetFloat(scrObj_Skill.skill_AnimatorFloatName, skill.skill_currentComboProgress); //przed updatem comboProgress
+                        if (!string.IsNullOrWhiteSpace(scrObj_Skill.skill_AnimatorFloatName)) live_charStats.charComponents._Animator.SetFloat(scrObj_Skill.skill_AnimatorFloatName, skill.skill_currentComboProgress); //przed updatem comboProgress
                         skill.skill_currentComboProgress += /*scrObj_Skill.skill_BaseCooldown +*/ 0.5f;
                         if (skill.skill_currentComboProgress >= 1) skill.skill_currentComboProgress = 0f; // trzeci Atak maxymalnie może podbić do [1.83f] więc żeby się wykonał trzeba dać powyżej [1.83f] (1.50f(1.51f dla bezpieczeństwa) + cooldown(0.33))
 
                     }
                     #endregion
                 }
-                live_charStats.currentCharStatus.isCasting = true;
+                live_charStats.charStatus._isCasting = true;
 
                 #region IsCasting -> Castable
 
@@ -67,10 +67,10 @@ public static class Static_SkillForge
                     if (!string.IsNullOrWhiteSpace(scrObj_Skill.skill_AnimatorBoolName)) //reset AnimatorIsCastingBooleana i CastingAudioClipa przy IsCastingFinished <- najlepiej żeby był taki sam jak długość AudioClipa przy HOLD
                     {
                         if (skill.skill_AudioSource != null) { skill.skill_AudioSource.Stop(); }  //Stop aktualnego Audio PlayOneShot 
-                        live_charStats.currentAnimator.SetBool(scrObj_Skill.skill_AnimatorBoolName, false);
+                        live_charStats.charComponents._Animator.SetBool(scrObj_Skill.skill_AnimatorBoolName, false);
                     }
 
-                    if (!string.IsNullOrWhiteSpace(scrObj_Skill.skill_AnimatorTriggerOnFinishedCastingName)) live_charStats.currentAnimator.SetTrigger(scrObj_Skill.skill_AnimatorTriggerOnFinishedCastingName);  //Animacja po wykonaniu casta                                           
+                    if (!string.IsNullOrWhiteSpace(scrObj_Skill.skill_AnimatorTriggerOnFinishedCastingName)) live_charStats.charComponents._Animator.SetTrigger(scrObj_Skill.skill_AnimatorTriggerOnFinishedCastingName);  //Animacja po wykonaniu casta                                           
                     skill.skill_currentCooldownRemaining = 1f;  //Ustawia cooldown po wycastowaniu żeby nie castował znów zbyt szybko, przydatnie jeśli mamy animację po wystrzeleniu
                 }
 
@@ -83,7 +83,7 @@ public static class Static_SkillForge
 
             #region IsCasting -> Hold
 
-            skill.skill_IsCastingHold = live_charStats.currentCharStatus.isCasting;
+            skill.skill_IsCastingHold = live_charStats.charStatus._isCasting;
 
             #endregion
         }
@@ -146,15 +146,15 @@ public static class Static_SkillForge
         {
             Utils.Skill_InputSelector(scrObj_Skill, skill, live_charStats);
 
-            if (skill.skill_input && live_charStats.charSkillCombat.skill_CanCast && Utils.Skill_ResourceTypeCurrentFloatReadOnly(scrObj_Skill, live_charStats) >= skill.skill_currentResourceCost)
+            if (skill.skill_input && skill.skill_CanCast && Utils.Skill_ResourceTypeCurrentFloatReadOnly(scrObj_Skill, live_charStats) >= skill.skill_currentResourceCost)
             {
-                if (!live_charStats.currentCharStatus.isCasting)
+                if (!live_charStats.charStatus._isCasting)
                 {
                     skill.skill_CastingVisualEffect.Play(); //może się odpalić tylko raz przy każdym inpucie, nie może się nadpisać -> taki sam efekt jak przy GetKeyDown
                     skill.skill_AudioSource.PlayOneShot(scrObj_Skill.skill_CastingAudioClip, scrObj_Skill.skill_CastingAudioVolume);//clip audio    
                 }
-                live_charStats.currentCharStatus.isCasting = true;
-                if (!string.IsNullOrWhiteSpace(scrObj_Skill.skill_AnimatorBoolName)) live_charStats.currentAnimator.SetBool(scrObj_Skill.skill_AnimatorBoolName, live_charStats.currentCharStatus.isCasting);
+                live_charStats.charStatus._isCasting = true;
+                if (!string.IsNullOrWhiteSpace(scrObj_Skill.skill_AnimatorBoolName)) live_charStats.charComponents._Animator.SetBool(scrObj_Skill.skill_AnimatorBoolName, live_charStats.charStatus._isCasting);
                 skill.skill_currentCastingProgress = Mathf.Lerp(skill.skill_currentCastingProgress, 1f, Time.deltaTime / scrObj_Skill.skill_TimeCast);
                 skill.skill_IsCastingFinishedCastable = (skill.skill_currentCastingProgress >= 1f) ? true : false;
                 if (skill.skill_IsCastingFinishedCastable) skill.skill_currentCastingProgress = 0f; //reset progressu po wycastowaniu Skilla
@@ -218,15 +218,15 @@ public static class Static_SkillForge
         {
             Utils.Skill_InputSelector(scrObj_Skill, skill, live_charStats);
 
-            if (skill.skill_input && live_charStats.charSkillCombat.skill_CanCast && Utils.Skill_ResourceTypeCurrentFloatReadOnly(scrObj_Skill, live_charStats) >= skill.skill_currentResourceCost)
+            if (skill.skill_input && skill.skill_CanCast && Utils.Skill_ResourceTypeCurrentFloatReadOnly(scrObj_Skill, live_charStats) >= skill.skill_currentResourceCost)
             {
-                if (!live_charStats.currentCharStatus.isCasting)
+                if (!live_charStats.charStatus._isCasting)
                 {
                     skill.skill_CastingVisualEffect.Play(); //może się odpalić tylko raz przy każdym inpucie, nie może się nadpisać -> taki sam efekt jak przy GetKeyDown
                     skill.skill_AudioSource.PlayOneShot(scrObj_Skill.skill_CastingAudioClip, scrObj_Skill.skill_CastingAudioVolume);//clip audio 
-                    if (!string.IsNullOrWhiteSpace(scrObj_Skill.skill_AnimatorTriggerName)) live_charStats.currentAnimator.SetTrigger(scrObj_Skill.skill_AnimatorTriggerName);
+                    if (!string.IsNullOrWhiteSpace(scrObj_Skill.skill_AnimatorTriggerName)) live_charStats.charComponents._Animator.SetTrigger(scrObj_Skill.skill_AnimatorTriggerName);
                 }
-                live_charStats.currentCharStatus.isCasting = true;
+                live_charStats.charStatus._isCasting = true;
             }
             else
             {
@@ -234,7 +234,7 @@ public static class Static_SkillForge
 
                 Utils.Skill_Target_ConeReset(skill); //Reset TargetList
             }
-            skill.skill_IsCastingInstant = live_charStats.currentCharStatus.isCasting;
+            skill.skill_IsCastingInstant = live_charStats.charStatus._isCasting;
         }
         #endregion
 
@@ -293,15 +293,15 @@ public static class Static_SkillForge
         {
             Utils.Skill_InputSelector(scrObj_Skill, skill, live_charStats);
 
-            if (skill.skill_input && live_charStats.charSkillCombat.skill_CanCast && Utils.Skill_ResourceTypeCurrentFloatReadOnly(scrObj_Skill, live_charStats) >= skill.skill_currentResourceCost)
+            if (skill.skill_input && skill.skill_CanCast && Utils.Skill_ResourceTypeCurrentFloatReadOnly(scrObj_Skill, live_charStats) >= skill.skill_currentResourceCost)
             {
-                if (!live_charStats.currentCharStatus.isCasting)
+                if (!live_charStats.charStatus._isCasting)
                 {
                     skill.skill_CastingVisualEffect.Play(); //może się odpalić tylko raz przy każdym inpucie, nie może się nadpisać -> taki sam efekt jak przy GetKeyDown
                     skill.skill_AudioSource.PlayOneShot(scrObj_Skill.skill_CastingAudioClip, scrObj_Skill.skill_CastingAudioVolume);//clip audio     
                 }
-                live_charStats.currentCharStatus.isCasting = true;
-                if (!string.IsNullOrWhiteSpace(scrObj_Skill.skill_AnimatorBoolName)) live_charStats.currentAnimator.SetBool(scrObj_Skill.skill_AnimatorBoolName, live_charStats.currentCharStatus.isCasting);
+                live_charStats.charStatus._isCasting = true;
+                if (!string.IsNullOrWhiteSpace(scrObj_Skill.skill_AnimatorBoolName)) live_charStats.charComponents._Animator.SetBool(scrObj_Skill.skill_AnimatorBoolName, live_charStats.charStatus._isCasting);
             }
             else
             {
@@ -466,7 +466,7 @@ public static void Skill_Cone_AttackConeCheck(bool isCasting, float skill_curren
     {
         Utils.Skill_Cone_DynamicCone(scrObj_Skill, skill, live_charStats);
 
-        if (live_charStats.currentCharStatus.isCasting)
+        if (live_charStats.charStatus._isCasting)
         {
             for (int i = 0; i < Physics.OverlapSphere(skill.skill_casterGameobject.transform.position, skill.skill_currentRadius).Length; i++)
             {
@@ -524,7 +524,7 @@ public static void Skill_Cone_AttackConeCheck(bool isCasting, float skill_curren
     {
         Utils.Skill_Melee_DynamicCone(scrObj_Skill, skill, live_charStats);
 
-        if (live_charStats.currentCharStatus.isCasting)
+        if (live_charStats.charStatus._isCasting)
         {
             for (int i = 0; i < Physics.OverlapSphere(skill.skill_casterGameobject.transform.position, skill.skill_currentRadius).Length; i++)
             {
@@ -578,7 +578,7 @@ public static void Skill_Cone_AttackConeCheck(bool isCasting, float skill_curren
     /// <param name="live_charStats">Live_charStats Castera</param>
     public static void Skill_Self_Target(ScrObj_skill scrObj_Skill, Skill skill, CharacterStatus live_charStats)
     {
-        if (live_charStats.currentCharStatus.isCasting)
+        if (live_charStats.charStatus._isCasting)
         {
             if (skill.skill_targetColliders.IndexOf(live_charStats.gameObject.GetComponent<Collider>()) < 0) //sprawdza czy nie ma na liście. Jeżeli IndexOf < 0 czyli nie ma obiektów z tym indexem
             {
@@ -698,7 +698,7 @@ public static void Skill_Cone_AttackConeCheck(bool isCasting, float skill_curren
     /// <param name="live_charStats">Live_charStats Castera</param>
     public static void Skill_DamageOverTime(ScrObj_skill scrObj_Skill, Skill skill, CharacterStatus live_charStats, bool isCastingType)
     {
-        Utils.Skill_EffectValuesUpdate(scrObj_Skill, skill, live_charStats, live_charStats.currentCharacterBonusStats); //nie chce mi się dopisywać linka do CharacterBonusStats :P
+        Utils.Skill_EffectValuesUpdate(scrObj_Skill, skill, live_charStats, live_charStats.charComponents._characterBonusStats); //nie chce mi się dopisywać linka do CharacterBonusStats :P
 
         if (isCastingType)
         {
@@ -712,15 +712,15 @@ public static void Skill_Cone_AttackConeCheck(bool isCasting, float skill_curren
             switch (scrObj_Skill.skill_ResourceType)
             {
                 case ScrObj_skill.Skill_ResourceType.health:
-                    live_charStats.currentHP = Mathf.MoveTowards(live_charStats.currentHP, -skill.skill_currentResourceCost, skill.skill_currentResourceCost * Time.deltaTime);    // ResourceCost / Sek 
+                    live_charStats.charStats._hp = Mathf.MoveTowards(live_charStats.charStats._hp, -skill.skill_currentResourceCost, skill.skill_currentResourceCost * Time.deltaTime);    // ResourceCost / Sek 
                     break;
 
                 case ScrObj_skill.Skill_ResourceType.mana:
-                    live_charStats.currentMP = Mathf.MoveTowards(live_charStats.currentMP, -skill.skill_currentResourceCost, skill.skill_currentResourceCost * Time.deltaTime);    // ResourceCost / Sek 
+                    live_charStats.charStats._mp = Mathf.MoveTowards(live_charStats.charStats._mp, -skill.skill_currentResourceCost, skill.skill_currentResourceCost * Time.deltaTime);    // ResourceCost / Sek 
                     break;
 
                 case ScrObj_skill.Skill_ResourceType.stamina:
-                    live_charStats.currentStam = Mathf.MoveTowards(live_charStats.currentStam, -skill.skill_currentResourceCost, skill.skill_currentResourceCost * Time.deltaTime);     // ResourceCost / Sek 
+                    live_charStats.charStats._stam = Mathf.MoveTowards(live_charStats.charStats._stam, -skill.skill_currentResourceCost, skill.skill_currentResourceCost * Time.deltaTime);     // ResourceCost / Sek 
                     break;
             }
         }
@@ -739,7 +739,7 @@ public static void Skill_Cone_AttackConeCheck(bool isCasting, float skill_curren
     /// <param name="live_charStats">Live_charStats Castera</param>
     public static void Skill_Hit(ScrObj_skill scrObj_Skill, Skill skill, CharacterStatus live_charStats, bool isCastingType)
     {
-        Utils.Skill_EffectValuesUpdate(scrObj_Skill, skill, live_charStats, live_charStats.currentCharacterBonusStats); //nie chce mi się dopisywać linka do CharacterBonusStats :P
+        Utils.Skill_EffectValuesUpdate(scrObj_Skill, skill, live_charStats, live_charStats.charComponents._characterBonusStats); //nie chce mi się dopisywać linka do CharacterBonusStats :P
 
         if (isCastingType)
         {
@@ -753,15 +753,15 @@ public static void Skill_Cone_AttackConeCheck(bool isCasting, float skill_curren
             switch (scrObj_Skill.skill_ResourceType)
             {
                 case ScrObj_skill.Skill_ResourceType.health:
-                    live_charStats.currentHP -= skill.skill_currentResourceCost; // ResourceCost Instant
+                    live_charStats.charStats._hp -= skill.skill_currentResourceCost; // ResourceCost Instant
                     break;
 
                 case ScrObj_skill.Skill_ResourceType.mana:
-                    live_charStats.currentMP -= skill.skill_currentResourceCost;  // ResourceCost Instant
+                    live_charStats.charStats._mp -= skill.skill_currentResourceCost;  // ResourceCost Instant
                     break;
 
                 case ScrObj_skill.Skill_ResourceType.stamina:
-                    live_charStats.currentStam -= skill.skill_currentResourceCost; // ResourceCost Instant
+                    live_charStats.charStats._stam -= skill.skill_currentResourceCost; // ResourceCost Instant
                     break;
             }
         }
@@ -779,7 +779,7 @@ public static void Skill_Cone_AttackConeCheck(bool isCasting, float skill_curren
     /// <param name="live_charStats">Live_charStats Castera</param>
     public static void Skill_HealOverTime(ScrObj_skill scrObj_Skill, Skill skill, CharacterStatus live_charStats, bool isCastingType)
     {
-        Utils.Skill_EffectValuesUpdate(scrObj_Skill, skill, live_charStats, live_charStats.currentCharacterBonusStats); //nie chce mi się dopisywać linka do CharacterBonusStats :P
+        Utils.Skill_EffectValuesUpdate(scrObj_Skill, skill, live_charStats, live_charStats.charComponents._characterBonusStats); //nie chce mi się dopisywać linka do CharacterBonusStats :P
 
         if (isCastingType)
         {
@@ -793,15 +793,15 @@ public static void Skill_Cone_AttackConeCheck(bool isCasting, float skill_curren
             switch (scrObj_Skill.skill_ResourceType)
             {
                 case ScrObj_skill.Skill_ResourceType.health:
-                    live_charStats.currentHP = Mathf.MoveTowards(live_charStats.currentHP, -skill.skill_currentResourceCost, skill.skill_currentResourceCost * Time.deltaTime);    // ResourceCost / Sek 
+                    live_charStats.charStats._hp = Mathf.MoveTowards(live_charStats.charStats._hp, -skill.skill_currentResourceCost, skill.skill_currentResourceCost * Time.deltaTime);    // ResourceCost / Sek 
                     break;
 
                 case ScrObj_skill.Skill_ResourceType.mana:
-                    live_charStats.currentMP = Mathf.MoveTowards(live_charStats.currentMP, -skill.skill_currentResourceCost, skill.skill_currentResourceCost * Time.deltaTime);    // ResourceCost / Sek 
+                    live_charStats.charStats._mp = Mathf.MoveTowards(live_charStats.charStats._mp, -skill.skill_currentResourceCost, skill.skill_currentResourceCost * Time.deltaTime);    // ResourceCost / Sek 
                     break;
 
                 case ScrObj_skill.Skill_ResourceType.stamina:
-                    live_charStats.currentStam = Mathf.MoveTowards(live_charStats.currentStam, -skill.skill_currentResourceCost, skill.skill_currentResourceCost * Time.deltaTime);     // ResourceCost / Sek 
+                    live_charStats.charStats._stam = Mathf.MoveTowards(live_charStats.charStats._stam, -skill.skill_currentResourceCost, skill.skill_currentResourceCost * Time.deltaTime);     // ResourceCost / Sek 
                     break;
             }
         }
@@ -819,7 +819,7 @@ public static void Skill_Cone_AttackConeCheck(bool isCasting, float skill_curren
     /// <param name="live_charStats">Live_charStats Castera</param>
     public static void Skill_Heal(ScrObj_skill scrObj_Skill, Skill skill, CharacterStatus live_charStats, bool isCastingType)
     {
-        Utils.Skill_EffectValuesUpdate(scrObj_Skill, skill, live_charStats, live_charStats.currentCharacterBonusStats); //nie chce mi się dopisywać linka do CharacterBonusStats :P
+        Utils.Skill_EffectValuesUpdate(scrObj_Skill, skill, live_charStats, live_charStats.charComponents._characterBonusStats); //nie chce mi się dopisywać linka do CharacterBonusStats :P
 
         if (isCastingType)
         {
@@ -833,15 +833,15 @@ public static void Skill_Cone_AttackConeCheck(bool isCasting, float skill_curren
             switch (scrObj_Skill.skill_ResourceType)
             {
                 case ScrObj_skill.Skill_ResourceType.health:
-                    live_charStats.currentHP -= skill.skill_currentResourceCost; // ResourceCost Instant
+                    live_charStats.charStats._hp -= skill.skill_currentResourceCost; // ResourceCost Instant
                     break;
 
                 case ScrObj_skill.Skill_ResourceType.mana:
-                    live_charStats.currentMP -= skill.skill_currentResourceCost;  // ResourceCost Instant
+                    live_charStats.charStats._mp -= skill.skill_currentResourceCost;  // ResourceCost Instant
                     break;
 
                 case ScrObj_skill.Skill_ResourceType.stamina:
-                    live_charStats.currentStam -= skill.skill_currentResourceCost; // ResourceCost Instant
+                    live_charStats.charStats._stam -= skill.skill_currentResourceCost; // ResourceCost Instant
                     break;
             }
         }
@@ -883,8 +883,8 @@ public static void Skill_Cone_AttackConeCheck(bool isCasting, float skill_curren
         /// <param name="live_charStats">Live_charStats Castera</param>
         public static void Skill_EnemyArraySelector(Skill skill, CharacterStatus live_charStats)
         {
-            skill.skill_EnemiesArray = new string[live_charStats.charInfo.currentEnemiesArray.Length + 1];              //tworzy array +1 od current enemies arraya
-            live_charStats.charInfo.currentEnemiesArray.CopyTo(skill.skill_EnemiesArray, 0);                                     //kopiuje current enemies arraya od indexu 0
+            skill.skill_EnemiesArray = new string[live_charStats.charInfo._enemiesArray.Length + 1];              //tworzy array +1 od current enemies arraya
+            live_charStats.charInfo._enemiesArray.CopyTo(skill.skill_EnemiesArray, 0);                                     //kopiuje current enemies arraya od indexu 0
             skill.skill_EnemiesArray[skill.skill_EnemiesArray.Length - 1] = "Destructibles";                                  //wstawia jako ostatni index Destructibles żeby zawsze można było go zniszczyć           
         }
 
@@ -956,12 +956,12 @@ public static void Skill_Cone_AttackConeCheck(bool isCasting, float skill_curren
             switch (scrObj_Skill.skill_InputType)
             {
                 case ScrObj_skill.Skill_InputType.primary:
-                    skill.skill_input = live_charStats.characterInput.inputPrimary;
-                    skill.skill_otherInput = live_charStats.characterInput.inputSecondary;
+                    skill.skill_input = live_charStats.charInput._primary;
+                    skill.skill_otherInput = live_charStats.charInput._secondary;
                     break;
                 case ScrObj_skill.Skill_InputType.secondary:
-                    skill.skill_input = live_charStats.characterInput.inputSecondary;
-                    skill.skill_otherInput = live_charStats.characterInput.inputPrimary;
+                    skill.skill_input = live_charStats.charInput._secondary;
+                    skill.skill_otherInput = live_charStats.charInput._primary;
                     break;
             }
         }
@@ -1058,15 +1058,15 @@ public static void Skill_Cone_AttackConeCheck(bool isCasting, float skill_curren
             switch (scrObj_Skill.skill_ResourceType)
             {
                 case ScrObj_skill.Skill_ResourceType.health:
-                    currentResource = live_charStats.currentHP;
+                    currentResource = live_charStats.charStats._hp;
                     break;
 
                 case ScrObj_skill.Skill_ResourceType.mana:
-                    currentResource = live_charStats.currentMP;
+                    currentResource = live_charStats.charStats._mp;
                     break;
 
                 case ScrObj_skill.Skill_ResourceType.stamina:
-                    currentResource = live_charStats.currentStam;
+                    currentResource = live_charStats.charStats._stam;
                     break;
             }
 
@@ -1105,8 +1105,8 @@ public static void Skill_Cone_AttackConeCheck(bool isCasting, float skill_curren
         /// <param name="live_charStats">Live_charStats Castera</param>
         public static void Skill_EffectValuesUpdate(ScrObj_skill scrObj_Skill, Skill skill, CharacterStatus live_charStats, CharacterBonusStats currentCharacterBonusStats)
         {
-            skill.skill_currentDamage = scrObj_Skill.skill_BaseDamage + (scrObj_Skill.skill_BaseDamage * (live_charStats.charInfo.currentCharLevel * scrObj_Skill.skill_Multiplier)) + (scrObj_Skill.skill_BaseDamage * (currentCharacterBonusStats.bonus_Skill_Damage * scrObj_Skill.skill_Multiplier)); //+bonus
-            skill.skill_currentResourceCost = scrObj_Skill.skill_BaseResourceCost + (scrObj_Skill.skill_BaseResourceCost * (live_charStats.charInfo.currentCharLevel * scrObj_Skill.skill_Multiplier));
+            skill.skill_currentDamage = scrObj_Skill.skill_BaseDamage + (scrObj_Skill.skill_BaseDamage * (live_charStats.charInfo._charLevel * scrObj_Skill.skill_Multiplier)) + (scrObj_Skill.skill_BaseDamage * (currentCharacterBonusStats.bonus_Skill_Damage * scrObj_Skill.skill_Multiplier)); //+bonus
+            skill.skill_currentResourceCost = scrObj_Skill.skill_BaseResourceCost + (scrObj_Skill.skill_BaseResourceCost * (live_charStats.charInfo._charLevel * scrObj_Skill.skill_Multiplier));
 
         }
         #endregion
@@ -1180,7 +1180,7 @@ public static void Skill_Cone_AttackConeCheck(bool isCasting, float skill_curren
         /// <param name="live_charStats">Live_charStats Castera</param>
         public static void Skill_Cone_DynamicCone(ScrObj_skill scrObj_Skill, Skill skill, CharacterStatus live_charStats)
         {
-            if (live_charStats.currentCharStatus.isCasting)
+            if (live_charStats.charStatus._isCasting)
             {
                 skill.skill_currentRadius = Mathf.SmoothDamp(skill.skill_currentRadius, scrObj_Skill.skill_MaxRadius, ref skill.skill_currentVectorRadius, scrObj_Skill.skill_TimeMaxRadius);
                 //dynamiczny BreathCone radius -> ++ on input
@@ -1257,8 +1257,8 @@ public static void Skill_Cone_AttackConeCheck(bool isCasting, float skill_curren
         public static void Skill_ResetAnyCasting(ScrObj_skill scrObj_Skill, Skill skill, CharacterStatus live_charStats)
         {
             if (skill.skill_CastingVisualEffect != null) skill.skill_CastingVisualEffect.Stop();
-            if (!string.IsNullOrWhiteSpace(scrObj_Skill.skill_AnimatorBoolName)) live_charStats.currentAnimator.SetBool(scrObj_Skill.skill_AnimatorBoolName, false);
-            if (!string.IsNullOrWhiteSpace(scrObj_Skill.skill_AnimatorTriggerName)) live_charStats.currentAnimator.ResetTrigger(scrObj_Skill.skill_AnimatorTriggerName);
+            if (!string.IsNullOrWhiteSpace(scrObj_Skill.skill_AnimatorBoolName)) live_charStats.charComponents._Animator.SetBool(scrObj_Skill.skill_AnimatorBoolName, false);
+            if (!string.IsNullOrWhiteSpace(scrObj_Skill.skill_AnimatorTriggerName)) live_charStats.charComponents._Animator.ResetTrigger(scrObj_Skill.skill_AnimatorTriggerName);
 
             if (skill.skill_AudioSource != null) 
             {
@@ -1268,7 +1268,7 @@ public static void Skill_Cone_AttackConeCheck(bool isCasting, float skill_curren
                 }
             }
 
-            live_charStats.currentCharStatus.isCasting = false;
+            live_charStats.charStatus._isCasting = false;
 
             skill.skill_IsCastingInstant = false;
 
@@ -1322,9 +1322,9 @@ public static void Skill_Cone_AttackConeCheck(bool isCasting, float skill_curren
         /// <param name="live_charStats"></param>
         public static void Skill_StopAllAnimatorMovement(ScrObj_skill scrObj_Skill, CharacterStatus live_charStats)
         {
-            if (!string.IsNullOrWhiteSpace(scrObj_Skill.skill_StopOnCastFloatNameAnimator)) live_charStats.currentAnimator.SetFloat(scrObj_Skill.skill_StopOnCastFloatNameAnimator, 0);
-            if (!string.IsNullOrWhiteSpace(scrObj_Skill.skill_StopOnCastTriggerNameAnimator)) live_charStats.currentAnimator.ResetTrigger(scrObj_Skill.skill_StopOnCastTriggerNameAnimator);
-            if (!string.IsNullOrWhiteSpace(scrObj_Skill.skill_StopOnCastBoolNameAnimator)) live_charStats.currentAnimator.SetBool(scrObj_Skill.skill_StopOnCastBoolNameAnimator, false);
+            if (!string.IsNullOrWhiteSpace(scrObj_Skill.skill_StopOnCastFloatNameAnimator)) live_charStats.charComponents._Animator.SetFloat(scrObj_Skill.skill_StopOnCastFloatNameAnimator, 0);
+            if (!string.IsNullOrWhiteSpace(scrObj_Skill.skill_StopOnCastTriggerNameAnimator)) live_charStats.charComponents._Animator.ResetTrigger(scrObj_Skill.skill_StopOnCastTriggerNameAnimator);
+            if (!string.IsNullOrWhiteSpace(scrObj_Skill.skill_StopOnCastBoolNameAnimator)) live_charStats.charComponents._Animator.SetBool(scrObj_Skill.skill_StopOnCastBoolNameAnimator, false);
 
         }
         #endregion

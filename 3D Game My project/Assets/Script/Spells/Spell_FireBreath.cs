@@ -67,29 +67,31 @@ public class Spell_FireBreath : MonoBehaviour
 
 
 
-    private void OnEnable()
+    /*Old - Unused
+     * private void OnEnable()
     {
         live_charStats = GetComponentInParent<CharacterStatus>();
         breath_AudioSource = GetComponentInParent<AudioSource>();//debugg jeœli nie ustawione w inspectorze
         breath_VisualEffect = GetComponentInParent<VisualEffect>();
         //live_charStats.skill_secondarySkill = GetComponent<Spell_FireBreath>();
-        live_charStats.charSkillCombat.spell_MaxRadius = breath_MaxFireRadius;
+        live_charStats.fov._spellRangeSkillMaxRadius = breath_MaxFireRadius;
         EnemyArraySelector();
-    }
+    }*/
 
-    private void EnemyArraySelector()
-    {
-        breath_EnemiesArray = new string[live_charStats.charInfo.currentEnemiesArray.Length + 1];    //tworzy array +1 od current enemies arraya
-        live_charStats.charInfo.currentEnemiesArray.CopyTo(breath_EnemiesArray, 0);                  //kopiuje current enemies arraya od indexu 0
-        breath_EnemiesArray[breath_EnemiesArray.Length - 1] = "Destructibles";              //wstawia jako ostatni index Destructibles ¿eby zawsze mo¿na by³o go zniszczyæ
-    }
+    /*Old - Unused
+     * private void EnemyArraySelector()
+     {
+         breath_EnemiesArray = new string[live_charStats.charInfo.currentEnemiesArray.Length + 1];    //tworzy array +1 od current enemies arraya
+         live_charStats.charInfo.currentEnemiesArray.CopyTo(breath_EnemiesArray, 0);                  //kopiuje current enemies arraya od indexu 0
+         breath_EnemiesArray[breath_EnemiesArray.Length - 1] = "Destructibles";              //wstawia jako ostatni index Destructibles ¿eby zawsze mo¿na by³o go zniszczyæ
+     }*/
 
-
-    // Update is called once per frame
+    /*Old - Unused
+     * // Update is called once per frame
     void Update()
     {
         breath_input = live_charStats.characterInput.inputSecondary; //testing inspector
-        live_charStats.charSkillCombat.skill_CanCast = !live_charStats.characterInput.inputPrimary && !live_charStats.currentCharStatus.isRunning && live_charStats.currentCharMove.currentMoveSpeed != live_charStats.currentCharMove.currentRunSpeed;
+        live_charStats.currentCharStatus.skill_CanCast = !live_charStats.characterInput.inputPrimary && !live_charStats.currentCharStatus.isRunning && live_charStats.currentCharMove.currentMoveSpeed != live_charStats.currentCharMove.currentRunSpeed;
     }
     private void FixedUpdate()
     {
@@ -107,13 +109,18 @@ public class Spell_FireBreath : MonoBehaviour
 
         }
 
-        //IMPLEMENTACJA zadawania dmg//
+        */
+
+    /*Old - Unused
+         * //IMPLEMENTACJA zadawania dmg//
         FireBreathDamage();
-    }
-    private void FireBreathVFX_Audio()
+    }*/
+
+    /*Old - Unused
+     * private void FireBreathVFX_Audio()
     {
 
-        if (live_charStats.characterInput.inputSecondary && live_charStats.charSkillCombat.skill_CanCast && live_charStats.currentMP >= 1f) 
+        if (live_charStats.characterInput.inputSecondary && live_charStats.currentCharStatus.skill_CanCast && live_charStats.currentMP >= 1f) 
         {
             if (!live_charStats.currentCharStatus.isCasting)
             {
@@ -140,13 +147,13 @@ public class Spell_FireBreath : MonoBehaviour
 
 
 
-    }
+    }*/
 
 
     //mechanika BREATH Cone
 
 
-    private void FireBreathDynamicCone()
+    /*private void FireBreathDynamicCone()
     {
 
         if (live_charStats.currentCharStatus.isCasting)
@@ -166,8 +173,9 @@ public class Spell_FireBreath : MonoBehaviour
             //dynamiczny BreathCone Angle -> -- off input
         }
 
-    }
-    private void BreathAttackConeCheck()  //dynamiczna lista colliderów z OverlapSphere
+    }*/
+
+    /*private void BreathAttackConeCheck()  //dynamiczna lista colliderów z OverlapSphere
     {
         FireBreathDynamicCone();
 
@@ -213,9 +221,10 @@ public class Spell_FireBreath : MonoBehaviour
             breath_targetInBreathRange = false;
             breath_targetColliders.Clear();  //czyszczenie listy colliderów
         }
-    }
+    }*/
 
-    private void FireBreathDamage()
+   /*  OLD - unused
+    * private void FireBreathDamage()
     {
         if (live_charStats.currentCharStatus.isCasting)
         {
@@ -235,44 +244,39 @@ public class Spell_FireBreath : MonoBehaviour
             //live_charStats.currentMP = Mathf.SmoothStep(live_charStats.currentMP, -live_charStats.currentSpell_MPCost, Time.deltaTime);  // MPCost / Sek
             live_charStats.currentMP = Mathf.MoveTowards(live_charStats.currentMP, -live_charStats.charSkillCombat.currentSpell_MPCost, live_charStats.charSkillCombat.currentSpell_MPCost * Time.deltaTime);    // MPCost / Sek
         }        
-    }
+    }*/
 
-
-
-
-
-
-
-#if UNITY_EDITOR //zamiast skryptu w Editor
+/* Old - Unused
+ * #if UNITY_EDITOR //zamiast skryptu w Editor
 
     private void OnDrawGizmos() //rusyje wszystkie
     {
         GizmosDrawer();
     }
-    /*private void OnDrawGizmosSelected() //rysuje tylko zaznaczone
+   private void OnDrawGizmosSelected() //rysuje tylko zaznaczone
     {
         GizmosDrawer();
-    }*/
+    }
 
     private void GizmosDrawer()
     {
 
-        Handles.color = live_charStats.charSkillCombat.spell_breathAngleColor;
+        Handles.color = live_charStats.charSkillCombat._skillAngleColor;
         Handles.DrawSolidArc(transform.position, Vector3.up, Quaternion.AngleAxis(-(breath_currentFireAngle / 2), Vector3.up) * transform.forward, breath_currentFireAngle, breath_currentFireRadius); //rysuje coneAngle view               
 
 
         if (breath_targetInBreathRange && breath_targetInBreathAngle)
         {
-            Handles.color = live_charStats.charSkillCombat.spell_breathRaycastColor;
+            Handles.color = live_charStats.charSkillCombat._skillRaycastColor;
             for (int i = 0; i < breath_targetColliders.Count; i++)
             {
-                Handles.DrawLine(transform.position, breath_targetColliders[i].transform.position, live_charStats.fov.fov_editorLineThickness); //rysowanie lini w kierunku targetów breatha jeœli nie zas³ania go obstacle Layer
+                Handles.DrawLine(transform.position, breath_targetColliders[i].transform.position, live_charStats.fov._editorLineThickness); //rysowanie lini w kierunku targetów breatha jeœli nie zas³ania go obstacle Layer
             }
 
         }
     }
 
-#endif
+#endif*/
 
 }
 

@@ -41,7 +41,7 @@ public class UI_PauseMenu : MonoBehaviour, IPlayerUpdate
 
     public void Resume()
     {
-        live_charStats.characterInput.inputEnableMouseRotate = mouseLocked;  //private var do przetrzymania mouse inputa, przywraca stan      
+        live_charStats.charInput._enableMouseRotate = mouseLocked;  //private var do przetrzymania mouse inputa, przywraca stan      
 
         pauseMenu.SetActive(false);
         Time.timeScale = 1f;
@@ -49,8 +49,8 @@ public class UI_PauseMenu : MonoBehaviour, IPlayerUpdate
     }
     private void Pause()
     {
-        mouseLocked = live_charStats.characterInput.inputEnableMouseRotate; //private var do przetrzymania mouse inputa, zapamiêtuje aktualny stan
-        live_charStats.characterInput.inputEnableMouseRotate = false;    //unlock mouse
+        mouseLocked = live_charStats.charInput._enableMouseRotate; //private var do przetrzymania mouse inputa, zapamiêtuje aktualny stan
+        live_charStats.charInput._enableMouseRotate = false;    //unlock mouse
         Cursor.lockState = CursorLockMode.None;         //unlock mouse
         pauseMenu.SetActive(true);
 

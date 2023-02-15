@@ -26,23 +26,23 @@ public class CharacterMovement : MonoBehaviour
     private void OnEnable()
     {
         live_charStats = GetComponent<CharacterStatus>();
-        live_NavMeshAgent = live_charStats.currentNavMeshAgent;
-        characterController = live_charStats.currentCharacterController;
-        _GravityEnabled = live_charStats.currentCharMove.currentGravityEnabled;
+        live_NavMeshAgent = live_charStats.charComponents._navMeshAgent;
+        characterController = live_charStats.charComponents._characterController;
+        _GravityEnabled = live_charStats.charMove._gravityEnabled;
     }
 
     public void RotatePlayer()
     {       
-        transform.Rotate(Vector3.up, live_charStats.characterInput.inputRotateHorizontal);
+        transform.Rotate(Vector3.up, live_charStats.charInput._rotateHorizontal);
     }
 
     public void Movement()
     {
-        live_charStats.currentCharStatus.isGrounded = Physics.CheckSphere(transform.position, live_charStats.currentCharMove.currentGroundDistance, live_charStats.currentCharMove.currentGroundMask); //sprawdzanie isGrounded
-        if (live_charStats.currentCharStatus.isGrounded) live_charStats.currentAnimator.ResetTrigger("Jump");       //resetowanie triggera Jump ¿eby nie wykonywa³ animacji po wyl¹dowaniu z opóŸnieniem
-        live_charStats.currentAnimator.SetBool("IsGrounded", live_charStats.currentCharStatus.isGrounded);          //Przeniesienie status isGrounded do animatora
+        live_charStats.charStatus._isGrounded = Physics.CheckSphere(transform.position, live_charStats.charMove.currentGroundDistance, live_charStats.charMove.currentGroundMask); //sprawdzanie isGrounded
+        if (live_charStats.charStatus._isGrounded) live_charStats.charComponents._Animator.ResetTrigger("Jump");       //resetowanie triggera Jump ¿eby nie wykonywa³ animacji po wyl¹dowaniu z opóŸnieniem
+        live_charStats.charComponents._Animator.SetBool("IsGrounded", live_charStats.charStatus._isGrounded);          //Przeniesienie status isGrounded do animatora
 
-        if (live_charStats.charInfo.playerInputEnable && live_charStats.charInfo.isPlayer)
+        if (live_charStats.charInfo._playerInputEnable && live_charStats.charInfo._isPlayer)
         //jeœli w inspektorze jest zaznaczona opcja PlayerInputEnable -> sterowanie z Player_Inputa         
 
         {
@@ -53,10 +53,10 @@ public class CharacterMovement : MonoBehaviour
             Jump(); //jump dzia³a z animacj¹ na fixedUpdate tylko jak jest GetKey w inpucie, na GetKeyDown nie dzia³a
             if (_GravityEnabled) Gravity();//grawitacja musi byæ na fixed update inaczej za szybko spada, za czêsty refresh klatki
 
-            characterController.Move(live_charStats.currentCharMove.currentMoveVector * Time.deltaTime);
+            characterController.Move(live_charStats.charMove._moveVector * Time.deltaTime);
 
         }
-        else if (!live_charStats.charInfo.playerInputEnable)
+        else if (!live_charStats.charInfo._playerInputEnable)
         {
             live_NavMeshAgent.enabled = true;//W³¹czenie NavMeshAgenta
             Movement_AgentInput();  //Jeœli nie => AgentInput
@@ -69,101 +69,101 @@ public class CharacterMovement : MonoBehaviour
 
     public void Movement_AgentInput()
     {
-        live_charStats.currentCharMove.currentMoveInputDirection = live_NavMeshAgent.velocity;
+        live_charStats.charMove._moveInputDirection = live_NavMeshAgent.velocity;
 
-        live_charStats.currentCharStatus.isMoving = (live_NavMeshAgent.velocity != Vector3.zero);  //If moveVector.y > 0 = true <= w skrócie, przypisanie do charStats
+        live_charStats.charStatus._isMoving = (live_NavMeshAgent.velocity != Vector3.zero);  //If moveVector.y > 0 = true <= w skrócie, przypisanie do charStats
 
 
-        live_NavMeshAgent.speed = live_charStats.currentCharMove.currentRunSpeed; //Zawsze stara siê poruszaæ RunningSpeed
+        live_NavMeshAgent.speed = live_charStats.charMove._runSpeed; //Zawsze stara siê poruszaæ RunningSpeed
 
 
         int localSpeedIndex = 0;
         //W³aœciwy movement z animacjami
-        if (live_charStats.currentCharMove.currentMoveInputDirection != Vector3.zero && live_NavMeshAgent.speed == live_charStats.currentCharMove.currentRunSpeed)
+        if (live_charStats.charMove._moveInputDirection != Vector3.zero && live_NavMeshAgent.speed == live_charStats.charMove._runSpeed)
                                                                                                                     
         {
-            if (live_charStats.currentStam > 0) live_charStats.currentStam = Mathf.MoveTowards(live_charStats.currentStam, 0f, (10f + live_charStats.charInfo.currentCharLevel) * Time.deltaTime); //zu¿ywa f stamy / sekunde
+            if (live_charStats.charStats._stam > 0) live_charStats.charStats._stam = Mathf.MoveTowards(live_charStats.charStats._stam, 0f, (10f + live_charStats.charInfo._charLevel) * Time.deltaTime); //zu¿ywa f stamy / sekunde
 
             ////Running Speed 
-            if (/*live_charStats.currentMoveInputDirection != Vector3.zero &&*/ !live_charStats.currentCharStatus.isJumping && !live_charStats.currentCharStatus.isAttacking && live_charStats.currentStam > 5f
-                && live_charStats.fov.fov_targetAquired && !live_charStats.characterInput.inputSecondary && live_charStats.currentNavMeshAgent.remainingDistance > 2 * live_charStats.fov.fov_attackRange)
+            if (/*live_charStats.currentMoveInputDirection != Vector3.zero &&*/ !live_charStats.charStatus._isJumping && !live_charStats.charStatus._isAttacking && live_charStats.charStats._stam > 5f
+                && live_charStats.fov._targetAquired && !live_charStats.charInput._secondary && live_charStats.charComponents._navMeshAgent.remainingDistance > 2 * live_charStats.fov._attackRangeSkillMaxRadius)
                 //dodatnkowy warunek ->biega tylko jak targetAquired=true, kolejny warnek jeœli nie castuje!!, Kolejny warunek jeœli agent.eemainingDistance > 2* attack range
             {
-                live_charStats.currentAnimator.ResetTrigger("MeeleAttack");
+                live_charStats.charComponents._Animator.ResetTrigger("MeeleAttack");
                 localSpeedIndex = 2;
-                live_NavMeshAgent.speed = live_charStats.currentCharMove.currentRunSpeed; //Run
-                live_charStats.currentCharMove.currentMoveSpeed = live_charStats.currentCharMove.currentRunSpeed; //zmienna przekazywana do charStats a póŸniej do Animatora
+                live_NavMeshAgent.speed = live_charStats.charMove._runSpeed; //Run
+                live_charStats.charMove._moveSpeed = live_charStats.charMove._runSpeed; //zmienna przekazywana do charStats a póŸniej do Animatora
             }
             else
             {   ////Walking Speed
                 localSpeedIndex = 1;
-                live_NavMeshAgent.speed = live_charStats.currentCharMove.currentWalkSpeed; //Sprintowanie bez Staminy -> Walk
-                live_charStats.currentCharMove.currentMoveSpeed = live_charStats.currentCharMove.currentWalkSpeed; //zmienna przekazywana do charStats a póŸniej do Animatora
+                live_NavMeshAgent.speed = live_charStats.charMove._walkSpeed; //Sprintowanie bez Staminy -> Walk
+                live_charStats.charMove._moveSpeed = live_charStats.charMove._walkSpeed; //zmienna przekazywana do charStats a póŸniej do Animatora
             }
 
 
         }       
-        else if (live_charStats.currentCharMove.currentMoveInputDirection == Vector3.zero && !live_charStats.currentCharStatus.isJumping && !live_charStats.currentCharStatus.isAttacking)
+        else if (live_charStats.charMove._moveInputDirection == Vector3.zero && !live_charStats.charStatus._isJumping && !live_charStats.charStatus._isAttacking)
         {   ///Idle Speed => speed = 0
             localSpeedIndex = 0;
-            live_charStats.currentCharMove.currentMoveSpeed = 0f; //zmienna przekazywana do charStats a póŸniej do Animatora
+            live_charStats.charMove._moveSpeed = 0f; //zmienna przekazywana do charStats a póŸniej do Animatora
 
 
         }
-        live_charStats.currentCharStatus.isRunning = (localSpeedIndex == 2);
-        live_charStats.currentCharStatus.isWalking = (localSpeedIndex == 1);
-        live_charStats.currentCharStatus.isIdle = (localSpeedIndex == 0);
+        live_charStats.charStatus._isRunning = (localSpeedIndex == 2);
+        live_charStats.charStatus._isWalking = (localSpeedIndex == 1);
+        live_charStats.charStatus._isIdle = (localSpeedIndex == 0);
         //specjalnie zrobione na jednej zmiennej tak ¿eby siê ci¹gle zmienia³a, trochê jak enumerator
     }
     
     private void Movement_PlayerInput()
     {
         //Movement -> vectory i transformacje        
-        Vector3 transformDirection = transform.TransformDirection(live_charStats.currentCharMove.currentMoveInputDirection); //przeniesienie transform direction z World do Local
-        Vector3 flatMovement = live_charStats.currentCharMove.currentMoveSpeed * transformDirection;
-        live_charStats.currentCharMove.currentMoveVector = new Vector3(flatMovement.x, live_charStats.currentCharMove.currentMoveVector.y, flatMovement.z);
+        Vector3 transformDirection = transform.TransformDirection(live_charStats.charMove._moveInputDirection); //przeniesienie transform direction z World do Local
+        Vector3 flatMovement = live_charStats.charMove._moveSpeed * transformDirection;
+        live_charStats.charMove._moveVector = new Vector3(flatMovement.x, live_charStats.charMove._moveVector.y, flatMovement.z);
 
-        live_charStats.currentCharStatus.isMoving = (live_charStats.currentCharMove.currentMoveVector.z != 0f);  //If moveVector.y > 0 = true <= w skrócie, przypisanie do charStats
+        live_charStats.charStatus._isMoving = (live_charStats.charMove._moveVector.z != 0f);  //If moveVector.y > 0 = true <= w skrócie, przypisanie do charStats
 
         int localSpeedIndex = 0;
         //W³aœciwy movement z animacjami
-        if (live_charStats.currentCharMove.currentMoveInputDirection != Vector3.zero && live_charStats.characterInput.inputRunning) 
+        if (live_charStats.charMove._moveInputDirection != Vector3.zero && live_charStats.charInput._running) 
         {
 
-            if (live_charStats.currentStam > 0) live_charStats.currentStam = Mathf.MoveTowards(live_charStats.currentStam, 0f, (10f + live_charStats.charInfo.currentCharLevel) * Time.deltaTime); //MoveTowards na koñcu podaje czas maxymalny na zmianê wartoœci
+            if (live_charStats.charStats._stam > 0) live_charStats.charStats._stam = Mathf.MoveTowards(live_charStats.charStats._stam, 0f, (10f + live_charStats.charInfo._charLevel) * Time.deltaTime); //MoveTowards na koñcu podaje czas maxymalny na zmianê wartoœci
 
 
-            if (live_charStats.currentCharMove.currentMoveInputDirection != Vector3.zero && live_charStats.currentCharMove.currentMoveInputDirection != Vector3.back && !live_charStats.currentCharStatus.isJumping && !live_charStats.currentCharStatus.isAttacking && live_charStats.currentStam > 5f) 
+            if (live_charStats.charMove._moveInputDirection != Vector3.zero && live_charStats.charMove._moveInputDirection != Vector3.back && !live_charStats.charStatus._isJumping && !live_charStats.charStatus._isAttacking && live_charStats.charStats._stam > 5f) 
             {                                                               //jeœli nie sprintuje do ty³u
                 ////Running Speed 
-                live_charStats.currentAnimator.ResetTrigger("MeeleAttack");
+                live_charStats.charComponents._Animator.ResetTrigger("MeeleAttack");
                 localSpeedIndex = 2;
-                live_charStats.currentCharMove.currentMoveSpeed = live_charStats.currentCharMove.currentRunSpeed; //Run
+                live_charStats.charMove._moveSpeed = live_charStats.charMove._runSpeed; //Run
             }
             else
             {
                 ////Walking Speed
                 localSpeedIndex = 1;
-                live_charStats.currentCharMove.currentMoveSpeed = live_charStats.currentCharMove.currentWalkSpeed; //Sprintowanie bez Staminy -> Walk
+                live_charStats.charMove._moveSpeed = live_charStats.charMove._walkSpeed; //Sprintowanie bez Staminy -> Walk
             }
 
 
         }
-        else if (live_charStats.currentCharMove.currentMoveInputDirection != Vector3.zero && !live_charStats.characterInput.inputRunning && !live_charStats.currentCharStatus.isJumping && !live_charStats.currentCharStatus.isAttacking)
+        else if (live_charStats.charMove._moveInputDirection != Vector3.zero && !live_charStats.charInput._running && !live_charStats.charStatus._isJumping && !live_charStats.charStatus._isAttacking)
         {   ////Walking Speed
             localSpeedIndex = 1;
-            live_charStats.currentCharMove.currentMoveSpeed = live_charStats.currentCharMove.currentWalkSpeed; //Walk
+            live_charStats.charMove._moveSpeed = live_charStats.charMove._walkSpeed; //Walk
         }
-        else if (live_charStats.currentCharMove.currentMoveInputDirection == Vector3.zero && !live_charStats.currentCharStatus.isJumping && !live_charStats.currentCharStatus.isAttacking)
+        else if (live_charStats.charMove._moveInputDirection == Vector3.zero && !live_charStats.charStatus._isJumping && !live_charStats.charStatus._isAttacking)
         {   ///Idle Speed => speed = 0
             localSpeedIndex = 0;
-            live_charStats.currentCharMove.currentMoveSpeed = 0; //Idle
+            live_charStats.charMove._moveSpeed = 0; //Idle
 
 
         }
-        live_charStats.currentCharStatus.isRunning = (localSpeedIndex == 2);
-        live_charStats.currentCharStatus.isWalking = (localSpeedIndex == 1);
-        live_charStats.currentCharStatus.isIdle = (localSpeedIndex == 0);
+        live_charStats.charStatus._isRunning = (localSpeedIndex == 2);
+        live_charStats.charStatus._isWalking = (localSpeedIndex == 1);
+        live_charStats.charStatus._isIdle = (localSpeedIndex == 0);
         //specjalnie zrobione na jednej zmiennej tak ¿eby siê ci¹gle zmienia³a, trochê jak enumerator
 
 
@@ -171,67 +171,65 @@ public class CharacterMovement : MonoBehaviour
 
     private void MovementAnimations()
     {
-        if (live_charStats.currentCharMove.currentMoveSpeed == 0f && live_charStats.currentCharStatus.isIdle) Idle();
-        else if (live_charStats.currentCharMove.currentMoveSpeed <= live_charStats.currentCharMove.currentWalkSpeed && live_charStats.currentCharStatus.isWalking) Walk();
-        else if (live_charStats.currentCharMove.currentMoveSpeed <= live_charStats.currentCharMove.currentRunSpeed && live_charStats.currentCharStatus.isRunning) Run();
+        if (live_charStats.charMove._moveSpeed == 0f && live_charStats.charStatus._isIdle) Idle();
+        else if (live_charStats.charMove._moveSpeed <= live_charStats.charMove._walkSpeed && live_charStats.charStatus._isWalking) Walk();
+        else if (live_charStats.charMove._moveSpeed <= live_charStats.charMove._runSpeed && live_charStats.charStatus._isRunning) Run();
 
     }
 
 
     private void Idle()
     {
-        live_charStats.currentAnimator.SetFloat("yAnim", 0);
+        live_charStats.charComponents._Animator.SetFloat("yAnim", 0);
     }
     private void Walk()
     {
-        live_charStats.currentAnimator.SetFloat("yAnim", 0.5f, 0.2f, Time.deltaTime);
+        live_charStats.charComponents._Animator.SetFloat("yAnim", 0.5f, 0.2f, Time.deltaTime);
     }
     private void Run()
     {
-        live_charStats.currentAnimator.SetFloat("yAnim", 1, 0.2f, Time.deltaTime);
+        live_charStats.charComponents._Animator.SetFloat("yAnim", 1, 0.2f, Time.deltaTime);
     }
 
 
     private void Jump()
     {
-        float jumpSpeed = live_charStats.currentCharMove.currentJumpPower;    //jumpPower
-        if (live_charStats.currentCharMove.currentMoveSpeed != 0) jumpSpeed = (live_charStats.currentCharMove.currentJumpPower + live_charStats.currentCharMove.currentMoveSpeed );  //w przypadku gdzie jest move speed, dodaje si³ê do jump power
+        float jumpSpeed = live_charStats.charMove._jumpPower;    //jumpPower
+        if (live_charStats.charMove._moveSpeed != 0) jumpSpeed = (live_charStats.charMove._jumpPower + live_charStats.charMove._moveSpeed );  //w przypadku gdzie jest move speed, dodaje si³ê do jump power
 
-        if (live_charStats.characterInput.inputJumping && live_charStats.currentCharStatus.isGrounded && !live_charStats.currentCharStatus.isAttacking && live_charStats.currentStam > 11f)
+        if (live_charStats.charInput._jumping && live_charStats.charStatus._isGrounded && !live_charStats.charStatus._isAttacking && live_charStats.charStats._stam > 11f)
         {            
             //zmiana trybu skakania J key
-            live_charStats.currentCharMove.currentMoveVector.y = live_charStats.currentCharMove.currentJumpMode_J_ ? (jumpSpeed) : Mathf.SmoothDamp(live_charStats.currentCharMove.currentMoveVector.y, jumpSpeed, ref live_charStats.currentCharMove.currentMoveVector.y, live_charStats.currentCharMove.currentJumpDeltaTime);
-            //jeœli (bool) jumpMode "On"=jumpSpeed(sta³y): "OFF" = Mathf.SmootDamp <=====
-                
-            live_charStats.currentCharStatus.isJumping = true;
+            live_charStats.charMove._moveVector.y = jumpSpeed;
+            live_charStats.charStatus._isJumping = true;
             JumpAnimation();
         }
         else
-            live_charStats.currentCharStatus.isJumping = false;
+            live_charStats.charStatus._isJumping = false;
     }
 
     public void JumpAnimation()
     {
-        live_charStats.currentStam -= (10f + live_charStats.charInfo.currentCharLevel); //Koszt Stamy przy skoku        
-        live_charStats.currentAnimator.ResetTrigger("MeeleAttack"); //¿eby nie animowa³ ataku w powietrzu           
-        live_charStats.currentAnimator.SetFloat("yAnim", 0);
-        live_charStats.currentAnimator.SetTrigger("Jump");
+        live_charStats.charStats._stam -= (10f + live_charStats.charInfo._charLevel); //Koszt Stamy przy skoku        
+        live_charStats.charComponents._Animator.ResetTrigger("MeeleAttack"); //¿eby nie animowa³ ataku w powietrzu           
+        live_charStats.charComponents._Animator.SetFloat("yAnim", 0);
+        live_charStats.charComponents._Animator.SetTrigger("Jump");
     }
 
     private void Gravity()
     {
-        if (!live_charStats.currentCharStatus.isGrounded)
+        if (!live_charStats.charStatus._isGrounded)
         {
             //live_charStats.currentMoveVector.y -= live_charStats.currentGravity * Time.deltaTime/*(Time.deltaTime / 2f)*/;  //moveVector to szybkoœæ poruszania siê wiêc gravity/delta.time (grawitacja/klatkê) jest prawid³owo jako przyspieszenie
                                                                                                                             //(Time.fixedDeltaTime / 1f) = klatki / sekunde     
             
-            live_charStats.currentCharMove.currentMoveVector.y = Mathf.MoveTowards(live_charStats.currentCharMove.currentMoveVector.y, -live_charStats.currentCharMove.currentGravity, 1f); //move towards dzia³a lepiej, wiêkszy przyrost na pocz¹tku                                                                                                     ////(Time.deltaTime / 2f) => co 2 klatkê odejmuje wartoœæ
+            live_charStats.charMove._moveVector.y = Mathf.MoveTowards(live_charStats.charMove._moveVector.y, -live_charStats.charMove._gravity, 1f); //move towards dzia³a lepiej, wiêkszy przyrost na pocz¹tku                                                                                                     ////(Time.deltaTime / 2f) => co 2 klatkê odejmuje wartoœæ
             
         }
 
-        if (live_charStats.currentCharStatus.isGrounded && live_charStats.currentCharMove.currentMoveVector.y < 0)
+        if (live_charStats.charStatus._isGrounded && live_charStats.charMove._moveVector.y < 0)
         {
-            live_charStats.currentCharMove.currentMoveVector.y = 0f;
+            live_charStats.charMove._moveVector.y = 0f;
         }
     }
 
