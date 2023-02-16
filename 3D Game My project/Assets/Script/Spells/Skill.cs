@@ -53,16 +53,19 @@ public class Skill : MonoBehaviour
     [Tooltip("(ref/refrence) Aktualny wektor(kierunek) w którum porusza się currentAngle skilla"), CanBeNull, SerializeField] public float skill_currentVectorAngle;
    
     [Header("Utils")]
-    [Tooltip("AudioSource skilla -> Caster"), SerializeField] public AudioSource skill_AudioSource;
+    [Tooltip("AudioSource skilla Instant -> Caster"), SerializeField] public AudioSource skill_AudioSourceInstant;
+    [Tooltip("AudioSource skilla Castable -> Caster"), SerializeField] public AudioSource skill_AudioSourceCastable;
+    [Tooltip("AudioSource skilla Hold -> Caster"), SerializeField] public AudioSource skill_AudioSourceHold;
     [Tooltip("VFX skilla -> Caster"), CanBeNull, SerializeField] public VisualEffect skill_CastingVisualEffect;
 
     //public Collider[] skill_localColliders;
 
     private void OnValidate()
     {
+        skill = this;
         //QuickSetup(); 
-        
-        
+
+
     }
 
     private void FixedUpdate()
@@ -79,7 +82,6 @@ public class Skill : MonoBehaviour
 
         if (live_charStats.charStatus._isCasting && skill_CanCast)
         {     
-            //Skill_Effect(scrObj_Skill);
             Skill_EffectTypeArray(scrObj_Skill, skill);
         }
         
@@ -101,7 +103,7 @@ public class Skill : MonoBehaviour
         live_charStats = GetComponentInParent<CharacterStatus>();
         currentCharacterBonusStats= GetComponentInParent<CharacterBonusStats>();
         skill_casterGameobject = gameObject;
-        skill_AudioSource= GetComponentInParent<AudioSource>();
+        //skill_AudioSourceInstant= GetComponentInParent<AudioSource>();
         skill_CastingVisualEffect= GetComponent<VisualEffect>();
 
         switch (scrObj_Skill.skill_InputType)

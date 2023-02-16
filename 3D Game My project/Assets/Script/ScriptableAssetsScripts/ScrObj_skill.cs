@@ -48,11 +48,16 @@ public class ScrObj_skill : ScriptableObject
 
     [Header("SkillObstacles")]
     [Tooltip("Layer Mask z przeszkodami przez które nie da się atakować(z klasy skill)"), SerializeField] public LayerMask skill_ObstaclesMask; //Obstacles dla skilla
-    
-    [Header("SkillAudio")]    
-    [CanBeNull, Tooltip("AudioClip skilla -> Caster"), SerializeField] public AudioClip skill_CastingAudioClip;
+
+    [Header("SkillAudio")]
+    [CanBeNull, Tooltip("AudioClip skilla Instant -> Caster"), SerializeField] public AudioClip skill_InstantAudioClip;
+    [CanBeNull, Tooltip("AudioClip skilla Hold -> Caster"), SerializeField] public AudioClip skill_HoldAudioClip;
+    [CanBeNull, Tooltip("Czas Loopa skilla Hold -> Caster"), SerializeField] public float skill_HoldAudioLoopTime;
+    [CanBeNull, Tooltip("AudioClip skilla Castable -> Caster"), SerializeField] public AudioClip skill_CastableAudioClip;
     [CanBeNull, Tooltip("AudioClip skilla OnFinished -> Caster"), SerializeField] public AudioClip skill_OnFinishCastingAudioClip;
+    [Space]
     [CanBeNull, Tooltip("AudioClip skilla -> Target"), SerializeField] public AudioClip skill_OnTargetHitAudioClip;
+    [Space]
     [CanBeNull, Tooltip("AudioVolume skilla -> Caster"), SerializeField] public float skill_CastingAudioVolume;
     [CanBeNull, Tooltip("AudioVolume skilla -> Target"), SerializeField] public float skill_OnTargetHitAudioVolume;
     [Space]
