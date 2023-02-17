@@ -3,14 +3,15 @@ using Unity.VisualScripting;
 using UnityEditor;
 using UnityEngine;
 
-[CustomPropertyDrawer(typeof(NamedArrayAttribute))]public class NamedArrayDrawer : PropertyDrawer
+[CustomPropertyDrawer(typeof(PropertyAttribute_NamedArrayAttribute))]
+public class PropertyDrawer_NamedArrayDrawer : PropertyDrawer
 {
     public override void OnGUI(Rect rect, SerializedProperty property, GUIContent label)
     {
         try
         {
             int pos = int.Parse(property.propertyPath.Split('[', ']')[1]);
-            EditorGUI.ObjectField(rect, property, new GUIContent(((NamedArrayAttribute)attribute).names[pos]));
+            EditorGUI.ObjectField(rect, property, new GUIContent(((PropertyAttribute_NamedArrayAttribute)attribute).names[pos]));
         }
         catch 
         {
@@ -19,12 +20,12 @@ using UnityEngine;
     }
 }
 
-[CustomPropertyDrawer(typeof(EnumNamedArrayAttribute))]
-public class DrawwerEnumNamedArray : PropertyDrawer
+[CustomPropertyDrawer(typeof(PropertyAttribute_EnumNamedArrayAttribute))]
+public class PropertyDrawer_EnumNamedArray : PropertyDrawer
 {
     public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
     {
-        EnumNamedArrayAttribute enumNames = attribute as EnumNamedArrayAttribute;  //Tworzenie lokalnej (zmiennej / instancji klasy) enumNames i przypisywanie attribute z EnumNamedArrayAttribute
+        PropertyAttribute_EnumNamedArrayAttribute enumNames = attribute as PropertyAttribute_EnumNamedArrayAttribute;  //Tworzenie lokalnej (zmiennej / instancji klasy) enumNames i przypisywanie attribute z EnumNamedArrayAttribute
        
         
         //propertyPath returns something like component_hp_max.Array.data[4]        
