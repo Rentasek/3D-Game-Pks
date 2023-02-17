@@ -111,7 +111,7 @@ public class CharacterStatus : MonoBehaviour
         [Tooltip("Aktualny spellRange pobrany z closeRangeSkill")] public float _spellRangeSkillMaxRadius;
         [CanBeNull, Tooltip("SpellRangeSkill przekazany z klasy Skill")] public Skill _spellRangeSkill;
         [Space]
-        [Tooltip("Aktualny attackRange pobrany z closeRangeSkill")] public float _attackRangeSkillMaxRadius;
+        [Tooltip("Aktualny attackRange pobrany z closeRangeSkill")] public float _closeRangeSkillMinRadius;
         [Tooltip("Podaje true jeœli target jest Aquired i znajduje siê w zasiêgu (MaxRadius) closeRangeSkilla")] public bool _targetInAttackRange;
         [CanBeNull, Tooltip("CloseRangeSkill przekazany z klasy Skill")] public Skill _closeRangeSkill;
         [Space]
@@ -231,7 +231,25 @@ public class CharacterStatus : MonoBehaviour
         if (GetComponent<NavMeshAgent>() != null)
         {
             charComponents._navMeshAgent = GetComponent<NavMeshAgent>();
-            charComponents._navMeshAgent.stoppingDistance = fov._attackRangeSkillMaxRadius;
+            //Skills Select By MaxRange
+            if (charSkillCombat._primarySkill != null && charSkillCombat._secondarySkill != null)
+            {
+                if (charSkillCombat._primarySkill.scrObj_Skill.skill_MaxRadius < charSkillCombat._secondarySkill.scrObj_Skill.skill_MaxRadius)
+                {
+                    fov._closeRangeSkill = charSkillCombat._primarySkill;
+                    fov._spellRangeSkill = charSkillCombat._secondarySkill;
+                    fov._closeRangeSkillMinRadius = charSkillCombat._primarySkill.scrObj_Skill.skill_MinRadius;
+                    fov._spellRangeSkillMaxRadius = charSkillCombat._secondarySkill.scrObj_Skill.skill_MaxRadius;
+                }
+                else
+                {
+                    fov._closeRangeSkill = charSkillCombat._secondarySkill;
+                    fov._spellRangeSkill = charSkillCombat._primarySkill;
+                    fov._closeRangeSkillMinRadius = charSkillCombat._secondarySkill.scrObj_Skill.skill_MinRadius;
+                    fov._spellRangeSkillMaxRadius = charSkillCombat._primarySkill.scrObj_Skill.skill_MaxRadius;
+                }
+            }
+            //charComponents._navMeshAgent.stoppingDistance = fov._closeRangeSkillMinRadius;
         }
         if (GetComponent<AudioSource>() != null) charComponents._audioSource = GetComponent<AudioSource>();
         if (GetComponent<CharacterBonusStats>() != null) charComponents._characterBonusStats = GetComponent<CharacterBonusStats>();
