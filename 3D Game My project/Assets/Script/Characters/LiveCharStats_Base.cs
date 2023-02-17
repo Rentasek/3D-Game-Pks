@@ -6,37 +6,93 @@ using UnityEngine;
 /// <summary>
 /// Statyczna klasa powiązana z komponentem Character Status
 /// </summary>
-
 public static class LiveCharStats_Base
 {
     #region FieldOfView
-
-    //////FieldOfView//////
-
     /// <summary>
-    /// <br>Metoda szuka przeciwnika w dynamicznym Range    
-    /// <br><i>Metoda pobiera CharacterStatus(live_charStats) i korzystając z wartości z live_charStats przypisuje live_charStats.fov_aquiredTargetGameObject</i></br>>
+    /// <br>Metoda szuka przeciwnika w dynamicznym Range</br>
+    /// <br><i>Metoda pobiera CharacterStatus(live_charStats) i korzystając z wartości z live_charStats przypisuje live_charStats.fov_aquiredTargetGameObject</i></br>
     /// </summary>
     /// <param name="live_charStats">Attached CharacterStatus object / Przypięty obiekt CharacterStatus</param>
-    /// <returns></returns>    
     public static void FieldOfViewTarget(CharacterStatus live_charStats)
     {
         if (!live_charStats.fov._spellRangeSkill.skill_input) //nie zmniejsza range jeśli castuje
         {
             DynamicSightRangeScalling(live_charStats);
         }
-
+        //CheckForTargetUniversal(live_charStats);
         CheckForTargetInDynamicSightRange(live_charStats);
         CheckForTargetInSpellRange(live_charStats, live_charStats.fov._spellRangeSkill);
         CheckForTargetInAttackRange(live_charStats, live_charStats.fov._closeRangeSkill);
     }
-
-    public static void CheckForTargetInDynamicSightRange(CharacterStatus live_charStats)
+    #region CheckForTargetUniversal - nie działa
+    public static void CheckForTargetUniversal(CharacterStatus live_charStats)
     {
-        live_charStats.fov._allTargetsInDynamicSightRange = Physics.OverlapSphere(live_charStats.gameObject.transform.position, live_charStats.fov._currentDynamicSightRadius);
+        //live_charStats.fov._allTargetsInDynamicSightRange = new Collider[30];
+
+        for (int i = 0; i < Physics.OverlapSphereNonAlloc(live_charStats.gameObject.transform.position, live_charStats.fov._currentDynamicSightRadius, live_charStats.fov._allTargetsInDynamicSightRange); i++)
+        {
+            for (int j = 0; j < live_charStats.charInfo._enemiesArray.Length; j++)
+            {
+                if (live_charStats.fov._allTargetsInDynamicSightRange[i].CompareTag(live_charStats.charInfo._enemiesArray[j]))
+                {
+                    live_charStats.fov._targetInDynamicSightRange = true;    //target jest w sight range   
+
+                    Vector3 directionToTarget = (live_charStats.fov._allTargetsInDynamicSightRange[i].transform.position - live_charStats.gameObject.transform.position).normalized; //0-1(normalized) różnica pomiędzy targetem a characterem Vector3.normalized ==> vector (kierunek w którym od niego znajduje się target)
+                                                                                                                                                                                     //sprawdzanie aktualnie ostatniego elementu z listy
+
+                    float distanceToTarget = Vector3.Distance(live_charStats.gameObject.transform.position, live_charStats.fov._allTargetsInDynamicSightRange[i].transform.position);
+
+                    if (Vector3.Angle(live_charStats.gameObject.transform.forward, directionToTarget) < live_charStats.fov._currentDynamicSightAngle / 2) //sprawdzanie angle wektora forward charactera i direction to target
+                                                                                                                                                          //target może być na + albo - od charactera dlatego w każdą stronę angle / 2                  
+                    {
+                        if (!Physics.Raycast(live_charStats.gameObject.transform.position, directionToTarget, distanceToTarget, live_charStats.fov._obstaclesLayerMask))    //dodatkowo sprawdza Raycastem czy nie ma przeszkody pomiędzy playerem a targetem //  
+                        {
+                            //jeśli raycast do targetu nie jest zasłonięty przez jakiekolwiek obstacles!!
+                            live_charStats.fov._aquiredTargetGameObject = live_charStats.fov._allTargetsInDynamicSightRange[i].gameObject;           //ustawia znaleziony colliderem game objecta jako target
+                            live_charStats.fov._targetAquired = true;
+
+                            if (distanceToTarget <= live_charStats.fov._closeRangeSkill.scrObj_Skill.skill_MinRadius)
+                            { 
+                                live_charStats.fov._targetInAttackRange = true;
+                                live_charStats.fov._targetInSpellRange = true;
+                                live_charStats.fov._targetInDynamicSightRange = true;    //target jest w sight range   
+
+                            }
+                            else if (distanceToTarget <= live_charStats.fov._spellRangeSkill.scrObj_Skill.skill_MaxRadius * live_charStats.fov._AISpellRangeSkillRadiusFromMax)
+                            {
+                                live_charStats.fov._targetInAttackRange = false;
+                                live_charStats.fov._targetInSpellRange = true;
+                                live_charStats.fov._targetInDynamicSightRange = true;    //target jest w sight range   
+
+                            }
+                            /* else if(distanceToTarget <= live_charStats.fov._currentDynamicSightRadius)
+                             {
+                                 live_charStats.fov._targetInAttackRange = false;
+                                 live_charStats.fov._targetInSpellRange = true;
+                                 live_charStats.fov._targetInDynamicSightRange = true;    //target jest w sight range    
+                             }*/
+                            else
+                            {
+                                live_charStats.fov._targetInAttackRange = false;
+                                live_charStats.fov._targetInSpellRange = false;
+                                live_charStats.fov._aquiredTargetGameObject = null;           //ustawia nie znaleziony colliderem game objecta jako null
+                                live_charStats.fov._targetAquired = false;
+                                live_charStats.fov._allTargetsInDynamicSightRange[i] = null;
+                            }
+                        }
+                    }
+                }
+                else live_charStats.fov._targetInDynamicSightRange = false;                     //target nie jest w sight range
+            }
+        }
+    }
+    #endregion
+    private static void CheckForTargetInDynamicSightRange(CharacterStatus live_charStats)
+    {
+        //live_charStats.fov._allTargetsInDynamicSightRange = Physics.OverlapSphere(live_charStats.gameObject.transform.position, live_charStats.fov._currentDynamicSightRadius);
 
         //sprawdzanie czy jest enemy przed wrzucaniem targetu, musi być brake po (targetInDynamicRange = true) i zwrócony boolean, bez tego prawdopodobnie się nadpisuje i przeciwnik nie reaguje na gracza
-
         foreach (Collider collider in Physics.OverlapSphere(live_charStats.gameObject.transform.position, live_charStats.fov._currentDynamicSightRadius)) //dla każdego collidera w zasięgu wzroku
         {
             if (live_charStats.charInfo._enemiesArray.Contains(collider.tag))    //jeśli ma tag zawarty w arrayu enemiesArray
@@ -96,8 +152,9 @@ public static class LiveCharStats_Base
                 }*/
             }
         }
+    }
 
-     /*                     OKO                                                  
+    /*                     OKO                                                  
                              |\                      Tak było, teraz Raycast zatrzymuje się na Targecie -> Vector3.Distance(( Char, Target)
                              | \  | < - Target       
                              |  \ |   
@@ -109,69 +166,12 @@ public static class LiveCharStats_Base
      ________________________|____|___\____(ziemia(Terrain/Envrironment)) 
      */
 
-
-        #region Nie działa do końca i jest wolniejsze od foreach
-        ///Nie działa do końca i jest wolniejsze od foreach !!!
-        ///
-        /*live_charStats.fov_enemyTargetsInDynamicSightRange.Clear; 
-       
-        
-        if(live_charStats.fov_targetInDynamicSightRange == true)
-        {
-            for (int i = 0; i < Physics.OverlapSphere(live_charStats.gameObject.transform.position, live_charStats.fov_CurrentDynamicSightRadius).Length; i++)
-            {
-                for (int j = 0; j < live_charStats.currentEnemiesArray.Length; j++)
-                {
-                    if (Physics.OverlapSphere(live_charStats.gameObject.transform.position, live_charStats.fov_CurrentDynamicSightRadius)[i].CompareTag(live_charStats.currentEnemiesArray[j]))
-                    {
-                        Vector3 directionToTarget = (Physics.OverlapSphere(live_charStats.gameObject.transform.position, live_charStats.fov_CurrentDynamicSightRadius)[i].transform.position - live_charStats.gameObject.transform.position).normalized; //0-1(normalized) różnica pomiędzy targetem a characterem Vector3.normalized ==> vector wyrażony w radianach
-                                                                                                                                                                                                                                                         //sprawdzanie aktualnie ostatniego elementu z listy
-                        if (Vector3.Angle(live_charStats.gameObject.transform.forward, directionToTarget) < live_charStats.fov_CurrentDynamicSightAngle / 2)
-                        //sprawdzanie angle wektora forward charactera i direction to target
-                        //target może być na + albo - od charactera dlatego w każdą stronę angle / 2
-                        {
-                            //if (!Physics.Raycast(transform.position, directionToTarget, breath_currentFireRadius, live_charStats.fov_obstaclesLayerMask))    //dodatkowo sprawdza Raycastem czy nie ma przeszkody pomiędzy playerem a targetem //  
-                            if (live_charStats.fov_enemyTargetsInDynamicSightRange.IndexOf(Physics.OverlapSphere(live_charStats.gameObject.transform.position, live_charStats.fov_CurrentDynamicSightRadius)[i]) < 0) //sprawdza czy nie ma na liście. Jeżeli IndexOf < 0 czyli nie ma obiektów z tym indexem
-                            {
-                                live_charStats.fov_enemyTargetsInDynamicSightRange.Add(Physics.OverlapSphere(live_charStats.gameObject.transform.position, live_charStats.fov_CurrentDynamicSightRadius)[i]); //przypisuje do listy colliders jeśli ma taga z listy enemies                           
-
-                            }
-                            else
-                            {
-                                live_charStats.fov_enemyTargetsInDynamicSightRange.Remove(Physics.OverlapSphere(live_charStats.gameObject.transform.position, live_charStats.fov_CurrentDynamicSightRadius)[i]);
-                            }
-
-                            if (!Physics.Raycast(live_charStats.gameObject.transform.position, directionToTarget, live_charStats.fov_CurrentDynamicSightRadius, live_charStats.fov_obstaclesLayerMask))
-                            {
-                                //jeśli raycast do targetu nie jest zasłonięty przez jakiekolwiek obstacles!!
-                                live_charStats.fov_aquiredTargetGameObject = live_charStats.fov_enemyTargetsInDynamicSightRange.ElementAt(0).gameObject;           //ustawia znaleziony colliderem game objecta jako target
-                                live_charStats.fov_targetAquired = true;
-                            }
-                            else
-                            {
-                                live_charStats.fov_aquiredTargetGameObject = null;           //ustawia nie znaleziony colliderem game objecta jako null
-                                live_charStats.fov_targetAquired = false;
-                            }
-                        }
-                    }
-                    else
-                    {
-                        live_charStats.fov_aquiredTargetGameObject = null;           //ustawia nie znaleziony colliderem game objecta jako null
-                        live_charStats.fov_targetAquired = false;
-                    }
-                }
-            }
-
-            if (live_charStats.fov_enemyTargetsInDynamicSightRange.Count() <= 0)
-            {
-                live_charStats.fov_targetInDynamicSightRange = false;       //jeśli nie ma żadnych targetów w zasięgu
-                live_charStats.fov_aquiredTargetGameObject = null;           //ustawia nie znaleziony colliderem game objecta jako null
-                live_charStats.fov_targetAquired = false;
-            }
-        }*/
-        #endregion
-    }
-
+    #region DynamicSightRangeScalling
+    /// <summary>
+    /// Mechanika Dynamicznego Range/Angle Cone
+    /// <br><i>Dynamicznie skaluje zasięg i kąt widzenia</i></br>
+    /// </summary>
+    /// <param name="live_charStats"></param>    
     private static void DynamicSightRangeScalling(CharacterStatus live_charStats)
     {
         //Dynamiczny Sight Range
@@ -191,7 +191,8 @@ public static class LiveCharStats_Base
             live_charStats.fov._currentDynamicSightAngle = Mathf.SmoothDamp(live_charStats.fov._currentDynamicSightAngle, live_charStats.fov._minSightAngle, ref live_charStats.fov._currentVectorDynamicSightAngle, live_charStats.fov._timeDynamicSightAngle);
             //dynamiczny sight Angle, poza sight range wraca do minimalnego Sight Angle
         }
-    }    
+    }     
+    #endregion
 
 
     /// <summary>
@@ -201,7 +202,7 @@ public static class LiveCharStats_Base
     /// <param name="skill_CloseRange">Skill o bliższym Range z live_charStats</param>
     private static void CheckForTargetInAttackRange(CharacterStatus live_charStats, Skill skill_CloseRange)
     {
-        foreach (Collider collider in Physics.OverlapSphere(live_charStats.gameObject.transform.position, skill_CloseRange.scrObj_Skill.skill_MaxRadius)) //dla każdego collidera w zasięgu wzroku
+        foreach (Collider collider in Physics.OverlapSphere(live_charStats.gameObject.transform.position, skill_CloseRange.scrObj_Skill.skill_MinRadius)) //dla każdego collidera w zasięgu wzroku
         {
             if (live_charStats.charInfo._enemiesArray.Contains(collider.tag))                                         //jeśli ma tag zawarty w arrayu enemiesArray
             {
@@ -235,33 +236,21 @@ public static class LiveCharStats_Base
     #endregion
 
     #region AI Controller
-
-    ////////////////////////AIController//////////////////////////////////////
     /// <summary>
-    /// <br>Metoda porusza postacią AI   
-    /// <br><i>Metoda pobiera CharacterStatus(live_charStats) i korzystając z wartości z live_charStats przypisuje live_charStats.fov_aquiredTargetGameObject</i></br>>
-    /// <br><i>Poruszanie postacią AI przy pomocy FieldOfView, używa NavMeshAgent</i></br>>
+    /// <br>Metoda porusza postacią AI</br>
+    /// <br><i>Metoda pobiera CharacterStatus(live_charStats) i korzystając z wartości z live_charStats przypisuje live_charStats.fov_aquiredTargetGameObject</i></br>
+    /// <br><i>Poruszanie postacią AI przy pomocy FieldOfView, używa NavMeshAgent</i></br>
     /// </summary>
     /// <param name="live_charStats">Attached CharacterStatus object / Przypięty obiekt CharacterStatus</param>
-    /// <returns></returns>    
     public static void AIControllerCheck(CharacterStatus live_charStats)
     {
-        /* if (!live_charStats.inputCasting) //nie zmniejsza range jeśli castuje
-         {
-             DynamicSightRangeScalling(live_charStats);
-         }*/
-
         //wyłączone player input na postaci gracza
         if (!live_charStats.charInfo._playerInputEnable && live_charStats.charComponents._navMeshAgent.enabled && live_charStats.charInfo._isPlayer)
         {
             live_charStats.charComponents._navMeshAgent.SetDestination(live_charStats.navMeshAge._walkPoint);
 
             if (!live_charStats.charInput._mouseCurrentMoving && !live_charStats.charInput._secondary)     //mouse input -> wyłącza CheckTagetInRange //dodatkowo input casting
-            {
-                /*CheckForTargetInDynamicSightRange(live_charStats);
-                CheckForTargetInSpellRange(live_charStats);
-                CheckForTargetInAttackRange(live_charStats);   */
-
+            {                
                 FieldOfViewTarget(live_charStats);
             }
 
@@ -278,7 +267,7 @@ public static class LiveCharStats_Base
             else live_charStats.charComponents._navMeshAgent.isStopped = false; //żeby odblokować agenta po atakowaniu
 
             // Jeśli dystans do walkPoint jest mniejszy niż 1f resetuje walkPointSet (wykorzystanie live_charStats.currentNavMeshAgent.*)            
-            if (live_charStats.charComponents._navMeshAgent.remainingDistance <= live_charStats.fov._attackRangeSkillMaxRadius)
+            if (live_charStats.charComponents._navMeshAgent.remainingDistance <= live_charStats.fov._closeRangeSkillMinRadius - 0.5f)
             {
                 live_charStats.navMeshAge._walkPoint = live_charStats.gameObject.transform.position;
             }
@@ -291,9 +280,6 @@ public static class LiveCharStats_Base
         //wyłączone player input na każdej innej postaci
         if (!live_charStats.charInfo._playerInputEnable && live_charStats.charComponents._navMeshAgent.enabled && !live_charStats.charInfo._isPlayer)
         {
-            /* CheckForTargetInDynamicSightRange(live_charStats);
-             CheckForTargetInSpellRange(live_charStats);
-             CheckForTargetInAttackRange(live_charStats);    */
             FieldOfViewTarget(live_charStats);
 
             if (!live_charStats.fov._targetInDynamicSightRange && !live_charStats.fov._targetAquired && !live_charStats.fov._targetInAttackRange && !live_charStats.fov._spellRangeSkill.skill_input) Patrolling(live_charStats);
@@ -349,7 +335,7 @@ public static class LiveCharStats_Base
         }
 
         // Jeśli dystans do walkPoint jest mniejszy niż 1f resetuje walkPointSet i szuka nowego (wykorzystanie live_charStats.currentNavMeshAgent.*)
-        if (live_charStats.charComponents._navMeshAgent.remainingDistance < live_charStats.fov._attackRangeSkillMaxRadius) live_charStats.navMeshAge._walkPointSet = false;
+        if (live_charStats.charComponents._navMeshAgent.remainingDistance < live_charStats.fov._closeRangeSkillMinRadius) live_charStats.navMeshAge._walkPointSet = false;
     }
 
     private static void SearchForWalkPoint(CharacterStatus live_charStats)
@@ -389,7 +375,14 @@ public static class LiveCharStats_Base
         }
     }
 
-    private static void AI_SpellCast(CharacterStatus live_charStats)   //AI_Castowanie Spelli
+    /// <summary>
+    /// <br><b>AI_Castowanie Spelli</b></br> 
+    /// <br>Metoda sprawdza jaki input castowania jest wybrany w Skill_InputType i go włązca[true]</br>
+    /// <br>Zatrzymuje go w aktualnej pozycji (_navMeshAgent.SetDestination(transform.position))</br>
+    /// <br>oraz nadaje metodę LookAt(Target)</br>
+    /// </summary>
+    /// <param name="live_charStats"></param>   
+    private static void AI_SpellCast(CharacterStatus live_charStats)   
     {
         if (!Physics.Raycast(live_charStats.gameObject.transform.position, live_charStats.gameObject.transform.forward, live_charStats.fov._spellRangeSkill.scrObj_Skill.skill_MaxRadius * live_charStats.fov._AISpellRangeSkillRadiusFromMax, live_charStats.fov._obstaclesLayerMask)) //raycast żeby nie bił przez ściany
         {
@@ -424,8 +417,6 @@ public static class LiveCharStats_Base
     #endregion
 
     #region Character Movement
-
-
     ////////////////////////CharacterMovement//////////////////////////////////////
     /// <summary>
     /// <br>Metoda obraca postacią przy pomocy myszki</br>
@@ -491,7 +482,7 @@ public static class LiveCharStats_Base
 
             ////Running Speed 
             if (live_charStats.charMove._moveInputDirection != Vector3.zero && !live_charStats.charStatus._isJumping && !live_charStats.charStatus._isAttacking && live_charStats.charStats._stam > 5f
-                && live_charStats.fov._targetAquired && !live_charStats.fov._spellRangeSkill.skill_input && live_charStats.charComponents._navMeshAgent.remainingDistance > 2 * live_charStats.fov._attackRangeSkillMaxRadius)
+                && live_charStats.fov._targetAquired && !live_charStats.fov._spellRangeSkill.skill_input && live_charStats.charComponents._navMeshAgent.remainingDistance > 2 * live_charStats.fov._closeRangeSkillMinRadius)
             //dodatnkowy warunek ->biega tylko jak targetAquired=true, kolejny warnek jeśli nie castuje!!, Kolejny warunek jeśli agent.eemainingDistance > 2* attack range
             {
                 live_charStats.charComponents._Animator.ResetTrigger("MeeleAttack");
@@ -625,7 +616,7 @@ public static class LiveCharStats_Base
             live_charStats.charMove._moveVector.y = 0f;
         }
     }
-
+    #endregion
 
     #region UTILSY
     private static class Utils
@@ -700,8 +691,6 @@ public static class LiveCharStats_Base
             live_charStats.charComponents._Animator.SetFloat("yAnim", 0);
             live_charStats.charComponents._Animator.ResetTrigger("Jump");
         }
-        #endregion
-
         #endregion
     }
     #endregion
