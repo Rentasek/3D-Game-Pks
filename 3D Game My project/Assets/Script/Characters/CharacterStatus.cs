@@ -438,11 +438,11 @@ public class CharacterStatus : MonoBehaviour
     public void ResourcesRegen()
     {
         //Stam Regen
-        if (charStats._stam < charStats._maxStam && !charStatus._isRunning /*&& !isAttacking *//*&& currentStam<currentMaxStam*/) charStats._stam = Mathf.MoveTowards(charStats._stam, charStats._maxStam, (charComponents._scrObj_CharStats.regenStam + (charComponents._scrObj_CharStats.regenStam * charComponents._scrObj_CharStats.Stam_Multiplier * charInfo._charLevel * 1f) + (charStats._maxStam * 0.1f * charComponents._scrObj_CharStats.Stam_Multiplier)) * Time.deltaTime); //regeneruje f stamy / sekunde
+        if (charStats._stam < charStats._maxStam && !charStatus._isRunning)  charStats._stam = Mathf.MoveTowards(charStats._stam, charStats._maxStam, (charComponents._scrObj_CharStats.regenStam + (charComponents._scrObj_CharStats.regenStam * charComponents._scrObj_CharStats.Stam_Multiplier * charInfo._charLevel * 1f) + (charStats._maxStam * 0.1f * charComponents._scrObj_CharStats.Stam_Multiplier)) * Time.deltaTime); //regeneruje f stamy / sekunde
         //HP Regen
         if (charStats._hp < charStats._maxHP) charStats._hp = Mathf.MoveTowards(charStats._hp, charStats._maxHP, (charComponents._scrObj_CharStats.regenHP + (charComponents._scrObj_CharStats.regenHP * charComponents._scrObj_CharStats.HP_Multiplier * charInfo._charLevel * 1f) + (charStats._maxHP * 0.1f * charComponents._scrObj_CharStats.HP_Multiplier)) * Time.deltaTime); //regeneruje f HP / sekunde
         //MP Regen
-        if (charStats._mp < charStats._maxMP /*&& !inputSecondary*//*&& !isAttacking*/ /*&& currentMP < currentMaxMP*/) charStats._mp = Mathf.MoveTowards(charStats._mp, charStats._maxMP, (charComponents._scrObj_CharStats.regenMP + (charComponents._scrObj_CharStats.regenMP * charComponents._scrObj_CharStats.MP_Multiplier * charInfo._charLevel * 1f) + (charStats._maxMP * 0.1f * charComponents._scrObj_CharStats.MP_Multiplier)) * Time.deltaTime); //regeneruje f HP / sekunde
+        if (charStats._mp < charStats._maxMP) charStats._mp = Mathf.MoveTowards(charStats._mp, charStats._maxMP, (charComponents._scrObj_CharStats.regenMP + (charComponents._scrObj_CharStats.regenMP * charComponents._scrObj_CharStats.MP_Multiplier * charInfo._charLevel * 1f) + (charStats._maxMP * 0.1f * charComponents._scrObj_CharStats.MP_Multiplier)) * Time.deltaTime); //regeneruje f HP / sekunde
 
     }
 

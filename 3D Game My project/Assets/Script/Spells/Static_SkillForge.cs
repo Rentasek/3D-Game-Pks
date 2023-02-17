@@ -1,5 +1,6 @@
 ﻿using System;
 using Unity.VisualScripting;
+using Unity.VisualScripting.FullSerializer;
 using UnityEngine;
 using UnityEngine.Diagnostics;
 
@@ -26,15 +27,17 @@ public static class Static_SkillForge
         {
             //InputSelector(scrObj_Skill, skill, live_charStats);
 
-            if (skill.skill_input && skill.skill_CanCast && Utils.Skill_ResourceTypeCurrentFloatReadOnly(scrObj_Skill, live_charStats) >= skill.skill_currentResourceCost)
+            if (skill.skill_input && skill.skill_CanCast && Utils.Skill_ResourceTypeCurrentFloatReadOnly(scrObj_Skill, live_charStats) > 0)
             {
-                if (!live_charStats.charStatus._isCasting) //Jeśli nie castuje i ma właśnie zacząć //Start Casting
+                if (Utils.Skill_ResourceTypeCurrentFloatReadOnly(scrObj_Skill, live_charStats) > skill.skill_currentResourceCost)   //Jeśli nie castuje i ma właśnie zacząć //Start Casting
                 {
+
                     #region IsCasting -> Instant
                     if (skill.skill_currentCooldownRemaining <= 0.05f)  //Jeśli zostało 0.05f lub mniej cooldownu może użyć instanta
                     {
+
                         if (skill.skill_CastingVisualEffect != null) skill.skill_CastingVisualEffect.Play(); //może się odpalić tylko raz przy każdym inpucie, nie może się nadpisać -> taki sam efekt jak przy GetKeyDown
-                        
+
                         Utils.Skill_StopAllAnimatorMovement(scrObj_Skill, live_charStats);
 
                         if (!string.IsNullOrWhiteSpace(scrObj_Skill.skill_AnimatorBoolName)) live_charStats.charComponents._Animator.SetBool(scrObj_Skill.skill_AnimatorBoolName, true);
@@ -46,38 +49,47 @@ public static class Static_SkillForge
                         if (!string.IsNullOrWhiteSpace(scrObj_Skill.skill_AnimatorFloatName)) live_charStats.charComponents._Animator.SetFloat(scrObj_Skill.skill_AnimatorFloatName, skill.skill_currentComboProgress); //przed updatem comboProgress
                         skill.skill_currentComboProgress += /*scrObj_Skill.skill_BaseCooldown +*/ 0.5f;
                         if (skill.skill_currentComboProgress >= 1) skill.skill_currentComboProgress = 0f; // trzeci Atak maxymalnie może podbić do [1.83f] więc żeby się wykonał trzeba dać powyżej [1.83f] (1.50f(1.51f dla bezpieczeństwa) + cooldown(0.33))
-                        
+
                         #region AudioClipy //Specjalnie puszczane przy instant ale po animatorze
-                        if (scrObj_Skill.skill_InstantAudioClip != null)
+                        if (scrObj_Skill.skill_OneShotOverlapAudioClip != null)
                         {
                             skill.skill_AudioSourceInstant.volume = scrObj_Skill.skill_CastingAudioVolume;
-                            skill.skill_AudioSourceInstant.PlayOneShot(scrObj_Skill.skill_InstantAudioClip, scrObj_Skill.skill_CastingAudioVolume);
+                            skill.skill_AudioSourceInstant.PlayOneShot(scrObj_Skill.skill_OneShotOverlapAudioClip, scrObj_Skill.skill_CastingAudioVolume);
                         }
 
-                        if (scrObj_Skill.skill_CastableAudioClip != null && !skill.skill_AudioSourceCastable.isPlaying)
+                        if (scrObj_Skill.skill_OneShotNonOverlapAudioClip != null && !skill.skill_AudioSourceHold.isPlaying)
+                        {
+                            skill.skill_AudioSourceHold.volume = scrObj_Skill.skill_CastingAudioVolume;
+                            skill.skill_AudioSourceHold.PlayOneShot(scrObj_Skill.skill_OneShotNonOverlapAudioClip, scrObj_Skill.skill_CastingAudioVolume);
+                        }
+
+                        if (scrObj_Skill.skill_TimeCastOverlapAudioClip != null)
                         {
                             skill.skill_AudioSourceCastable.volume = scrObj_Skill.skill_CastingAudioVolume;
-                            skill.skill_AudioSourceCastable.clip = scrObj_Skill.skill_CastableAudioClip;
+                            skill.skill_AudioSourceCastable.clip = scrObj_Skill.skill_TimeCastOverlapAudioClip;
                             skill.skill_AudioSourceCastable.PlayScheduled(scrObj_Skill.skill_TimeCast);
                         }
 
-                        if (scrObj_Skill.skill_HoldAudioClip != null && !skill.skill_AudioSourceHold.isPlaying) //jak złapie dobry Audoclip na hold to wrzuce
+                        if (scrObj_Skill.skill_TimeCastNonOverlapAudioClip != null && !skill.skill_AudioSourceCastable.isPlaying)
                         {
-                            skill.skill_AudioSourceHold.volume = scrObj_Skill.skill_CastingAudioVolume;
-                            skill.skill_AudioSourceHold.PlayOneShot(scrObj_Skill.skill_HoldAudioClip, scrObj_Skill.skill_CastingAudioVolume);
+                            skill.skill_AudioSourceCastable.volume = scrObj_Skill.skill_CastingAudioVolume;
+                            skill.skill_AudioSourceCastable.clip = scrObj_Skill.skill_TimeCastNonOverlapAudioClip;
+                            skill.skill_AudioSourceCastable.PlayScheduled(scrObj_Skill.skill_TimeCast);
                         }
                         #endregion
-                    }
-                    #endregion
-                }
-                live_charStats.charStatus._isCasting = true;
+                    }                    
+                    #endregion  
+                    
+                    live_charStats.charStatus._isCasting = true;                   
+
+                } else { Utils.Skill_ResetCastingAudioSourceInFixedTime(skill); }
 
                 #region IsCasting -> Castable
                 skill.skill_currentCastingProgress = Mathf.MoveTowards(skill.skill_currentCastingProgress, 1f, Time.deltaTime / scrObj_Skill.skill_TimeCast); //casting progress rośnie do 1 w (1sek * 1/TimeCast ) czyli (sek * "n" [np.0.5f] = "n" część sekundy)
                 skill.skill_IsCastingFinishedCastable = (skill.skill_currentCastingProgress >= 0.95f) ? true : false;
                 if (skill.skill_IsCastingFinishedCastable)
                 {
-                    Utils.Skill_ResetAnyAudioSourceInstantly(skill);
+                    Utils.Skill_ResetCastingAudioSourceInstantly(skill);
 
                     skill.skill_currentCastingProgress = 0f;    //reset progressu po wycastowaniu Skilla
 
@@ -90,17 +102,18 @@ public static class Static_SkillForge
                     skill.skill_currentCooldownRemaining = 1f;  //Ustawia cooldown po wycastowaniu żeby nie castował znów zbyt szybko, przydatnie jeśli mamy animację po wystrzeleniu
                 }
                 #endregion
+
+                #region IsCasting -> Hold
+                skill.skill_IsCastingHold = true;
+                #endregion
+
             }
             else
             {
+
                 Utils.Skill_ResetAnyCasting(scrObj_Skill, skill, live_charStats);
             }
 
-            #region IsCasting -> Hold
-
-            skill.skill_IsCastingHold = live_charStats.charStatus._isCasting;
-
-            #endregion
         }
         #endregion
 
@@ -166,7 +179,7 @@ public static class Static_SkillForge
                 if (!live_charStats.charStatus._isCasting)
                 {
                     skill.skill_CastingVisualEffect.Play(); //może się odpalić tylko raz przy każdym inpucie, nie może się nadpisać -> taki sam efekt jak przy GetKeyDown
-                    skill.skill_AudioSourceCastable.PlayOneShot(scrObj_Skill.skill_CastableAudioClip, scrObj_Skill.skill_CastingAudioVolume);//clip audio    
+                    skill.skill_AudioSourceCastable.PlayOneShot(scrObj_Skill.skill_TimeCastNonOverlapAudioClip, scrObj_Skill.skill_CastingAudioVolume);//clip audio    
                 }
                 live_charStats.charStatus._isCasting = true;
                 if (!string.IsNullOrWhiteSpace(scrObj_Skill.skill_AnimatorBoolName)) live_charStats.charComponents._Animator.SetBool(scrObj_Skill.skill_AnimatorBoolName, live_charStats.charStatus._isCasting);
@@ -238,7 +251,7 @@ public static class Static_SkillForge
                 if (!live_charStats.charStatus._isCasting)
                 {
                     skill.skill_CastingVisualEffect.Play(); //może się odpalić tylko raz przy każdym inpucie, nie może się nadpisać -> taki sam efekt jak przy GetKeyDown
-                    skill.skill_AudioSourceInstant.PlayOneShot(scrObj_Skill.skill_InstantAudioClip, scrObj_Skill.skill_CastingAudioVolume);//clip audio 
+                    skill.skill_AudioSourceInstant.PlayOneShot(scrObj_Skill.skill_OneShotOverlapAudioClip, scrObj_Skill.skill_CastingAudioVolume);//clip audio 
                     if (!string.IsNullOrWhiteSpace(scrObj_Skill.skill_AnimatorTriggerName)) live_charStats.charComponents._Animator.SetTrigger(scrObj_Skill.skill_AnimatorTriggerName);
                 }
                 live_charStats.charStatus._isCasting = true;
@@ -313,7 +326,7 @@ public static class Static_SkillForge
                 if (!live_charStats.charStatus._isCasting)
                 {
                     skill.skill_CastingVisualEffect.Play(); //może się odpalić tylko raz przy każdym inpucie, nie może się nadpisać -> taki sam efekt jak przy GetKeyDown
-                    skill.skill_AudioSourceHold.PlayOneShot(scrObj_Skill.skill_HoldAudioClip, scrObj_Skill.skill_CastingAudioVolume);//clip audio     
+                    skill.skill_AudioSourceHold.PlayOneShot(scrObj_Skill.skill_OneShotNonOverlapAudioClip, scrObj_Skill.skill_CastingAudioVolume);//clip audio     
                 }
                 live_charStats.charStatus._isCasting = true;
                 if (!string.IsNullOrWhiteSpace(scrObj_Skill.skill_AnimatorBoolName)) live_charStats.charComponents._Animator.SetBool(scrObj_Skill.skill_AnimatorBoolName, live_charStats.charStatus._isCasting);
@@ -1277,19 +1290,19 @@ public static void Skill_Cone_AttackConeCheck(bool isCasting, float skill_curren
 
             if (skill.skill_AudioSourceInstant != null)
             {
-                skill.skill_AudioSourceInstant.volume = Mathf.MoveTowards(skill.skill_AudioSourceInstant.volume, 0, Time.deltaTime / 4); //obniza volume 1-> 0 w 4sek
+                skill.skill_AudioSourceInstant.volume = Mathf.MoveTowards(skill.skill_AudioSourceInstant.volume, 0, Time.deltaTime / 2); //obniza volume 1-> 0 w 2sek
                 if (skill.skill_AudioSourceInstant.volume <= 0.05f) { skill.skill_AudioSourceInstant.Stop(); }
             }
 
             if (skill.skill_AudioSourceCastable != null)
             {
-                skill.skill_AudioSourceCastable.volume = Mathf.MoveTowards(skill.skill_AudioSourceCastable.volume, 0, Time.deltaTime / 4); //obniza volume 1-> 0 w 4sek
+                skill.skill_AudioSourceCastable.volume = Mathf.MoveTowards(skill.skill_AudioSourceCastable.volume, 0, Time.deltaTime / 2); //obniza volume 1-> 0 w 2sek
                 if (skill.skill_AudioSourceCastable.volume <= 0.05f) { skill.skill_AudioSourceCastable.Stop(); }
             }
 
             if (skill.skill_AudioSourceHold != null)
             {
-                skill.skill_AudioSourceHold.volume = Mathf.MoveTowards(skill.skill_AudioSourceHold.volume, 0, Time.deltaTime / 4); //obniza volume 1-> 0 w 4sek
+                skill.skill_AudioSourceHold.volume = Mathf.MoveTowards(skill.skill_AudioSourceHold.volume, 0, Time.deltaTime / 2); //obniza volume 1-> 0 w 2sek
                 if (skill.skill_AudioSourceHold.volume <= 0.05f) { skill.skill_AudioSourceHold.Stop(); }
             }
 
@@ -1305,19 +1318,20 @@ public static void Skill_Cone_AttackConeCheck(bool isCasting, float skill_curren
             Skill_Target_ConeReset(skill); //Reset TargetList
         }
         #endregion
-        
+
+        #region Skill_ResetCastingAudioSourceInstantly
         /// <summary>
-        /// Natychmiastowo przerywa wszystkie Skill_AudioSource
+        /// Natychmiastowo przerywa wszystkie Skill_AudioSource oprucz Instant, ponieważ instant ma krótki cast i cały zas by przerywało
         /// </summary>
         /// <param name="scrObj_Skill"></param>
         /// <param name="skill"></param>
         /// <param name="live_charStats"></param>
-        public static void Skill_ResetAnyAudioSourceInstantly(Skill skill)
+        public static void Skill_ResetCastingAudioSourceInstantly(Skill skill)
         {
-            if (skill.skill_AudioSourceInstant != null)
+            /*if (skill.skill_AudioSourceInstant != null)
             {
-                skill.skill_AudioSourceInstant.Stop();
-            }
+                //skill.skill_AudioSourceInstant.Stop();
+            }*/
 
             if (skill.skill_AudioSourceCastable != null)
             {
@@ -1328,7 +1342,35 @@ public static void Skill_Cone_AttackConeCheck(bool isCasting, float skill_curren
             {
                 skill.skill_AudioSourceHold.Stop();
             }
-        } 
+        }
+        #endregion
+
+        #region Skill_ResetCastingAudioSourceInFixedTime
+        /// <summary>
+        /// Przerywa wszystkie Skill_AudioSource w 1sek, potrzebne do resetu AudioSource w wypadku kiedy kończy się resource(mana) podczas castowania spella
+        /// </summary>
+        /// <param name="skill"></param>  
+        public static void Skill_ResetCastingAudioSourceInFixedTime(Skill skill)
+        {
+            if (skill.skill_AudioSourceInstant != null)
+            {
+                skill.skill_AudioSourceInstant.volume = Mathf.MoveTowards(skill.skill_AudioSourceInstant.volume, 0, Time.deltaTime / 2); //obniza volume 1-> 0 w 2sek
+                if (skill.skill_AudioSourceInstant.volume <= 0.05f) { skill.skill_AudioSourceInstant.Stop(); }
+            }
+
+            if (skill.skill_AudioSourceCastable != null)
+            {
+                skill.skill_AudioSourceCastable.volume = Mathf.MoveTowards(skill.skill_AudioSourceCastable.volume, 0, Time.deltaTime / 2); //obniza volume 1-> 0 w 2sek
+                if (skill.skill_AudioSourceCastable.volume <= 0.05f) { skill.skill_AudioSourceCastable.Stop(); }
+            }
+
+            if (skill.skill_AudioSourceHold != null)
+            {
+                skill.skill_AudioSourceHold.volume = Mathf.MoveTowards(skill.skill_AudioSourceHold.volume, 0, Time.deltaTime / 2); //obniza volume 1-> 0 w 2sek
+                if (skill.skill_AudioSourceHold.volume <= 0.05f) { skill.skill_AudioSourceHold.Stop(); }
+            }
+        }
+        #endregion
 
         #region Skill_CastingTypeCurrentFloatReadOnly
         /// <summary>

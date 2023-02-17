@@ -50,11 +50,12 @@ public class ScrObj_skill : ScriptableObject
     [Tooltip("Layer Mask z przeszkodami przez które nie da się atakować(z klasy skill)"), SerializeField] public LayerMask skill_ObstaclesMask; //Obstacles dla skilla
 
     [Header("SkillAudio")]
-    [CanBeNull, Tooltip("AudioClip skilla Instant -> Caster"), SerializeField] public AudioClip skill_InstantAudioClip;
-    [CanBeNull, Tooltip("AudioClip skilla Hold -> Caster"), SerializeField] public AudioClip skill_HoldAudioClip;
-    [CanBeNull, Tooltip("Czas Loopa skilla Hold -> Caster"), SerializeField] public float skill_HoldAudioLoopTime;
-    [CanBeNull, Tooltip("AudioClip skilla Castable -> Caster"), SerializeField] public AudioClip skill_CastableAudioClip;
+    [CanBeNull, Tooltip("AudioClip skilla OneShotOverlap -> Caster"), SerializeField] public AudioClip skill_OneShotOverlapAudioClip;
+    [CanBeNull, Tooltip("AudioClip skilla OneShot non-Overlap -> Caster"), SerializeField] public AudioClip skill_OneShotNonOverlapAudioClip;   
+    [CanBeNull, Tooltip("AudioClip skilla TimeCastOverlap -> Caster"), SerializeField] public AudioClip skill_TimeCastOverlapAudioClip;
+    [CanBeNull, Tooltip("AudioClip skilla TimeCast Non-Overlap -> Caster"), SerializeField] public AudioClip skill_TimeCastNonOverlapAudioClip;
     [CanBeNull, Tooltip("AudioClip skilla OnFinished -> Caster"), SerializeField] public AudioClip skill_OnFinishCastingAudioClip;
+    [CanBeNull, Tooltip("Czas Loopa skilla Hold -> Caster"), SerializeField] public float skill_HoldAudioLoopTime;
     [Space]
     [CanBeNull, Tooltip("AudioClip skilla -> Target"), SerializeField] public AudioClip skill_OnTargetHitAudioClip;
     [Space]

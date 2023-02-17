@@ -63,7 +63,7 @@ public class Skill : MonoBehaviour
     private void OnValidate()
     {
         skill = this;
-        //QuickSetup(); 
+        //QuickSetup();
 
 
     }
@@ -147,7 +147,6 @@ public class Skill : MonoBehaviour
         {
             Static_SkillForge.CastingType.Skill_CastingUniversal_VFX_Audio(scrObj_Skill, skill, live_charStats);
         }
-        else Static_SkillForge.Utils.Skill_ResetAnyCasting(scrObj_Skill, skill, live_charStats);
     }
 
     /*private void Skill_Casting(ScrObj_skill scrObj_Skill)
