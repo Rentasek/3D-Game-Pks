@@ -6,15 +6,13 @@ using UnityEngine.UI;
 
 public class UI_DebugConsole : MonoBehaviour, IPlayerUpdate
 {
-    [SerializeField] private CharacterStatus live_charStats;
-    [SerializeField] private Player_Input player_Input;
+    [SerializeField] private CharacterStatus live_charStats;    
     [SerializeField] private Skill secondarySkill;
 
 
     private void OnEnable()
     {
-        live_charStats = Camera.main.GetComponent<CameraController>().player.GetComponent<CharacterStatus>();        
-        player_Input = Camera.main.GetComponent<CameraController>().player.GetComponent<Player_Input>();
+        live_charStats = Camera.main.GetComponent<CameraController>().player.GetComponent<CharacterStatus>();
         secondarySkill = Camera.main.GetComponent<CameraController>().player.GetComponent<CharacterStatus>().charSkillCombat._secondarySkill;
         
     }
@@ -22,7 +20,6 @@ public class UI_DebugConsole : MonoBehaviour, IPlayerUpdate
     public void PlayerUpdate()
     {
         live_charStats = Camera.main.GetComponent<CameraController>().player.GetComponent<CharacterStatus>();
-        player_Input = Camera.main.GetComponent<CameraController>().player.GetComponent<Player_Input>();
         secondarySkill = Camera.main.GetComponent<CameraController>().player.GetComponent<CharacterStatus>().charSkillCombat._secondarySkill;
     }
 
@@ -38,8 +35,7 @@ public class UI_DebugConsole : MonoBehaviour, IPlayerUpdate
     {
         GetComponent<TextMeshProUGUI>().SetText(
             "Player Input Enable [P] " + live_charStats.charInfo._playerInputEnable + ".\n" +
-            "Enable Mouse Rotate [X] " + live_charStats.charInput._enableMouseRotate + ".\n" +
-            "Options Panel [0] " + player_Input.optionsActivated + " .\n" +
+            "Enable Mouse Rotate [X] " + live_charStats.charInput._enableMouseRotate + ".\n" +            
             "Save Game [5] .\n" +
             "Load Game [6] .\n" +
             "Reset Position [R] .\n" +

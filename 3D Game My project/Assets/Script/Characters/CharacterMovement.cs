@@ -86,7 +86,7 @@ public class CharacterMovement : MonoBehaviour
 
             ////Running Speed 
             if (/*live_charStats.currentMoveInputDirection != Vector3.zero &&*/ !live_charStats.charStatus._isJumping && !live_charStats.charStatus._isAttacking && live_charStats.charStats._stam > 5f
-                && live_charStats.fov._targetAquired && !live_charStats.charInput._secondary && live_charStats.charComponents._navMeshAgent.remainingDistance > 2 * live_charStats.fov._attackRangeSkillMaxRadius)
+                && live_charStats.fov._targetAquired && !live_charStats.charInput._secondary && live_charStats.charComponents._navMeshAgent.remainingDistance > 2 * live_charStats.fov._closeRangeSkillMinRadius)
                 //dodatnkowy warunek ->biega tylko jak targetAquired=true, kolejny warnek jeœli nie castuje!!, Kolejny warunek jeœli agent.eemainingDistance > 2* attack range
             {
                 live_charStats.charComponents._Animator.ResetTrigger("MeeleAttack");

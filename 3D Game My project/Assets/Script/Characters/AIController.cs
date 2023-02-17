@@ -24,7 +24,7 @@ public class AIController : MonoBehaviour
         enemiesArray = live_charStats.charInfo._enemiesArray;
         agent = live_charStats.charComponents._navMeshAgent;
         live_charStats.navMeshAge._spawnPoint = transform.position;
-        agent.stoppingDistance = live_charStats.fov._attackRangeSkillMaxRadius;
+        agent.stoppingDistance = live_charStats.fov._closeRangeSkillMinRadius;
     }
 
     ///////////////////////////////////////////////////////////////////////////////////////
@@ -70,7 +70,7 @@ public class AIController : MonoBehaviour
                 }
             }
             // Jeœli dystans do walkPoint jest mniejszy ni¿ 1f resetuje walkPointSet (wykorzystanie agent.*)            
-            if (agent.remainingDistance <= live_charStats.fov._attackRangeSkillMaxRadius) { live_charStats.navMeshAge._walkPoint = transform.position; }
+            if (agent.remainingDistance <= live_charStats.fov._closeRangeSkillMinRadius) { live_charStats.navMeshAge._walkPoint = transform.position; }
 
             if (live_charStats.fov._targetInDynamicSightRange && !live_charStats.fov._targetInAttackRange) Chasing(); // player bez inputa œciga tylko przy close sight range
 
@@ -150,7 +150,7 @@ public class AIController : MonoBehaviour
 
     private void CheckForTargetInAttackRange()
     {
-        foreach (Collider collider in Physics.OverlapSphere(transform.position, live_charStats.fov._attackRangeSkillMaxRadius)) //dla ka¿dego collidera w zasiêgu wzroku
+        foreach (Collider collider in Physics.OverlapSphere(transform.position, live_charStats.fov._closeRangeSkillMinRadius)) //dla ka¿dego collidera w zasiêgu wzroku
         {
             if (enemiesArray.Contains(collider.tag))                                         //jeœli ma tag zawarty w arrayu enemiesArray
             {                                                      
@@ -191,7 +191,7 @@ public class AIController : MonoBehaviour
         }
 
         // Jeœli dystans do walkPoint jest mniejszy ni¿ 1f resetuje walkPointSet i szuka nowego (wykorzystanie agent.*)
-        if (agent.remainingDistance < live_charStats.fov._attackRangeSkillMaxRadius) live_charStats.navMeshAge._walkPointSet = false;                
+        if (agent.remainingDistance < live_charStats.fov._closeRangeSkillMinRadius) live_charStats.navMeshAge._walkPointSet = false;                
     }
 
     private void SearchForWalkPoint()

@@ -44,7 +44,7 @@ public class UI_SkillFrame : MonoBehaviour, IPlayerUpdate
         }
     }
 
-    /*void OnEnable()
+    /*void OnValidate()
     {
         SkillFrameSetUp();
     }*/
@@ -114,16 +114,18 @@ public class UI_SkillFrame : MonoBehaviour, IPlayerUpdate
             case CharStat.CloseRangeAttDamage:
                 if (live_charStats.fov._closeRangeSkill != null)
                 {
+                    Static_SkillForge.Utils.Skill_EffectValuesUpdate(live_charStats.fov._closeRangeSkill.scrObj_Skill, live_charStats.fov._closeRangeSkill.skill, live_charStats, currentCharacterBonusStats);
                     skill_BonusFloat = currentCharacterBonusStats.bonus_currentDamageCombo;
                     skill_OutputFloat = live_charStats.fov._closeRangeSkill.skill_currentDamage;
                 }
-                skill_selectedName = "Melee Damage";
+                skill_selectedName = "Close Damage";
                 skill_Image.GetComponent<Image>().sprite = skillImagesList[4];
                 break;
 
             case CharStat.SpellRangeAttDamage:
                 if (live_charStats.fov._spellRangeSkill != null)
                 {
+                    Static_SkillForge.Utils.Skill_EffectValuesUpdate(live_charStats.fov._spellRangeSkill.scrObj_Skill, live_charStats.fov._spellRangeSkill.skill, live_charStats, currentCharacterBonusStats);
                     skill_BonusFloat = currentCharacterBonusStats.bonus_Skill_Damage;
                     skill_OutputFloat = live_charStats.fov._spellRangeSkill.skill_currentDamage;
                 }
@@ -145,8 +147,8 @@ public class UI_SkillFrame : MonoBehaviour, IPlayerUpdate
     private void SkillFrameUpdate()
     {
        
-        SkillPointCheck();        
-        skill_statText.GetComponent<TextMeshProUGUI>().SetText(skill_selectedName + "\n" + Mathf.Round(skill_OutputFloat*10f)*0.1f); // 0,1 po przecinku
+        SkillPointCheck();
+        skill_statText.GetComponent<TextMeshProUGUI>().SetText(skill_selectedName /*System.Enum.GetName(typeof(CharStat), charStat)*/ + "\n" + Mathf.Round(skill_OutputFloat * 10f) * 0.1f) ; // 0,1 po przecinku
 
         switch (charStat)
         {
@@ -171,11 +173,12 @@ public class UI_SkillFrame : MonoBehaviour, IPlayerUpdate
                 break;
 
             case CharStat.CloseRangeAttDamage:
-                if(live_charStats.fov._closeRangeSkill != null)
+                if (live_charStats.fov._closeRangeSkill != null)
                 {
                     skill_BonusFloat = currentCharacterBonusStats.bonus_currentDamageCombo;
                     skill_OutputFloat = live_charStats.fov._closeRangeSkill.skill_currentDamage;
-                }                               
+                    Static_SkillForge.Utils.Skill_EffectValuesUpdate(live_charStats.fov._closeRangeSkill.scrObj_Skill, live_charStats.fov._closeRangeSkill.skill, live_charStats, currentCharacterBonusStats);
+                }
                 break;
 
             case CharStat.SpellRangeAttDamage:
@@ -183,8 +186,11 @@ public class UI_SkillFrame : MonoBehaviour, IPlayerUpdate
                 {
                     skill_BonusFloat = currentCharacterBonusStats.bonus_Skill_Damage;
                     skill_OutputFloat = live_charStats.fov._spellRangeSkill.skill_currentDamage;
-                }                
+                    Static_SkillForge.Utils.Skill_EffectValuesUpdate(live_charStats.fov._spellRangeSkill.scrObj_Skill, live_charStats.fov._spellRangeSkill.skill, live_charStats, currentCharacterBonusStats);
+                }
                 break;
+
+            
 
             case CharStat.SkillPTS:
                 skill_OutputFloat = currentCharacterBonusStats.bonus_SkillPoints;

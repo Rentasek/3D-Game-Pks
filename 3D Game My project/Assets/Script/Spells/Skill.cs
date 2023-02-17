@@ -39,6 +39,7 @@ public class Skill : MonoBehaviour
     
     [Header("Targets")]
     [Tooltip("Enemies Array z klasy scr_skill(do bazowego enemies array dopisane Destructibles, (Metoda EnemyArraySelector)"), SerializeField, TagField] public string[] skill_EnemiesArray; //Pozwala na wybór Enemies przy pomocy Tag     
+    [Tooltip("Zwracana lista wszystkich colliderów w zasięgu skilla"), CanBeNull, SerializeField] public Collider[] skill_allLocalColliders = new Collider[30];
     [Tooltip("Zwracana lista colliderów zgodnych z parametrami(EnemyTag,InCurrentRadius,InCurrentAngle)"), CanBeNull, SerializeField] public List<Collider> skill_targetColliders;    
     [Tooltip("GameObject skilla (castera) -> potrzebny do transform"), SerializeField] public GameObject skill_casterGameobject;
 
@@ -57,34 +58,27 @@ public class Skill : MonoBehaviour
     [Tooltip("AudioSource skilla Castable -> Caster"), SerializeField] public AudioSource skill_AudioSourceCastable;
     [Tooltip("AudioSource skilla Hold -> Caster"), SerializeField] public AudioSource skill_AudioSourceHold;
     [Tooltip("VFX skilla -> Caster"), CanBeNull, SerializeField] public VisualEffect skill_CastingVisualEffect;
-
-    //public Collider[] skill_localColliders;
-
+    
     private void OnValidate()
     {
         skill = this;
-        //QuickSetup();
+        //QuickSetup(); 
 
 
     }
 
     private void FixedUpdate()
     {
-        //if (Input.GetKeyDown(KeyCode.Keypad0)) { skill.skill_currentCooldownRemaining = 1f; skill.skill_currentComboProgress = 1f; } ///Testing
-
         Static_SkillForge.Utils.Skill_EveryFrameValuesUpdate(scrObj_Skill, skill, live_charStats, currentCharacterBonusStats);        
-
-        //Skill_Casting(scrObj_Skill);
-
+             
         Skill_UniversalCasting(scrObj_Skill);
 
-        Skill_Range(scrObj_Skill);
+        Skill_TargetType(scrObj_Skill);
 
         if (live_charStats.charStatus._isCasting && skill_CanCast)
         {     
             Skill_EffectTypeArray(scrObj_Skill, skill);
         }
-        
     }
 
     /// <summary>
@@ -125,14 +119,14 @@ public class Skill : MonoBehaviour
             {
                 live_charStats.fov._closeRangeSkill = live_charStats.charSkillCombat._primarySkill;
                 live_charStats.fov._spellRangeSkill = live_charStats.charSkillCombat._secondarySkill;
-                live_charStats.fov._attackRangeSkillMaxRadius = live_charStats.charSkillCombat._primarySkill.scrObj_Skill.skill_MaxRadius;
+                live_charStats.fov._closeRangeSkillMinRadius = live_charStats.charSkillCombat._primarySkill.scrObj_Skill.skill_MinRadius;
                 live_charStats.fov._spellRangeSkillMaxRadius = live_charStats.charSkillCombat._secondarySkill.scrObj_Skill.skill_MaxRadius;
             }
             else
             {
                 live_charStats.fov._closeRangeSkill = live_charStats.charSkillCombat._secondarySkill;
                 live_charStats.fov._spellRangeSkill = live_charStats.charSkillCombat._primarySkill;
-                live_charStats.fov._attackRangeSkillMaxRadius = live_charStats.charSkillCombat._secondarySkill.scrObj_Skill.skill_MaxRadius;
+                live_charStats.fov._closeRangeSkillMinRadius = live_charStats.charSkillCombat._secondarySkill.scrObj_Skill.skill_MinRadius;
                 live_charStats.fov._spellRangeSkillMaxRadius = live_charStats.charSkillCombat._primarySkill.scrObj_Skill.skill_MaxRadius;
             }
         }
@@ -147,31 +141,9 @@ public class Skill : MonoBehaviour
         {
             Static_SkillForge.CastingType.Skill_CastingUniversal_VFX_Audio(scrObj_Skill, skill, live_charStats);
         }
-    }
 
-    /*private void Skill_Casting(ScrObj_skill scrObj_Skill)
-    {
-        live_charStats.skill_CanCast = !skill.skill_otherInput && !live_charStats.isRunning && live_charStats.currentMoveSpeed != live_charStats.currentRunSpeed;
-
-        if (live_charStats.skill_CanCast)
-        {
-            switch (scrObj_Skill.skill_CastingType)
-            {
-                case ScrObj_skill.Skill_CastingType.Castable:
-                    Static_SkillForge.Skill_Castable_VFX_Audio(scrObj_Skill, skill, live_charStats);
-                    break;
-
-                case ScrObj_skill.Skill_CastingType.Instant:
-                    Static_SkillForge.Skill_Instant_VFX_Audio(scrObj_Skill, skill, live_charStats);
-                    break;
-
-                case ScrObj_skill.Skill_CastingType.Hold:
-                    Static_SkillForge.Skill_Hold_VFX_Audio(scrObj_Skill, skill, live_charStats);
-                    break;
-            }
-        }
-        else Static_SkillForge.Skill_ResetAnyCasting(scrObj_Skill, skill, live_charStats);
-    }*/
+        if(live_charStats.charStatus._isDead) { Static_SkillForge.Utils.Skill_ResetAnyCasting(scrObj_Skill, skill, live_charStats); }
+    }    
 
     private void Skill_EffectTypeArray(ScrObj_skill scrObj_Skill, Skill skill)
     {
@@ -183,7 +155,7 @@ public class Skill : MonoBehaviour
                     break;
 
                 case ScrObj_skill.Skill_EffectTypeArray.hit:
-                    Static_SkillForge.Skill_Hit(scrObj_Skill, skill, live_charStats, Static_SkillForge.Utils.Skill_CastingTypeCurrentFloatReadOnly(currentCastingIndex, skill));
+                    Static_SkillForge.EffectType.Skill_Hit(scrObj_Skill, skill, live_charStats, Static_SkillForge.Utils.Skill_CastingTypeCurrentFloatReadOnly(currentCastingIndex, skill));
                     break;
 
                 case ScrObj_skill.Skill_EffectTypeArray.boom:
@@ -196,15 +168,15 @@ public class Skill : MonoBehaviour
                     break;
 
                 case ScrObj_skill.Skill_EffectTypeArray.damageOverTime:
-                    Static_SkillForge.Skill_DamageOverTime(scrObj_Skill, skill, live_charStats, Static_SkillForge.Utils.Skill_CastingTypeCurrentFloatReadOnly(currentCastingIndex, skill));
+                    Static_SkillForge.EffectType.Skill_DamageOverTime(scrObj_Skill, skill, live_charStats, Static_SkillForge.Utils.Skill_CastingTypeCurrentFloatReadOnly(currentCastingIndex, skill));
                     break;
 
                 case ScrObj_skill.Skill_EffectTypeArray.healOverTime:
-                    Static_SkillForge.Skill_HealOverTime(scrObj_Skill, skill, live_charStats, Static_SkillForge.Utils.Skill_CastingTypeCurrentFloatReadOnly(currentCastingIndex, skill));
+                    Static_SkillForge.EffectType.Skill_HealOverTime(scrObj_Skill, skill, live_charStats, Static_SkillForge.Utils.Skill_CastingTypeCurrentFloatReadOnly(currentCastingIndex, skill));
                     break;
 
                 case ScrObj_skill.Skill_EffectTypeArray.heal:
-                    Static_SkillForge.Skill_HealOverTime(scrObj_Skill, skill, live_charStats, Static_SkillForge.Utils.Skill_CastingTypeCurrentFloatReadOnly(currentCastingIndex, skill));
+                    Static_SkillForge.EffectType.Skill_HealOverTime(scrObj_Skill, skill, live_charStats, Static_SkillForge.Utils.Skill_CastingTypeCurrentFloatReadOnly(currentCastingIndex, skill));
                     break;
 
                 case ScrObj_skill.Skill_EffectTypeArray.summon:
@@ -213,72 +185,38 @@ public class Skill : MonoBehaviour
         }        
     }
 
-
-
-    private void Skill_Range(ScrObj_skill scrObj_Skill)
+    private void Skill_TargetType(ScrObj_skill scrObj_Skill)
     {
         if (!live_charStats.charStatus._isDead /*&& live_charStats.skill_CanCast*/) //tylko dla żywych :P
         {
-            switch (scrObj_Skill.skill_RangeType)
+            switch (scrObj_Skill.skill_TargetType)
             {
-                case ScrObj_skill.Skill_RangeType.melee:
-                    Static_SkillForge.Skill_Melee_Target(scrObj_Skill, skill, live_charStats);
+                case ScrObj_skill.Skill_TargetType.melee:
+                    Static_SkillForge.TargetType.Skill_Melee_Target(scrObj_Skill, skill, live_charStats);
                     break;
 
-                case ScrObj_skill.Skill_RangeType.cone:
-                    Static_SkillForge.Skill_Cone_Target(scrObj_Skill, skill, live_charStats);
+                case ScrObj_skill.Skill_TargetType.cone:
+                    Static_SkillForge.TargetType.Skill_Cone_Target(scrObj_Skill, skill, live_charStats);
                     break;
 
-                case ScrObj_skill.Skill_RangeType.projectile:
-
-                    break;
-
-                case ScrObj_skill.Skill_RangeType.aoeMouse:
+                case ScrObj_skill.Skill_TargetType.projectile:
 
                     break;
 
-                case ScrObj_skill.Skill_RangeType.self:
-                    Static_SkillForge.Skill_Self_Target(scrObj_Skill, skill, live_charStats);
+                case ScrObj_skill.Skill_TargetType.aoeMouse:
+
                     break;
 
-                case ScrObj_skill.Skill_RangeType.summon:
+                case ScrObj_skill.Skill_TargetType.self:
+                    Static_SkillForge.TargetType.Skill_Self_Target(scrObj_Skill, skill, live_charStats);
+                    break;
+
+                case ScrObj_skill.Skill_TargetType.summon:
 
                     break;
             }
         }
-    }
-
-    /*private void Skill_Effect(ScrObj_skill scrObj_Skill)
-    {
-        switch (scrObj_Skill.skill_EffectType)
-        {
-            case ScrObj_skill.Skill_EffectType.hit:                
-                break;
-
-            case ScrObj_skill.Skill_EffectType.boom:
-                break;
-
-            case ScrObj_skill.Skill_EffectType.pierce:
-                break;
-
-            case ScrObj_skill.Skill_EffectType.chain:
-                break;
-
-            case ScrObj_skill.Skill_EffectType.damageOverTime:
-                Static_SkillForge.Skill_DamageOverTime(scrObj_Skill, skill, live_charStats);
-                break;
-
-            case ScrObj_skill.Skill_EffectType.healOverTime:
-                break;
-
-            case ScrObj_skill.Skill_EffectType.heal:
-                break;
-
-            case ScrObj_skill.Skill_EffectType.summon:
-                break;
-        }
-    }*/
-
+    }     
 
 #if UNITY_EDITOR //zamiast skryptu w Editor
 

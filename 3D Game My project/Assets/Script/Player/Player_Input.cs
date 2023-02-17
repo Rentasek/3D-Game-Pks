@@ -11,9 +11,7 @@ public class Player_Input : MonoBehaviour
     public CharacterStatus live_charStats;
 
 
-    public bool pauseKeyPressed;
-    public bool optionsActivated = true;
-    [SerializeField] private GameObject optionsPanel;
+    public bool pauseKeyPressed;      
     private bool mouseRotateLocalBool;
 
 
@@ -152,21 +150,9 @@ public class Player_Input : MonoBehaviour
 
             if (!live_charStats.charInfo._playerInputEnable) IsometricInputClass();//jeœli nie ma flagi player input //isometric
             if (live_charStats.charInfo._playerInputEnable) PlayerInputClass();//jeœli zaznaczona jest flaga playerInputEnable //3rd person
-
-            //options panel
-            if (Input.GetKeyDown(KeyCode.O)) OptionsPanel_enabling();
+                      
         }        
     }
     ////////////////////////////////////////////////////////////////////  
 
-    
-    public void OptionsPanel_enabling()
-    {
-        if (live_charStats.charInfo._isPlayer)
-        {
-            optionsActivated = !optionsActivated;
-            optionsPanel.SetActive(optionsActivated);
-        }
-
-    }
 }

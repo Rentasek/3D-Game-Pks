@@ -114,7 +114,6 @@ public class CharControler : MonoBehaviour
     /// <br>PlayerUpdate class - reload character stars from scriptable object and Character Level</br>
     /// <br>Also resets all triggers, states and inputs</br>
     /// </summary>
-    /// <returns></returns>
     public void PlayerUpdate()
     {
         if (live_charStats.charInfo._isPlayer)
@@ -136,7 +135,6 @@ public class CharControler : MonoBehaviour
     /// <br>Use static LiveCharStats_Base class, contains only: </br>
     /// <br>Dynamic FieldOfViewCheck</br>
     /// </summary>
-    /// <returns></returns>
     private IEnumerator FOVRoutine()
     {
         if (live_charStats.fov._isSearchingForTarget)
@@ -160,7 +158,6 @@ public class CharControler : MonoBehaviour
     /// <br>Use static LiveCharStats_Base class, contains: </br>
     /// <br>Dynamic FieldOfViewCheck, NavMeshAgent Controll, AI Movement</br>
     /// </summary>
-    /// <returns></returns>
     public IEnumerator AIControllerRoutine()
     {
         if (live_charStats.navMeshAge._isCheckingAIRoutine)
@@ -313,9 +310,6 @@ public class CharControler : MonoBehaviour
         live_charStats.fov._isSearchingForTarget = false;
         live_charStats.navMeshAge._isCheckingAIRoutine = false;
 
-        //live_charStats.charSkillCombat.spell_OnCoroutine = false; // old - unused
-
-        //if (live_charStats.isPlayer) live_charStats.inputEnableMouseRotate = true;
     }
 
     /// <summary>
