@@ -13,14 +13,14 @@ public class UI_PauseMenu : MonoBehaviour, IPlayerUpdate
     private bool mouseLocked;
     [SerializeField]private GameObject pauseOptionsPanel, pauseMainPanel;
 
-    private void OnEnable()
+    private void OnEnable() 
     {
         live_charStats = Camera.main.GetComponent<CameraController>().player.GetComponent<CharacterStatus>();
         player_Input = Camera.main.GetComponent<CameraController>().player.GetComponent<Player_Input>();
     }
     
 
-    private void Update()
+    private void LateUpdate()
     {
         if(player_Input.pauseKeyPressed)
             if (isPaused)
