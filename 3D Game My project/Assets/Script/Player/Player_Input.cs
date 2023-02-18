@@ -65,14 +65,14 @@ public class Player_Input : MonoBehaviour
             {                
                 live_charStats.fov._targetInAttackRange = false;      //debugging ¿eby nie blokowa³ siê przy atakowaniu
                 live_charStats.fov._targetInDynamicSightRange = false;      //debugging ¿eby nie blokowa³ siê przy atakowaniu
-                live_charStats.charStatus._isAttacking = false;                     //debugging ¿eby nie blokowa³ siê przy atakowaniu
+                //live_charStats.charStatus._isAttacking = false;                     //debugging ¿eby nie blokowa³ siê przy atakowaniu
                 live_charStats.charInput._primary = false;                  //debugging ¿eby nie blokowa³ siê przy atakowaniu
                 live_charStats.charInput._secondary = false;                  //debugging ¿eby nie blokowa³ siê przy atakowaniu
                 live_charStats.fov._targetAquired = true;             //debugging ¿eby nie blokowa³ siê przy atakowaniu                
             }
         }
 
-        if (live_charStats.charInput._secondary)  //lub castujemy
+        if (live_charStats.fov._spellRangeSkill.skill_input)  //lub castujemy
         {
             Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
             if (Physics.Raycast(ray, out RaycastHit hit))
@@ -82,7 +82,7 @@ public class Player_Input : MonoBehaviour
             
             live_charStats.fov._targetInAttackRange = false;      //debugging ¿eby nie blokowa³ siê przy atakowaniu
             live_charStats.fov._targetInDynamicSightRange = false;      //debugging ¿eby nie blokowa³ siê przy atakowaniu
-            live_charStats.charStatus._isAttacking = false;                     //debugging ¿eby nie blokowa³ siê przy atakowaniu
+            //live_charStats.charStatus._isAttacking = false;                     //debugging ¿eby nie blokowa³ siê przy atakowaniu
             live_charStats.charInput._primary = false;                  //debugging ¿eby nie blokowa³ siê przy atakowaniu
             live_charStats.fov._targetAquired = true;             //debugging ¿eby nie blokowa³ siê przy atakowaniu
             live_charStats.charStatus._isRunning= false;

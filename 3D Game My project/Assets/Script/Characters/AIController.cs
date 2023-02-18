@@ -60,7 +60,7 @@ public class AIController : MonoBehaviour
                 CheckForTargetInAttackRange();
             }
 
-            if (live_charStats.charStatus._isAttacking)
+            if (live_charStats.fov._closeRangeSkill.skill_input)
             {
                 //debugging if not null
                 if (live_charStats.fov._aquiredTargetGameObject != null && !live_charStats.charInput._mouseCurrentMoving) //przy wciskaniu przucisku porusazania siê nie lockuje targetu

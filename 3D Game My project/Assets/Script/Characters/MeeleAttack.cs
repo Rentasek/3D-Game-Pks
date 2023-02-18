@@ -37,7 +37,7 @@ public class MeeleAttack : MonoBehaviour
     }
     private void Update()
     {
-        if(live_charStats.charStatus._isAttacking && live_charStats.fov._closeRangeSkill.skill_currentComboProgress == onCombo) //W³¹czanie colliderów tylko dla aktualnego combo
+        if(live_charStats.fov._closeRangeSkill.skill_input && live_charStats.fov._closeRangeSkill.skill_currentComboProgress == onCombo) //W³¹czanie colliderów tylko dla aktualnego combo
         {
             gameObject.GetComponent<Collider>().enabled = true;
         }
@@ -74,7 +74,7 @@ public class MeeleAttack : MonoBehaviour
             i++;  //zmienna testing only
 
         }
-        else if (other.CompareTag("Destructibles") && live_charStats.charStatus._isAttacking && live_charStats.fov._closeRangeSkill.skill_currentComboProgress == onCombo) 
+        else if (other.CompareTag("Destructibles") && live_charStats.fov._closeRangeSkill.skill_input && live_charStats.fov._closeRangeSkill.skill_currentComboProgress == onCombo) 
         {
             audioSource.PlayOneShot(other.GetComponent<CharacterStatus>().charComponents._scrObj_CharStats.damagedDestructibles, 1);
 

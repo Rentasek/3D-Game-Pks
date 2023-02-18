@@ -85,7 +85,7 @@ public class CharacterMovement : MonoBehaviour
             if (live_charStats.charStats._stam > 0) live_charStats.charStats._stam = Mathf.MoveTowards(live_charStats.charStats._stam, 0f, (10f + live_charStats.charInfo._charLevel) * Time.deltaTime); //zu¿ywa f stamy / sekunde
 
             ////Running Speed 
-            if (/*live_charStats.currentMoveInputDirection != Vector3.zero &&*/ !live_charStats.charStatus._isJumping && !live_charStats.charStatus._isAttacking && live_charStats.charStats._stam > 5f
+            if (/*live_charStats.currentMoveInputDirection != Vector3.zero &&*/ !live_charStats.charStatus._isJumping && !live_charStats.fov._closeRangeSkill.skill_input && live_charStats.charStats._stam > 5f
                 && live_charStats.fov._targetAquired && !live_charStats.charInput._secondary && live_charStats.charComponents._navMeshAgent.remainingDistance > 2 * live_charStats.fov._closeRangeSkillMinRadius)
                 //dodatnkowy warunek ->biega tylko jak targetAquired=true, kolejny warnek jeœli nie castuje!!, Kolejny warunek jeœli agent.eemainingDistance > 2* attack range
             {
@@ -103,7 +103,7 @@ public class CharacterMovement : MonoBehaviour
 
 
         }       
-        else if (live_charStats.charMove._moveInputDirection == Vector3.zero && !live_charStats.charStatus._isJumping && !live_charStats.charStatus._isAttacking)
+        else if (live_charStats.charMove._moveInputDirection == Vector3.zero && !live_charStats.charStatus._isJumping && !live_charStats.fov._closeRangeSkill.skill_input)
         {   ///Idle Speed => speed = 0
             localSpeedIndex = 0;
             live_charStats.charMove._moveSpeed = 0f; //zmienna przekazywana do charStats a póŸniej do Animatora
@@ -133,7 +133,7 @@ public class CharacterMovement : MonoBehaviour
             if (live_charStats.charStats._stam > 0) live_charStats.charStats._stam = Mathf.MoveTowards(live_charStats.charStats._stam, 0f, (10f + live_charStats.charInfo._charLevel) * Time.deltaTime); //MoveTowards na koñcu podaje czas maxymalny na zmianê wartoœci
 
 
-            if (live_charStats.charMove._moveInputDirection != Vector3.zero && live_charStats.charMove._moveInputDirection != Vector3.back && !live_charStats.charStatus._isJumping && !live_charStats.charStatus._isAttacking && live_charStats.charStats._stam > 5f) 
+            if (live_charStats.charMove._moveInputDirection != Vector3.zero && live_charStats.charMove._moveInputDirection != Vector3.back && !live_charStats.charStatus._isJumping && !live_charStats.fov._closeRangeSkill.skill_input && live_charStats.charStats._stam > 5f) 
             {                                                               //jeœli nie sprintuje do ty³u
                 ////Running Speed 
                 live_charStats.charComponents._Animator.ResetTrigger("MeeleAttack");
@@ -149,12 +149,12 @@ public class CharacterMovement : MonoBehaviour
 
 
         }
-        else if (live_charStats.charMove._moveInputDirection != Vector3.zero && !live_charStats.charInput._running && !live_charStats.charStatus._isJumping && !live_charStats.charStatus._isAttacking)
+        else if (live_charStats.charMove._moveInputDirection != Vector3.zero && !live_charStats.charInput._running && !live_charStats.charStatus._isJumping && !live_charStats.fov._closeRangeSkill.skill_input)
         {   ////Walking Speed
             localSpeedIndex = 1;
             live_charStats.charMove._moveSpeed = live_charStats.charMove._walkSpeed; //Walk
         }
-        else if (live_charStats.charMove._moveInputDirection == Vector3.zero && !live_charStats.charStatus._isJumping && !live_charStats.charStatus._isAttacking)
+        else if (live_charStats.charMove._moveInputDirection == Vector3.zero && !live_charStats.charStatus._isJumping && !live_charStats.fov._closeRangeSkill.skill_input)
         {   ///Idle Speed => speed = 0
             localSpeedIndex = 0;
             live_charStats.charMove._moveSpeed = 0; //Idle
@@ -197,7 +197,7 @@ public class CharacterMovement : MonoBehaviour
         float jumpSpeed = live_charStats.charMove._jumpPower;    //jumpPower
         if (live_charStats.charMove._moveSpeed != 0) jumpSpeed = (live_charStats.charMove._jumpPower + live_charStats.charMove._moveSpeed );  //w przypadku gdzie jest move speed, dodaje si³ê do jump power
 
-        if (live_charStats.charInput._jumping && live_charStats.charStatus._isGrounded && !live_charStats.charStatus._isAttacking && live_charStats.charStats._stam > 11f)
+        if (live_charStats.charInput._jumping && live_charStats.charStatus._isGrounded && !live_charStats.fov._closeRangeSkill.skill_input && live_charStats.charStats._stam > 11f)
         {            
             //zmiana trybu skakania J key
             live_charStats.charMove._moveVector.y = jumpSpeed;
