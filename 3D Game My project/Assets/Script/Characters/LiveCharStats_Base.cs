@@ -267,7 +267,7 @@ public static class LiveCharStats_Base
             else live_charStats.charComponents._navMeshAgent.isStopped = false; //żeby odblokować agenta po atakowaniu
 
             // Jeśli dystans do walkPoint jest mniejszy niż 1f resetuje walkPointSet (wykorzystanie live_charStats.currentNavMeshAgent.*)            
-            if (live_charStats.charComponents._navMeshAgent.remainingDistance <= live_charStats.fov._closeRangeSkillMinRadius - 0.5f)
+            if (live_charStats.charComponents._navMeshAgent.remainingDistance <= live_charStats.fov._closeRangeSkillMinRadius + 0.5f)
             {
                 live_charStats.navMeshAge._walkPoint = live_charStats.gameObject.transform.position;
             }
@@ -335,7 +335,7 @@ public static class LiveCharStats_Base
         }
 
         // Jeśli dystans do walkPoint jest mniejszy niż 1f resetuje walkPointSet i szuka nowego (wykorzystanie live_charStats.currentNavMeshAgent.*)
-        if (live_charStats.charComponents._navMeshAgent.remainingDistance < live_charStats.fov._closeRangeSkillMinRadius) live_charStats.navMeshAge._walkPointSet = false;
+        if (live_charStats.charComponents._navMeshAgent.remainingDistance < live_charStats.fov._closeRangeSkillMinRadius + 0.5f) live_charStats.navMeshAge._walkPointSet = false;
     }
 
     private static void SearchForWalkPoint(CharacterStatus live_charStats)
@@ -346,13 +346,13 @@ public static class LiveCharStats_Base
 
         live_charStats.navMeshAge._walkPoint = new Vector3(live_charStats.gameObject.transform.position.x + randomX, live_charStats.gameObject.transform.position.y, live_charStats.gameObject.transform.position.z + randomZ);
 
-        //Raycast sprawdza czy walkpoint trafia na terrain, vector osi po której sprawdza =>(-transform.up)
+        //Raycast sprawdza czy walkpoint trafia na terrain, vector osi po której sprawdza =>(-transform.up // wysyła raycast od walk point do osi -up (w dół) od gameobjectu chara )
         if (Physics.Raycast(live_charStats.navMeshAge._walkPoint, -live_charStats.gameObject.transform.up, 2f, live_charStats.navMeshAge._whatIsGround) &&
             Vector3.Distance(live_charStats.navMeshAge._walkPoint, live_charStats.navMeshAge._spawnPoint) < live_charStats.navMeshAge._wanderingRange)
         //Dodatkowo srawdza czy walkPoint ustawił się w zasięgu wanderingRange od spawnPointa
         {
             live_charStats.navMeshAge._walkPointSet = true;
-            live_charStats.navMeshAge._failsafeCounter = 0;
+            live_charStats.navMeshAge._failsafeCounter = 0;            
         }
         else
         {   //mechanizm ochronny w wypadku poscigu za przeciwnikiem, resetuje walkPointSet do spawnPoint
