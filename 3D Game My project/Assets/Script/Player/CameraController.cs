@@ -43,6 +43,7 @@ public partial class CameraController : MonoBehaviour
     void Start()
     {
         SearchForPlayer();
+        if(live_charStats.charInfo._playerInputEnable)Invoke(nameof(SwitchCursorOptions), 0.3f); //Specjalnie ustawiony Invoke, aktywuje siê chwile po za³adowaniu bo inaczej nie dzia³a i live_charStats.charInput._enableMouseRotate==false
     }
 
     // Update is called once per frame  //update u¿ywaæ do input GetKeyDown, dzia³aj¹ bez laga
@@ -51,7 +52,7 @@ public partial class CameraController : MonoBehaviour
         CameraDistance();
 
         if (Input.GetKeyDown(KeyCode.X)) SwitchCursorOptions();
-        if (live_charStats.charInput._enableMouseRotate) MouseRotate();
+        if (live_charStats.charInput._enableMouseRotate && live_charStats.charInfo._playerInputEnable) MouseRotate();
 
         CameraFollowPlayer();
     }
@@ -87,18 +88,8 @@ public partial class CameraController : MonoBehaviour
     {
         if (live_charStats.charInfo._isPlayer)
         {
-            if (live_charStats.charInfo._playerInputEnable) //jesli 3rd person view
-            {
-                live_charStats.charInput._enableMouseRotate = !live_charStats.charInput._enableMouseRotate; //w³¹czanie i wy³¹czanie booleana przyciskiem on/off
-
-                if (live_charStats.charInput._enableMouseRotate) Cursor.lockState = CursorLockMode.Locked; //kursor zablokwany na œrodku ekranu
-                else { Cursor.lockState = CursorLockMode.None; Cursor.visible = true; }
-            }
-            else //jeœli isometric
-            {
-                Cursor.lockState = CursorLockMode.None;
-                Cursor.visible = true;
-            } //jeœli player steruje -> lock cursora, jeœli nie cursor widoczny
+            if (!live_charStats.charInput._enableMouseRotate) Cursor.lockState = CursorLockMode.Locked; //kursor zablokwany na œrodku ekranu
+            else { Cursor.lockState = CursorLockMode.None; Cursor.visible = true; }
         }
     }
 

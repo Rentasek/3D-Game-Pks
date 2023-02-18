@@ -10,32 +10,28 @@ public class Player_Input : MonoBehaviour
     [Header("Character Objects")]
     public CharacterStatus live_charStats;
 
-
-    public bool pauseKeyPressed;      
-    private bool mouseRotateLocalBool;
-
+    public bool isPaused;
+    public bool pauseKeyPressed;
 
     // Start is called before the first frame update
     private void OnEnable()
     {
         live_charStats = GetComponent<CharacterStatus>();        
-        if (live_charStats.charInfo._isPlayer)  GameObject.Find("Player_Charmander/UI_Screen/OptionsPanel");
     }
-
-
-    /*// Update is called once per frame  //update u¿ywaæ do input GetKeyDown, dzia³aj¹ bez laga
-    void Update()
-    {      
-
-    }*/
 
     /// <summary>
     /// PlayerInput tylko dla Playera
     /// </summary>
     public void PlayerInputClass() //wsyzstkie klasy maj¹ w sobie dodatkowe warunki do dzia³ania INPUTA
     {
-        if (live_charStats.charInput._enableMouseRotate) Cursor.lockState = CursorLockMode.Locked;
-        else Cursor.lockState = CursorLockMode.None;
+        
+        if(!isPaused || !live_charStats.charInfo._playerInputEnable) //¿eby nie zmienia³ stanu jeœli jest zapauzowany lu playerInput w³¹czony
+        {
+            if (Cursor.lockState == CursorLockMode.Locked ) //live_charStats.charInput._enableMouseRotate tylko przetrzymuje dane aktualnego lock.state, nie zmienia go
+            { live_charStats.charInput._enableMouseRotate = true; }
+            else live_charStats.charInput._enableMouseRotate = false;
+        }
+        
 
         live_charStats.charInput._running = Input.GetKey(KeyCode.LeftShift);
         live_charStats.charInput._jumping = Input.GetKey(KeyCode.Space);
@@ -53,8 +49,7 @@ public class Player_Input : MonoBehaviour
     /// IsometricInput tylko dla Playera
     /// </summary>
     public void IsometricInputClass()
-    {              
-        //live_charStats.inputEnableMouseRotate = false;
+    {   
         // click œrodkowy mouse -> wskazanie destination dla agenta
         if (live_charStats.charInput._mouseCurrentMoving && live_charStats.charInfo._isPlayer && !live_charStats.charInfo._playerInputEnable)
         {            
@@ -95,8 +90,6 @@ public class Player_Input : MonoBehaviour
             live_charStats.charComponents._navMeshAgent.isStopped = true;
 
         }
-
-        //if (live_charStats.inputEnableMouseRotate) live_charStats.inputEnableMouseRotate = false; //odblokowanie mouse positiona w isometric
     }
    
 
@@ -134,14 +127,14 @@ public class Player_Input : MonoBehaviour
 
                 if (!live_charStats.charInfo._playerInputEnable)
                 {
-                    mouseRotateLocalBool = live_charStats.charInput._enableMouseRotate;
-                    live_charStats.charInput._enableMouseRotate = false;
+                    { Cursor.lockState = CursorLockMode.None; Cursor.visible = true; }
                 }
-                else live_charStats.charInput._enableMouseRotate = mouseRotateLocalBool;
-
-                if (!live_charStats.charInput._enableMouseRotate) { Cursor.lockState = CursorLockMode.None; Cursor.visible = true; }
-                else Cursor.lockState = CursorLockMode.Locked;
-            }
+                else
+                {
+                    if (live_charStats.charInput._enableMouseRotate) Cursor.lockState = CursorLockMode.Locked; //tutaj live_charStats.charInput._enableMouseRotate dzia³a jak przechowalnia lock.state i przywraca poprzedni stan
+                    else Cursor.lockState = CursorLockMode.None;
+                }
+            }           
 
             //casting Spells
             if (live_charStats.charInfo._isPlayer) live_charStats.charInput._secondary = Input.GetKey(KeyCode.Mouse1);
