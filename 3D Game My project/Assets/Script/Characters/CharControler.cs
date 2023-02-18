@@ -29,14 +29,15 @@ public class CharControler : MonoBehaviour
     {
         if (live_charStats.charInfo._isPlayer) live_charStats.LoadLevel();
         live_charStats.LoadCharStats();
+        live_charStats.SetCharacterPosition();
     }
 
     private void OnEnable()
     {
-        //live_charStats = GetComponent<CharacterStatus>();
+        //live_charStats = GetComponent<CharacterStatus>();        
         
-        if (live_charStats.charInfo._isPlayer) live_charStats.LoadLevel();
-        live_charStats.LoadCharStats();
+        /*if (live_charStats.charInfo._isPlayer) live_charStats.LoadLevel();
+        live_charStats.LoadCharStats();*/
 
         if (live_charStats.charComponents._Animator != null)
         {
@@ -250,6 +251,16 @@ public class CharControler : MonoBehaviour
     {
         gameObject.SetActive(true);
 
+        if (live_charStats != null)
+        {
+            if (live_charStats.charInfo._isPlayer) live_charStats.LoadGame();
+            else
+            {
+                live_charStats.ResetCharacterPosition();
+                live_charStats.LoadCharStats();
+            }
+        }
+
         live_charStats.charStats._hp = live_charStats.charStats._maxHP;
 
         live_charStats.charStatus._isDead = false;
@@ -257,17 +268,7 @@ public class CharControler : MonoBehaviour
         if (live_charStats.GetComponent<Animator>() != null)
         {
             live_charStats.charComponents._Animator.SetBool("ISDead", live_charStats.charStatus._isDead);
-        }
-
-        if (live_charStats != null )
-        {
-            if (live_charStats.charInfo._isPlayer) live_charStats.LoadGame();
-            else
-            {
-                live_charStats.ResetCharacterPosition();
-                live_charStats.LoadCharStats();
-            } 
-        }
+        }        
     }
 
     /// <summary>
@@ -299,8 +300,7 @@ public class CharControler : MonoBehaviour
         live_charStats.charInput._secondary = false;       
 
         live_charStats.charStatus._isMoving = false;
-        live_charStats.charStatus._isJumping = false;
-        live_charStats.charStatus._isAttacking = false;
+        live_charStats.charStatus._isJumping = false;        
         live_charStats.charStatus._isRunning = false;
         live_charStats.charStatus._isWalking = false;
         live_charStats.charStatus._isIdle = false;
