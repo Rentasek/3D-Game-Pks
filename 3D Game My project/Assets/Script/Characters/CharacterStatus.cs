@@ -116,7 +116,7 @@ public class CharacterStatus : MonoBehaviour
         [Space]
         [Tooltip("Podaje true jeœli target znajduje siê w dynamic SightRange && Angle && !Raycast(obstaclesLayerMask)")] public bool _targetAquired;
         [CanBeNull, Tooltip("Aktualnie znaleziony (DynamicSightRange) && goniony (Chasing) aquiredTargetGameObject")] public GameObject _aquiredTargetGameObject;
-        public float _distanceToTarget;
+        [Tooltip("Dystans do aktualnego _aquiredTargetGameObject")]public float _distanceToTarget;
         
         [Header("Utils")]
         [Tooltip("Wszystkie Collidery z DunamicSightRange (Physics.OverlapCapsuleNonAlloc) (Uwaga na MAX iloœæ elementów w Array)")] public Collider[] _allTargetsInDynamicSightRange = new Collider[30];
@@ -278,6 +278,7 @@ public class CharacterStatus : MonoBehaviour
         navMeshAge._walkPointRange = charComponents._scrObj_CharStats.navMeAge_walkPointRange;
         navMeshAge._whatIsGround = charComponents._scrObj_CharStats.navMeAge_whatIsGround;
         navMeshAge._patrollingDelay = charComponents._scrObj_CharStats.navMeAge_patrollingDelay;
+        navMeshAge._AIRoutineDelay = charComponents._scrObj_CharStats.navMeAge_AIRoutineDelay;
 
         //FoV NavMesh
         fov._maxSightAngle = charComponents._scrObj_CharStats.fov_MaxSightAngle;
