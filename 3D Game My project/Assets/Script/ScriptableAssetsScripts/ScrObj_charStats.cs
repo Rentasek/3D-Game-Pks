@@ -25,29 +25,28 @@ public class ScrObj_charStats : ScriptableObject
 
     [Space]
     [Header("Zmienne z NavMeshAgenta")]
-    public float navMeAge_attackRange;
-    public float navMeAge_wanderingRange;
-    public float navMeAge_walkPointRange;
-    public LayerMask navMeAge_whatIsGround;    
-    public float navMeAge_patrollingDelay; 
-    public float navMeAge_AIRoutineDelay;
+    [Tooltip("Zasiêg w jakim mo¿e ustawiæ walkPoint od origina (_spawnPoint)")] public float navMeAge_wanderingRange;
+    [Tooltip("Zasiêg w jakim wylicza nowy walkPoint (-/+)")] public float navMeAge_walkPointRange;
+    [Tooltip("LayerMask do Raycasta - Co traktuje jako pod³o¿e?")] public LayerMask navMeAge_whatIsGround;
+    [Tooltip("Nie ustawione (Mia³ byæ delay - jeœli nie dojdzie do _walkPoint w okreœlonym czasie to reset")] public float navMeAge_patrollingDelay;
+    [Tooltip("OpóŸnienie _AIRoutine w Sekndach - im wiêcej tym ³atwiej dla kompa"), Range(0f, 0.3f)] public float navMeAge_AIRoutineDelay;
 
     [Space]
     [Header("Field of View NavMeshAgent")]
-    [Range(0, 360)] public float fov_MaxSightAngle;
-    [Range(0, 360)] public float fov_MinSightAngle;
-    [Range(0, 1)] public float fov_TimeDynamicSightAngle;
-    [Range(0, 100)] public float fov_MinSightRadius;
-    [Range(0, 100)] public float fov_MaxSightRadius;
-    [Range(0, 5)] public float fov_TimeDynamicSightRadius;
-    [Range(0, 10)] public float fov_editorLineThickness;
-    [ColorUsageAttribute(true, true)] public Color fov_editorAngleLineColor; //kolor HDR picker
-    [ColorUsageAttribute(true, true)] public Color fov_editorAngleColor; //kolor HDR picker
-    [ColorUsageAttribute(true, true)] public Color fov_editorRadiusColor;
-    [ColorUsageAttribute(true, true)] public Color fov_editorDynamicRadiusColor;
-    [ColorUsageAttribute(true, true)] public Color fov_editorRaycastColor;
-    public float fov_coneRoutineDelay;
-    public LayerMask fov_obstaclesLayerMask;      
+    [Tooltip("Min DynamicSightAngle"), Range(0, 360)] public float fov_MinSightAngle;
+    [Tooltip("Max DynamicSightAngle"), Range(0, 360)] public float fov_MaxSightAngle;
+    [Tooltip("ile sekund na ca³y ruch (MAX -> MAX)"), Range(0, 1)] public float fov_TimeDynamicSightAngle;
+    [Tooltip("Min DynamicSightRadius"), Range(0, 20)] public float fov_MinSightRadius;
+    [Tooltip("Max DynamicSightRadius"), Range(0, 20)] public float fov_MaxSightRadius;
+    [Tooltip("ile sekund na ca³y ruch (MAX -> MAX)"), Range(0, 5)] public float fov_TimeDynamicSightRadius;
+    [Tooltip("Gruboœæ lini Gizmos"), Range(0, 10)] public float fov_editorLineThickness;
+    [Tooltip("Kolor Gizmos - AngleLineColor (kolor HDR picker)"), ColorUsageAttribute(true, true)] public Color fov_editorAngleLineColor; //kolor HDR picker
+    [Tooltip("Kolor Gizmos - AngleColor (kolor HDR picker)"), ColorUsageAttribute(true, true)] public Color fov_editorAngleColor; //kolor HDR picker
+    [Tooltip("Kolor  Gizmos - MaxRadius"), ColorUsageAttribute(true, true)] public Color fov_editorRadiusColor;
+    [Tooltip("Kolor  Gizmos - DynamicRadius"), ColorUsageAttribute(true, true)] public Color fov_editorDynamicRadiusColor;
+    [Tooltip("Kolor  Gizmos - Raycast"), ColorUsageAttribute(true, true)] public Color fov_editorRaycastColor;
+    [Tooltip("OpóŸnienie _FoVRoutine w Sekndach - im wiêcej tym ³atwiej dla kompa (Wy³¹czone przy AIController)"), Range(0f, 0.3f)] public float fov_coneRoutineDelay;
+    [Tooltip("Obstacles LayerMask dla FieldOfView")] public LayerMask fov_obstaclesLayerMask;      
 
     [Space]
     [Header("Character GroundMask")]
