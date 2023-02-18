@@ -402,7 +402,7 @@ public static class LiveCharStats_Base
     }
 
     public static void StopMovementNavMeshAgent(CharacterStatus live_charStats) //debugging żeby nie próbował uciekać
-    {
+    {        
         live_charStats.navMeshAge._walkPoint = live_charStats.gameObject.transform.position;
         live_charStats.charComponents._navMeshAgent.SetDestination(live_charStats.navMeshAge._walkPoint);
 
@@ -411,7 +411,8 @@ public static class LiveCharStats_Base
 
     private static void Attacking(CharacterStatus live_charStats)
     {
-        StopMovementNavMeshAgent(live_charStats);
+        if (live_charStats.fov._aquiredTargetGameObject != null) live_charStats.gameObject.transform.LookAt(live_charStats.fov._aquiredTargetGameObject.transform);
+        //StopMovementNavMeshAgent(live_charStats);
     }
 
     #endregion
