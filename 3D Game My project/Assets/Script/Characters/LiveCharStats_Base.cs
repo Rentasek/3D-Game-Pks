@@ -21,9 +21,11 @@ public static class LiveCharStats_Base
             DynamicSightRangeScalling(live_charStats);
         }
         //CheckForTargetUniversal(live_charStats);
-        CheckForTargetInDynamicSightRange(live_charStats);
+        CheckForTargetInDynamicSightRange(live_charStats);        
         CheckForTargetInSpellRange(live_charStats, live_charStats.fov._spellRangeSkill);
         CheckForTargetInAttackRange(live_charStats, live_charStats.fov._closeRangeSkill);
+        
+        //CheckForTargetInAttackAndSpellRange(live_charStats);
     }
     #region CheckForTargetUniversal - nie działa
     public static void CheckForTargetUniversal(CharacterStatus live_charStats)
@@ -114,20 +116,22 @@ public static class LiveCharStats_Base
             {
                 if (live_charStats.charInfo._enemiesArray.Contains(collider.tag))    //jeśli ma tag zawarty w arrayu enemiesArray
                 {
-                    //live_charStats.fov_targetInDynamicSightRange = true;    //target jest w sight range 
+                    //live_charStats.fov._targetInDynamicSightRange = true;    //target jest w sight range 
 
                     Vector3 directionToTarget = (collider.transform.position - live_charStats.gameObject.transform.position).normalized; //różnica pomiędzy targetem a characterem wyrażona w wektorze (normalized) -> Vector3( x:0-1, y:0-1, z:0-1) 
 
                     float distanceToTarget = Vector3.Distance(live_charStats.gameObject.transform.position, collider.transform.position); //dystans pomiędzy targetem a characterem wyrażona we float (wykorzystana jak radius do Raycasta)
+
+                    live_charStats.fov._distanceToTarget = distanceToTarget;
 
                     if (Vector3.Angle(live_charStats.gameObject.transform.forward, directionToTarget) < live_charStats.fov._currentDynamicSightAngle / 2) //sprawdzanie angle wektora forward charactera i direction to target
                                                                                                                                                          //target może być na + albo - od charactera dlatego w każdą stronę angle / 2
                     {
                         if (!Physics.Raycast(live_charStats.gameObject.transform.position, directionToTarget, distanceToTarget, live_charStats.fov._obstaclesLayerMask))  //zmiana DynamicRange na Distance ponieważ wysyłał Raycasta na taką odległość że patrząc na target -> patrzył w ziemie(Terrain / Environment LayerMask)
                         {
-                            //jeśli raycast do targetu nie jest zasłonięty przez jakiekolwiek obstacles!!
+                            //jeśli raycast do targetu nie jest zasłonięty przez jakiekolwiek obstacles!!   
                             live_charStats.fov._aquiredTargetGameObject = collider.gameObject;           //ustawia znaleziony colliderem game objecta jako target
-                            live_charStats.fov._targetAquired = true;
+                            live_charStats.fov._targetAquired = true;                            
                             break;          //najważniejszy jest brake, nie da się jednocześnie porównać listy colliderów z Overlapa z listą tagów z enemiesArray
                                             //foreach sprawdza wszystkie collidery jeśli trafi => target bool = true, ale że sprawdza wszystkie collidery
                                             //to trafia i pudłuje cały czas, dlatego trzeba foreacha zatrzymać breakiem kiedy trafi !!!
@@ -144,11 +148,11 @@ public static class LiveCharStats_Base
                         live_charStats.fov._targetAquired = false;
                     }
                 }
-                /*else
+               /* else
                 {
-                    live_charStats.fov_targetInDynamicSightRange = false;                     //target nie jest w sight range
-                    live_charStats.fov_aquiredTargetGameObject = null;           //ustawia nie znaleziony colliderem game objecta jako null
-                    live_charStats.fov_targetAquired = false;
+                    live_charStats.fov._targetInDynamicSightRange = false;                     //target nie jest w sight range
+                    live_charStats.fov._aquiredTargetGameObject = null;           //ustawia nie znaleziony colliderem game objecta jako null
+                    live_charStats.fov._targetAquired = false;
                 }*/
             }
         }
@@ -215,6 +219,7 @@ public static class LiveCharStats_Base
         }
         //Jeśli jest w zasięgu ataku, triggeruje booleana inputAttacking w charStats, które posyła go dalej => CharacterMovement
 
+        //Attacking z przypisania input=live_charStats.fov._targetInAttackRange
         Utils.CloseRangeInputSwitcher(live_charStats, skill_CloseRange);
     }
 
@@ -231,6 +236,34 @@ public static class LiveCharStats_Base
             }
             else live_charStats.fov._targetInSpellRange = false;
         }
+    }
+
+    private static void CheckForTargetInAttackAndSpellRange(CharacterStatus live_charStats)
+    {
+        if (live_charStats.fov._aquiredTargetGameObject != null && live_charStats.fov._targetAquired)
+        {
+            if (live_charStats.fov._distanceToTarget <= live_charStats.fov._closeRangeSkill.scrObj_Skill.skill_MinRadius)
+            {
+                live_charStats.fov._targetInAttackRange = true;
+
+            }
+            else if (live_charStats.fov._distanceToTarget <= live_charStats.fov._spellRangeSkill.scrObj_Skill.skill_MaxRadius * live_charStats.fov._AISpellRangeSkillRadiusFromMax)
+            {
+                live_charStats.fov._targetInSpellRange = true;
+                live_charStats.fov._targetInAttackRange = false;
+            }
+            else
+            {
+                live_charStats.fov._targetInSpellRange = false;
+                live_charStats.fov._targetInAttackRange = false;
+            }
+        }
+        else
+        {
+            live_charStats.fov._targetInSpellRange = false;
+            live_charStats.fov._targetInAttackRange = false;
+        }
+        Utils.CloseRangeInputSwitcher(live_charStats, live_charStats.fov._closeRangeSkill);
     }
 
     #endregion
@@ -254,14 +287,15 @@ public static class LiveCharStats_Base
                 FieldOfViewTarget(live_charStats);
             }
 
-            if (live_charStats.charStatus._isAttacking)
+            if (live_charStats.fov._closeRangeSkill.skill_input)
             {
                 //debugging if not null
                 if (live_charStats.fov._aquiredTargetGameObject != null && !live_charStats.charInput._mouseCurrentMoving) //przy wciskaniu przucisku porusazania się nie lockuje targetu
                 {
-                    live_charStats.gameObject.transform.LookAt(live_charStats.fov._aquiredTargetGameObject.transform);//Enemy jest zwrócony w stronę Playera
-                    live_charStats.navMeshAge._walkPoint = live_charStats.fov._aquiredTargetGameObject.transform.position;
-                    StopMovementNavMeshAgent(live_charStats);
+                    Attacking(live_charStats);
+                    //live_charStats.gameObject.transform.LookAt(live_charStats.fov._aquiredTargetGameObject.transform);//Enemy jest zwrócony w stronę Playera
+                    //live_charStats.navMeshAge._walkPoint = live_charStats.fov._aquiredTargetGameObject.transform.position;
+                    //StopMovementNavMeshAgent(live_charStats);
                 }
             }
             else live_charStats.charComponents._navMeshAgent.isStopped = false; //żeby odblokować agenta po atakowaniu
@@ -405,14 +439,19 @@ public static class LiveCharStats_Base
     {        
         live_charStats.navMeshAge._walkPoint = live_charStats.gameObject.transform.position;
         live_charStats.charComponents._navMeshAgent.SetDestination(live_charStats.navMeshAge._walkPoint);
+        live_charStats.gameObject.transform.LookAt(live_charStats.fov._aquiredTargetGameObject.transform, Vector3.up);
 
         //live_charStats.currentNavMeshAgent.isStopped = true;
     }
 
     private static void Attacking(CharacterStatus live_charStats)
     {
-        if (live_charStats.fov._aquiredTargetGameObject != null) live_charStats.gameObject.transform.LookAt(live_charStats.fov._aquiredTargetGameObject.transform);
-        //StopMovementNavMeshAgent(live_charStats);
+        if (live_charStats.fov._aquiredTargetGameObject != null) 
+        {          
+            StopMovementNavMeshAgent(live_charStats);
+            Debug.Log("Attacking!!");
+        }
+        
     }
 
     #endregion
@@ -482,7 +521,7 @@ public static class LiveCharStats_Base
             if (live_charStats.charStats._stam > 0) live_charStats.charStats._stam = Mathf.MoveTowards(live_charStats.charStats._stam, 0f, (10f + live_charStats.charInfo._charLevel) * Time.deltaTime); //zużywa f stamy / sekunde
 
             ////Running Speed 
-            if (live_charStats.charMove._moveInputDirection != Vector3.zero && !live_charStats.charStatus._isJumping && !live_charStats.charStatus._isAttacking && live_charStats.charStats._stam > 5f
+            if (live_charStats.charMove._moveInputDirection != Vector3.zero && !live_charStats.charStatus._isJumping && !live_charStats.fov._closeRangeSkill.skill_input && live_charStats.charStats._stam > 5f
                 && live_charStats.fov._targetAquired && !live_charStats.fov._spellRangeSkill.skill_input && live_charStats.charComponents._navMeshAgent.remainingDistance > 2 * live_charStats.fov._closeRangeSkillMinRadius)
             //dodatnkowy warunek ->biega tylko jak targetAquired=true, kolejny warnek jeśli nie castuje!!, Kolejny warunek jeśli agent.eemainingDistance > 2* attack range
             {
@@ -500,7 +539,7 @@ public static class LiveCharStats_Base
 
 
         }
-        else if (live_charStats.charMove._moveInputDirection == Vector3.zero && !live_charStats.charStatus._isJumping && !live_charStats.charStatus._isAttacking)
+        else if (live_charStats.charMove._moveInputDirection == Vector3.zero && !live_charStats.charStatus._isJumping && !live_charStats.fov._closeRangeSkill.skill_input)
         {   ///Idle Speed => speed = 0
             localSpeedIndex = 0;
             live_charStats.charMove._moveSpeed = 0f; //zmienna przekazywana do charStats a później do Animatora
@@ -509,7 +548,7 @@ public static class LiveCharStats_Base
         live_charStats.charStatus._isWalking = (localSpeedIndex == 1);
         live_charStats.charStatus._isIdle = (localSpeedIndex == 0);
         //specjalnie zrobione na jednej zmiennej tak żeby się ciągle zmieniała, trochę jak enumerator
-
+                
         Utils.SlowMovementOnAttackOrCast(live_charStats);
     }
 
@@ -529,7 +568,7 @@ public static class LiveCharStats_Base
             if (live_charStats.charStats._stam > 0) live_charStats.charStats._stam = Mathf.MoveTowards(live_charStats.charStats._stam, 0f, (10f + live_charStats.charInfo._charLevel) * Time.deltaTime); //MoveTowards na końcu podaje czas maxymalny na zmianę wartości
 
 
-            if (live_charStats.charMove._moveInputDirection != Vector3.zero && live_charStats.charMove._moveInputDirection != Vector3.back && !live_charStats.charStatus._isJumping && !live_charStats.charStatus._isAttacking && live_charStats.charStats._stam > 5f)
+            if (live_charStats.charMove._moveInputDirection != Vector3.zero && live_charStats.charMove._moveInputDirection != Vector3.back && !live_charStats.charStatus._isJumping && !live_charStats.fov._closeRangeSkill.skill_input && live_charStats.charStats._stam > 5f)
             {                                                               //jeśli nie sprintuje do tyłu
                 ////Running Speed 
                 live_charStats.charComponents._Animator.ResetTrigger("MeeleAttack");
@@ -543,12 +582,12 @@ public static class LiveCharStats_Base
                 live_charStats.charMove._moveSpeed = live_charStats.charMove._walkSpeed; //Sprintowanie bez Staminy -> Walk
             }
         }
-        else if (live_charStats.charMove._moveInputDirection != Vector3.zero && !live_charStats.charInput._running && !live_charStats.charStatus._isJumping && !live_charStats.charStatus._isAttacking)
+        else if (live_charStats.charMove._moveInputDirection != Vector3.zero && !live_charStats.charInput._running && !live_charStats.charStatus._isJumping && !live_charStats.fov._closeRangeSkill.skill_input)
         {   ////Walking Speed
             localSpeedIndex = 1;
             live_charStats.charMove._moveSpeed = live_charStats.charMove._walkSpeed; //Walk
         }
-        else if (live_charStats.charMove._moveInputDirection == Vector3.zero && !live_charStats.charStatus._isJumping && !live_charStats.charStatus._isAttacking)
+        else if (live_charStats.charMove._moveInputDirection == Vector3.zero && !live_charStats.charStatus._isJumping && !live_charStats.fov._closeRangeSkill.skill_input)
         {   ///Idle Speed => speed = 0
             localSpeedIndex = 0;
             live_charStats.charMove._moveSpeed = 0; //Idle
@@ -586,7 +625,7 @@ public static class LiveCharStats_Base
         float jumpSpeed = live_charStats.charMove._jumpPower;    //jumpPower
         if (live_charStats.charMove._moveSpeed != 0) jumpSpeed = (live_charStats.charMove._jumpPower + live_charStats.charMove._moveSpeed);  //w przypadku gdzie jest move speed, dodaje siłę do jump power
 
-        if (live_charStats.charInput._jumping && live_charStats.charStatus._isGrounded && !live_charStats.charStatus._isAttacking && live_charStats.charStats._stam > 11f)
+        if (live_charStats.charInput._jumping && live_charStats.charStatus._isGrounded && !live_charStats.fov._closeRangeSkill.skill_input && live_charStats.charStats._stam > 11f)
         {
             //zmiana trybu skakania J key
             live_charStats.charMove._moveVector.y = jumpSpeed;
