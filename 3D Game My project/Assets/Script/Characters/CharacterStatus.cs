@@ -116,6 +116,7 @@ public class CharacterStatus : MonoBehaviour
         [Space]
         [Tooltip("Podaje true jeœli target znajduje siê w dynamic SightRange && Angle && !Raycast(obstaclesLayerMask)")] public bool _targetAquired;
         [CanBeNull, Tooltip("Aktualnie znaleziony (DynamicSightRange) && goniony (Chasing) aquiredTargetGameObject")] public GameObject _aquiredTargetGameObject;
+        public float _distanceToTarget;
         
         [Header("Utils")]
         [Tooltip("Wszystkie Collidery z DunamicSightRange (Physics.OverlapCapsuleNonAlloc) (Uwaga na MAX iloœæ elementów w Array)")] public Collider[] _allTargetsInDynamicSightRange = new Collider[30];
@@ -449,7 +450,9 @@ public class CharacterStatus : MonoBehaviour
 
     public void ResetCharacterPosition()
     {
-        transform.SetPositionAndRotation(charMove._backupPosition, charMove._backupRotation);        
+        //transform.SetPositionAndRotation(charMove._backupPosition, charMove._backupRotation);
+        transform.position= charMove._backupPosition;
+        transform.rotation= charMove._backupRotation;
     }
 
     public void ResourcesRegen()
