@@ -44,16 +44,15 @@ public class CharacterStatus : MonoBehaviour
     [Serializable]
     public class CharInput
     {
-        public Vector3 _movingVector;
-        public float _rotateHorizontal;
+        [Tooltip("Aktualny obrót myszk¹")] public float _rotateHorizontal;
         public bool _moving;
         public bool _running;
         public bool _jumping;
-        public bool _primary;
-        public bool _secondary;
-        public float _rotateSensivity;
-        public bool _enableMouseRotate;
-        public bool _mouseCurrentMoving;     
+        [Tooltip("LMB / LPM")] public bool _primary;
+        [Tooltip("RMB / PPM")] public bool _secondary;
+        [Tooltip("Sensitivity myszki")] public float _rotateSensivity;
+        [Tooltip("Czy mo¿na obracaæ myszk¹? - Player (X)")] public bool _enableMouseRotate;
+        [Tooltip("Poruszanie siê we wskazany _walkPoint - nadpisanie dzia³ania AIControllera - Player (MiddleMouse)")] public bool _mouseCurrentMoving;     
 
         [Space]
         public bool _saveGame;
@@ -70,17 +69,17 @@ public class CharacterStatus : MonoBehaviour
     [Serializable]
     public class NavMeshAge
     {
-        public float _wanderingRange;
-        public Vector3 _spawnPoint;
-        public Vector3 _walkPoint;
-        public Vector3 _mouseWalkPoint;
-        public bool _walkPointSet;
-        public float _walkPointRange;
-        public LayerMask _whatIsGround;
-        public int _failsafeCounter;
-        public float _patrollingDelay;
-        public float _AIRoutineDelay;
-        public bool _isCheckingAIRoutine;
+        [Tooltip("Zasiêg w jakim mo¿e ustawiæ walkPoint od origina (_spawnPoint)")] public float _wanderingRange;
+        [Tooltip("Punkt origin który ustawia siê po spawnie i zawsze zostaje ten sam")] public Vector3 _spawnPoint;
+        [Tooltip("Aktualnie ustawiony _walkPoint")] public Vector3 _walkPoint;
+        [Tooltip("Aktualnie ustawiony (myszk¹)_walkPoint - tylko Player")] public Vector3 _mouseWalkPoint;
+        [Tooltip("Czy jest ustawioy _walkPoint?")] public bool _walkPointSet;
+        [Tooltip("Zasiêg w jakim wylicza nowy walkPoint (-/+)")] public float _walkPointRange;
+        [Tooltip("LayerMask do Raycasta - Co traktuje jako pod³o¿e?")] public LayerMask _whatIsGround;
+        [Tooltip("Mechanizm ochronny jeœli wyjdzie poza _wanderingRange, resetuje walkPointSet do spawnPoint (max.10 i reset)")] public int _failsafeCounter;
+        [Tooltip("Nie ustawione (Mia³ byæ delay - jeœli nie dojdzie do _walkPoint w okreœlonym czasie to reset")] public float _patrollingDelay;
+        [Tooltip("OpóŸnienie _AIRoutine - im wiêcej tym ³atwiej dla kompa")] public float _AIRoutineDelay;
+        [Tooltip("Aktualny status - Czy jest w trakcie _AIRoutine? Jeœli jest nie odpali nowej")] public bool _isCheckingAIRoutine;
     }
     [Tooltip("Zmienne z NavMeshAgenta")] public NavMeshAge navMeshAge;
     #endregion
