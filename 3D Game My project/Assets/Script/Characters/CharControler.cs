@@ -22,8 +22,7 @@ public class CharControler : MonoBehaviour
         live_charStats.Utils_RestoreResourcesToAll();
 
         live_charStats.SetCharacterPosition();
-
-
+       
     }
 
     private void Start()

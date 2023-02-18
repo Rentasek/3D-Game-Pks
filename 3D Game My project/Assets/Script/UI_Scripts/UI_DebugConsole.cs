@@ -40,7 +40,7 @@ public class UI_DebugConsole : MonoBehaviour, IPlayerUpdate
             "Load Game [6] .\n" +
             "Reset Position [R] .\n" +
             "Set Position [B] .\n" +
-            "Mouse movement [Middle mouse]" + !live_charStats.charInput._enableMouseRotate + ".\n" +
+            "Mouse movement [Middle mouse]" + !live_charStats.charInput._mouseCurrentMoving+ ".\n" +
             "Normal Attack [Left mouse]" + ".\n" +
             "Special Attack [Right mouse]" + secondarySkill + ".\n" +
             "MoveSpeed " + live_charStats.charMove._moveSpeed + ".\n" +

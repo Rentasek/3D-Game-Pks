@@ -78,7 +78,7 @@ public class CharacterStatus : MonoBehaviour
         [Tooltip("LayerMask do Raycasta - Co traktuje jako pod³o¿e?")] public LayerMask _whatIsGround;
         [Tooltip("Mechanizm ochronny jeœli wyjdzie poza _wanderingRange, resetuje walkPointSet do spawnPoint (max.10 i reset)")] public int _failsafeCounter;
         [Tooltip("Nie ustawione (Mia³ byæ delay - jeœli nie dojdzie do _walkPoint w okreœlonym czasie to reset")] public float _patrollingDelay;
-        [Tooltip("OpóŸnienie _AIRoutine - im wiêcej tym ³atwiej dla kompa")] public float _AIRoutineDelay;
+        [Tooltip("OpóŸnienie _AIRoutine w Sekndach - im wiêcej tym ³atwiej dla kompa"), Range(0f,0.3f)] public float _AIRoutineDelay;
         [Tooltip("Aktualny status - Czy jest w trakcie _AIRoutine? Jeœli jest nie odpali nowej")] public bool _isCheckingAIRoutine;
     }
     [Tooltip("Zmienne z NavMeshAgenta")] public NavMeshAge navMeshAge;
@@ -122,8 +122,8 @@ public class CharacterStatus : MonoBehaviour
         [Space]
         [Tooltip("Obstacles LayerMask dla FieldOfView")] public LayerMask _obstaclesLayerMask;
         [Space]
-        [Tooltip("Podaje true jeœli target wogóle znajduje siê w dynamic SightRange")] public float _routineDelay;
-        [Tooltip("Podaje true jeœli target wogóle znajduje siê w dynamic SightRange")] public bool _isSearchingForTarget;
+        [Tooltip("OpóŸnienie _FoVRoutine w Sekndach - im wiêcej tym ³atwiej dla kompa (Wy³¹czone przy AIController)"), Range(0f, 0.3f)] public float _routineDelay;
+        [Tooltip("Aktualny status - Czy jest w trakcie _FoVRoutine? Jeœli jest nie odpali nowej")] public bool _isSearchingForTarget;
         [Space]
         [Header("GizmosColor")]
         [Tooltip("Gruboœæ lini Gizmos"), Range(0, 10)] public float _editorLineThickness;
