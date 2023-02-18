@@ -52,12 +52,13 @@ public class Player_Input : MonoBehaviour
     {   
         // click œrodkowy mouse -> wskazanie destination dla agenta
         if (live_charStats.charInput._mouseCurrentMoving && live_charStats.charInfo._isPlayer && !live_charStats.charInfo._playerInputEnable)
-        {            
+        {
+            LayerMask layerMask = 1 << 22; // ustawia jako layerMask tylko nr22 (Terrain)
             Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-            if (Physics.Raycast(ray, out RaycastHit hit))
+            if (Physics.Raycast(ray, out RaycastHit hit,40f,layerMask)) //Raycast dzia³a przez œciany, zatrzymuje siê tylko na Terrain
             {
                 live_charStats.navMeshAge._mouseWalkPoint = hit.point;
-                live_charStats.navMeshAge._walkPoint = hit.point;
+                live_charStats.navMeshAge._walkPoint = hit.point;                
             }
             live_charStats.navMeshAge._walkPointSet = true;
             
@@ -77,7 +78,7 @@ public class Player_Input : MonoBehaviour
             Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
             if (Physics.Raycast(ray, out RaycastHit hit))
             {
-                transform.LookAt(hit.point);              //Obraca playera w stronê mouse Pointa przy breath
+                transform.LookAt(hit.point,Vector3.up);              //Obraca playera w stronê mouse Pointa przy breath //Tylko wokó³ osi up, dziêki temu nie atakuje w górê lub w dó³
             }
             
             live_charStats.fov._targetInAttackRange = false;      //debugging ¿eby nie blokowa³ siê przy atakowaniu
