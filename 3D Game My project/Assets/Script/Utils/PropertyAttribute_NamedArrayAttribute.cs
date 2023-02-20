@@ -20,3 +20,12 @@ public class PropertyAttribute_EnumNamedArrayAttribute : PropertyAttribute
     }
 }
 
+public class PropertyAttribute_EnumNamedNestedArrayAttribute : PropertyAttribute
+{
+    public string[] names;
+
+    public PropertyAttribute_EnumNamedNestedArrayAttribute(System.Type names_enum_type)
+    {
+        this.names = System.Enum.GetNames(names_enum_type);    //Tutaj pobiera name do fieldów z Enuma wskazanego przy wpisywaniu zmiennej [EnumNamedArray(typeof(names_enum_type))]
+    }
+}
