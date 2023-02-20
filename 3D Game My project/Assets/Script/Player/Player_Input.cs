@@ -40,8 +40,8 @@ public class Player_Input : MonoBehaviour
 
         live_charStats.charInput._rotateHorizontal = Input.GetAxis("Horizontal") * live_charStats.charInput._rotateSensivity * Time.deltaTime;
 
-        //MeeleAttack
-        live_charStats.charInput._primary = Input.GetKey(KeyCode.Mouse0) && !live_charStats.charStatus._isRunning;
+        //PimaryAttack
+        live_charStats.charInput._primary = Input.GetKey(KeyCode.Mouse0) /*&& !live_charStats.charStatus._isRunning*/;
 
     }
 
