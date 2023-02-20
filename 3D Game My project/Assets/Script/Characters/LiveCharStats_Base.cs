@@ -566,7 +566,7 @@ public static class LiveCharStats_Base
                 && live_charStats.fov._targetAquired && !live_charStats.fov._spellRangeSkill.skill_input && live_charStats.charComponents._navMeshAgent.remainingDistance > 2 * live_charStats.fov._closeRangeSkillMinRadius)
             //dodatnkowy warunek ->biega tylko jak targetAquired=true, kolejny warnek jeśli nie castuje!!, Kolejny warunek jeśli agent.eemainingDistance > 2* attack range
             {
-                live_charStats.charComponents._Animator.ResetTrigger("MeeleAttack");
+                //live_charStats.charComponents._Animator.ResetTrigger("MeeleAttack");
                 localSpeedIndex = 2;
                 live_charStats.charComponents._navMeshAgent.speed = live_charStats.charMove._runSpeed; //Run
                 live_charStats.charMove._moveSpeed = live_charStats.charMove._runSpeed; //zmienna przekazywana do charStats a później do Animatora
@@ -612,7 +612,7 @@ public static class LiveCharStats_Base
             if (live_charStats.charMove._moveInputDirection != Vector3.zero && live_charStats.charMove._moveInputDirection != Vector3.back && !live_charStats.charStatus._isJumping && !live_charStats.fov._closeRangeSkill.skill_input && live_charStats.charStats._stam > 5f)
             {                                                               //jeśli nie sprintuje do tyłu
                 ////Running Speed 
-                live_charStats.charComponents._Animator.ResetTrigger("MeeleAttack");
+                //live_charStats.charComponents._Animator.ResetTrigger("MeeleAttack");
                 localSpeedIndex = 2;
                 live_charStats.charMove._moveSpeed = live_charStats.charMove._runSpeed; //Run
             }
