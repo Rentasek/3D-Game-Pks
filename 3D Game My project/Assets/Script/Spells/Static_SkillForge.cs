@@ -17,7 +17,9 @@ public static class Static_SkillForge
 
         /// <summary>
         /// Metoda odpowiedzialna za VFX, animacje Animatora i Audio skilla
-        /// <br><i>Rodzaj castowania -> Castable (przytrzymaj i poczekaj aż wystrzeli)</i></br>
+        /// <br><i>Rodzaj castowania -> <b>Castable</b> (przytrzymaj i poczekaj aż wystrzeli)</i></br>
+        /// <br><i>Rodzaj castowania -> <b>Instant</b> działa w momencie użycia (ograniczone cooldownem)</i></br>
+        /// <br><i>Rodzaj castowania -> <b>Hold</b> dziala od razu (przytrzymaj)</i></br>
         /// </summary>
         /// <param name="scrObj_Skill">Scriptable Object Skilla</param>
         /// <param name="skill">Ten GameObject skill</param>
@@ -85,8 +87,8 @@ public static class Static_SkillForge
 
                 #region IsCasting -> Castable
                 skill.skill_currentCastingProgress = Mathf.MoveTowards(skill.skill_currentCastingProgress, 1f, Time.deltaTime / scrObj_Skill.skill_TimeCast); //casting progress rośnie do 1 w (1sek * 1/TimeCast ) czyli (sek * "n" [np.0.5f] = "n" część sekundy)
-                skill.skill_IsCastingFinishedCastable = (skill.skill_currentCastingProgress >= 0.95f) ? true : false;
-                if (skill.skill_IsCastingFinishedCastable)
+                skill.skill_IsCastingFinishedCastable = (skill.skill_currentCastingProgress >= 0.95f);
+                if (skill.skill_currentCastingProgress >= 0.95f)
                 {
                     Utils.Skill_ResetCastingAudioSourceInstantly(skill);
 
@@ -156,7 +158,7 @@ public static class Static_SkillForge
                             //target może być na + albo - od charactera dlatego w każdą stronę angle / 2
                             {
                                 if (!Physics.Raycast(skill.skill_casterGameobject.transform.position, directionToTarget, Vector3.Distance(skill.skill_casterGameobject.transform.position, skill.skill_allLocalColliders[i].transform.position), scrObj_Skill.skill_ObstaclesMask))    //dodatkowo sprawdza Raycastem czy nie ma przeszkody pomiędzy playerem a targetem //  
-                                {
+                                {                                   
                                     skill.skill_targetInAngle = true;
 
                                     if (skill.skill_targetColliders.IndexOf(skill.skill_allLocalColliders[i]) < 0) //sprawdza czy nie ma na liście. Jeżeli IndexOf < 0 czyli nie ma obiektów z tym indexem
@@ -286,6 +288,42 @@ public static class Static_SkillForge
                         }
                     }
                 }
+            }
+            else
+            {
+                Utils.Skill_Target_Reset(skill);
+            }
+        }
+        #endregion
+
+        #region Skill_Collider_Target
+        /// <summary>
+        /// Szuka targetów w ColliderRange -> OnTriggerEnter  
+        /// <br><i>Zwraca do Skill Objectu listę colliderów zgodnych z parametrami(EnemyTag,InCurrentRadius,InCurrentAngle) </i></br> 
+        /// </summary>
+        /// <param name="scrObj_Skill">Scriptable Object Skilla</param>
+        /// <param name="skill">Ten GameObject skill</param>
+        /// <param name="live_charStats">Live_charStats Castera</param>
+        public static void Skill_Collider_Target(ScrObj_skill scrObj_Skill, Skill skill, CharacterStatus live_charStats)
+        {
+            /// trzeba zrobić prefaba z colliderem i skryptem OnTriggerEnter
+            /// na OntriggerEnter powinien wrzucać targety do target list i odpalać isCastingType
+            /// wszystko powinno działać na on triggerEnter żeby nie spamowało przy przelatywaniu przez target
+            /// trzeba zrobić tak żeby po uderzeniu target znikał z listy targetów czyli:
+            /// OnTriggerEnter -> wrzuca colissionTarget na targetList, odpala isCastingType i po 1 klatce wywala z targetList 
+            /// trzeba jeszce ustalić limit uderzeń jakie prefab może przyjąć aż sie nie zneutralizuje
+            /// Można OnTrigerEnter zrobić: OnTriggerEnter -> WYRZUCA wszystkie targety z colliderList!! targetList.Clear(); -> potem wrzuca collisiontarget na targetList, odpala isCastingType i po 1 klatce wywala z targetList 
+
+
+
+            /// dla hold -> będzie wysyłał prefaba co chwilę (nie może być non stop bo bezie za dużo) trzeba jakiś delay ustawić dla hold też bedzie odpalał Hold (takie przedłużenie po tym jak postać przestanie inputować)
+            /// dla instant -> poleci 1 partical prefab i odpali instantCasting jak trafi
+            /// dla castable -> prefab odpali na CastingFinished
+            /// można też zrobić alternatywne booleany tylko do wypuszczania prefaba ale po co?
+
+            if (live_charStats.charStatus._isCasting)
+            {
+                
             }
             else
             {
@@ -918,6 +956,66 @@ public static class Static_SkillForge
         }
         #endregion
 
+        #region Skill_ResetAnyCastingExceptInstant
+
+        /// <summary>
+        /// Reset wszystkich Static metod Casting
+        /// </summary>
+        /// <param name="scrObj_Skill">Scriptable Object Skilla</param>
+        /// <param name="skill">Ten GameObject skill</param>
+        /// <param name="live_charStats">Live_charStats Castera</param> 
+        public static void Skill_ResetAnyCastingExceptInstant(ScrObj_skill scrObj_Skill, Skill skill, CharacterStatus live_charStats)
+        {
+            if (scrObj_Skill.skill_EffectTypeArray[0] != ScrObj_skill.Skill_EffectTypeArray.none) //Podaje index Castowania z Enumeratora ScrObj_skill.Skill_EffectTypeArray jako argument
+            {                
+                if (skill.skill_AudioSourceCastable != null)
+                {
+                    if (skill.skill_CastingVisualEffect != null) skill.skill_CastingVisualEffect.Stop();
+                    if (!string.IsNullOrWhiteSpace(scrObj_Skill.skill_AnimatorBoolName)) live_charStats.charComponents._Animator.SetBool(scrObj_Skill.skill_AnimatorBoolName, false);
+                    if (!string.IsNullOrWhiteSpace(scrObj_Skill.skill_AnimatorTriggerName)) live_charStats.charComponents._Animator.ResetTrigger(scrObj_Skill.skill_AnimatorTriggerName);
+
+                    skill.skill_AudioSourceCastable.volume = Mathf.MoveTowards(skill.skill_AudioSourceCastable.volume, 0, Time.deltaTime / 0.3f); //obniza volume 1-> 0 w 0.3sek
+                    if (skill.skill_AudioSourceCastable.volume <= 0.05f) { skill.skill_AudioSourceCastable.Stop(); }
+
+                    //live_charStats.charStatus._isCasting = false;
+
+                    //skill.skill_IsCastingInstant = false;
+
+                    //skill.skill_IsCastingHold = false;
+
+                    skill.skill_currentCastingProgress = 0f; //reset progressu przy przerwaniu casta / niespełnieniu warunków
+                    skill.skill_IsCastingFinishedCastable = false;
+
+                    Skill_Target_Reset(skill); //Reset TargetList
+                }
+            }
+
+            if (scrObj_Skill.skill_EffectTypeArray[2] != ScrObj_skill.Skill_EffectTypeArray.none)  //Podaje index Castowania z Enumeratora ScrObj_skill.Skill_EffectTypeArray jako argument
+            {
+                if (skill.skill_AudioSourceHold != null)
+                {
+                    if (skill.skill_CastingVisualEffect != null) skill.skill_CastingVisualEffect.Stop();
+                    if (!string.IsNullOrWhiteSpace(scrObj_Skill.skill_AnimatorBoolName)) live_charStats.charComponents._Animator.SetBool(scrObj_Skill.skill_AnimatorBoolName, false);
+                    if (!string.IsNullOrWhiteSpace(scrObj_Skill.skill_AnimatorTriggerName)) live_charStats.charComponents._Animator.ResetTrigger(scrObj_Skill.skill_AnimatorTriggerName);
+
+                    skill.skill_AudioSourceHold.volume = Mathf.MoveTowards(skill.skill_AudioSourceHold.volume, 0, Time.deltaTime / 0.3f); //obniza volume 1-> 0 w 0.3sek
+                    if (skill.skill_AudioSourceHold.volume <= 0.05f) { skill.skill_AudioSourceHold.Stop(); }
+
+                    //live_charStats.charStatus._isCasting = false;
+
+                    //skill.skill_IsCastingInstant = false;
+
+                    skill.skill_IsCastingHold = false;
+
+                    //skill.skill_currentCastingProgress = 0f; //reset progressu przy przerwaniu casta / niespełnieniu warunków
+                    //skill.skill_IsCastingFinishedCastable = false;
+
+                    Skill_Target_Reset(skill); //Reset TargetList
+                }
+            }
+        }
+        #endregion
+
         #region Skill_ResetCastingAudioSourceInstantly
         /// <summary>
         /// Natychmiastowo przerywa wszystkie Skill_AudioSource oprócz Instant, ponieważ instant ma krótki cast i cały zas by przerywało
@@ -973,10 +1071,11 @@ public static class Static_SkillForge
 
         #region Skill_CastingTypeCurrentFloatReadOnly
         /// <summary>
-        /// <br>Przyjmuje currentCastingIndex z arraya EffetType [i] oraz tego Skilla</br>
+        /// <br>Przyjmuje currentCastingIndex z arraya EffetType [i] tego Skilla</br>
         /// <br>Zwraca Boola IsCastingType [FinishedCastable / Instant / Hold]</br>
         /// <br>Bool IsCastingType [FinishedCastable / Instant / Hold] przekazywany jest dalej do wybranej przez switcha Static metody z EffectType</br>
-        /// <br>Metoda wykorzystana w "for" CastingTypeArray Skill script</br> 
+        /// <br>Kiedy trafia do EffectTypeArraya, który przeskakuje for[i] przez każdy z IsCastingTypów odpala odpowiedni switch EffectType</br>
+        /// <br>Metoda wykorzystana w "for" EffectTypeArray Skill script</br> 
         /// </summary>
         /// <param name="currentCastingIndex">currentCastingIndex z arraya EffetType [i]</param>
         /// <param name="skill">Ten GameObject skill</param>

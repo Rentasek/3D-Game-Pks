@@ -3,6 +3,7 @@ using JetBrains.Annotations;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.InteropServices;
 using Unity.VisualScripting;
 using UnityEditor;
 using UnityEngine;
@@ -23,6 +24,7 @@ public class Skill : MonoBehaviour
     [Tooltip("Lokalny boolean CanCast dla tego skilla dla klasy skill"), SerializeField] public bool skill_CanCast;
 
     [Header("Current IsCasting Values")]
+    [Tooltip("Aktualny index Castowania -> currentCastingIndex z arraya EffetType [i]")]private int currentCastingIndex;
     [Tooltip("Bool zwracany true jeśli jest skończy castableCast (CastingType -> Finished Castable)"), SerializeField] public bool skill_IsCastingFinishedCastable;
     [Tooltip("Aktualny progress Castowania (CastingType -> Castable)"), SerializeField] public float skill_currentCastingProgress;
     [Space]
@@ -63,7 +65,12 @@ public class Skill : MonoBehaviour
     {
         skill = this;
         //QuickSetup(); 
-
+        if(live_charStats.charInfo._isPlayer)
+        {
+            Debug.Log("0 -" + scrObj_Skill.skill_EffectTypeArray[0]);
+            Debug.Log("1 -" + scrObj_Skill.skill_EffectTypeArray[1]);
+            Debug.Log("2 -" + scrObj_Skill.skill_EffectTypeArray[2]);
+        }       
 
     }
 
@@ -132,22 +139,52 @@ public class Skill : MonoBehaviour
         }
     }
 
-
+    /// <summary>
+    /// Metoda odpowiedzialna za wystartowanie skilla
+    /// <br><i>Sprawdza warunek CanCast oraz w zależności od tego czy biega wyłącza odpowiednie CastingType</i></br>
+    /// </summary>
+    /// <param name="scrObj_Skill">Scriptable Object Skilla</param>
     private void Skill_UniversalCasting(ScrObj_skill scrObj_Skill)
     {
-        skill_CanCast = !skill.skill_otherInput && !live_charStats.charStatus._isRunning && live_charStats.charMove._moveSpeed != live_charStats.charMove._runSpeed && !live_charStats.charStatus._isDead;
+        skill_CanCast = !skill.skill_otherInput && !live_charStats.charStatus._isDead;
 
         if (skill_CanCast)  //CanCast jest wykorzystane w inpucie więc warunkiem nie może być resource!!!
         {
             Static_SkillForge.CastingType.Skill_CastingUniversal_VFX_Audio(scrObj_Skill, skill, live_charStats);
-        }
 
-        if(live_charStats.charStatus._isDead) { Static_SkillForge.Utils.Skill_ResetAnyCasting(scrObj_Skill, skill, live_charStats); }
+           /* brzydko wygląda na NonPlayerach
+            * if (live_charStats.charStatus._isRunning || live_charStats.charMove._moveSpeed > live_charStats.charMove._walkSpeed)  //Jeśli biegnie lub speed jest większy od walkSpeed to resetuje wszystkie casty oprócz Instant
+            {
+                Static_SkillForge.Utils.Skill_ResetAnyCastingExceptInstant(scrObj_Skill, skill, live_charStats);
+            }*/
+
+            if (live_charStats.charInfo._isPlayer) //W miare na nonPlayerach
+            {
+                if (live_charStats.charStatus._isRunning || live_charStats.charMove._moveSpeed > live_charStats.charMove._walkSpeed)  //Jeśli biegnie lub speed jest większy od walkSpeed to resetuje wszystkie casty oprócz Instant
+                {
+                    Static_SkillForge.Utils.Skill_ResetAnyCastingExceptInstant(scrObj_Skill, skill, live_charStats);
+                }
+            }
+            else
+            {
+                if (live_charStats.charStatus._isRunning || live_charStats.charMove._moveSpeed > live_charStats.charMove._walkSpeed)
+                {
+                    Static_SkillForge.Utils.Skill_ResetAnyCasting(scrObj_Skill, skill, live_charStats);
+                }
+            }
+
+        }
+        else { Static_SkillForge.Utils.Skill_ResetAnyCasting(scrObj_Skill, skill, live_charStats); }
+
+
+
+
+        if (live_charStats.charStatus._isDead) { Static_SkillForge.Utils.Skill_ResetAnyCasting(scrObj_Skill, skill, live_charStats); }
     }    
 
     private void Skill_EffectTypeArray(ScrObj_skill scrObj_Skill, Skill skill)
     {
-        for (int currentCastingIndex = 0; currentCastingIndex < scrObj_Skill.skill_EffectTypeArray.Length; currentCastingIndex++)
+        for (currentCastingIndex = 0; currentCastingIndex < scrObj_Skill.skill_EffectTypeArray.Length; currentCastingIndex++)
         {   
             switch (scrObj_Skill.skill_EffectTypeArray[currentCastingIndex])
             {
@@ -241,6 +278,8 @@ public class Skill : MonoBehaviour
             for (int i = 0; i < skill_targetColliders.Count; i++)
             {
                 Handles.DrawLine(transform.position, skill_targetColliders[i].transform.position, live_charStats.fov._editorLineThickness); //rysowanie lini w kierunku targetów breatha jeśli nie zasłania go obstacle Layer
+                /*Gizmos.matrix = Matrix4x4.TRS(transform.position, transform.rotation, new Vector3(Camera.main.aspect, 1f, 1f));
+                Gizmos.DrawFrustum(transform.position, skill_currentAngle,skill_currentRadius,0f,1);*/
             }
 
         }
