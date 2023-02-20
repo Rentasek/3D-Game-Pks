@@ -57,11 +57,12 @@ public class ScrObj_skill : ScriptableObject
     [CanBeNull, Tooltip("AudioVolume skilla -> Caster")] public float skill_CastingAudioVolume;
     [CanBeNull, Tooltip("AudioVolume skilla -> Target")] public float skill_OnTargetHitAudioVolume;
     [Space]
-    [CanBeNull, Tooltip("Prefab z VisualEffectem pojawiający się na przeciwniku -> Target ")] public GameObject skill_OnTargetHitVisualEffectPrefab;   
+    [CanBeNull, Tooltip("Prefab z VisualEffectem pojawiający się na przeciwniku -> Target ")] public GameObject skill_OnTargetHitVisualEffectPrefab;
     //Można tak zrobić że jak trafi przeciwnika to pojawia na nim (Instantiate) empty object(Prefab z Bazy) który ma na sobie VisualEffect ale może pojawiać się tylko raz
-    //Można mu dać że ma zniknąć jeśli nie jest na liście targetów castującego
-      
+    //Można mu dać że ma zniknąć jeśli nie jest na liście targetów castującego    
 
+    
+    
     [Header("Animator Values")]
     [CanBeNull, Tooltip("Jaki Float Animatora odpowiada za animację? - Nazwa")] public string skill_AnimatorFloatName;
     [CanBeNull, Tooltip("Jaki Trigger Animatora odpowiada za animację?  - Nazwa")] public string skill_AnimatorTriggerName;
@@ -80,4 +81,17 @@ public class ScrObj_skill : ScriptableObject
      [Tooltip("VFX - Maxymalny Lifetime particali")] public float skill_LifetimeMax;
      [Tooltip("VFX - Kierunek i prędkość (wektor) rozchodzenia się particali")] public float skill_MovingTowardsFactor;*/
 
+    #region TestingCustomPropertyArray
+    [Serializable]
+    public class CosixClass
+    {
+        [Header("SkillRange")]
+        [Tooltip("Bazowy Minimalny Radius skilla")] public float flaot_1;
+        [Tooltip("Bazowy Minimalny Kąt skilla")] public float flaot_2;
+        [Tooltip("Bazowy Maxymalny Radius skilla")] public float flaot_3;
+        [Tooltip("Bazowy Maxymalny Kąt skilla")] public float flaot_4;
+    }
+    [PropertyAttribute_EnumNamedNestedArray(typeof(Skill_CastingType))] public CosixClass[] cosixClasses = new CosixClass[3];
+    //public CosixClass cosixClasses;
+    #endregion
 }

@@ -90,7 +90,6 @@ public class ScrObj_charStats : ScriptableObject
     public float MultiplierSpell_Damage;
     public float baseSpell_MPCost;
 
-
     [Space]
     [Header("Target Audio")]    
     public AudioClip damagedEnemy;
