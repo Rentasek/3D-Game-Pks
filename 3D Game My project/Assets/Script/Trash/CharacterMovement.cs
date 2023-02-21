@@ -9,7 +9,7 @@ using UnityEngine.AI;
 using UnityEngine.UIElements;
 
 public class CharacterMovement : MonoBehaviour
-{
+{/*
     [Space]
     [Header("Character Components")]
     public CharacterStatus live_charStats;   
@@ -85,7 +85,7 @@ public class CharacterMovement : MonoBehaviour
             if (live_charStats.charStats._stam > 0) live_charStats.charStats._stam = Mathf.MoveTowards(live_charStats.charStats._stam, 0f, (10f + live_charStats.charInfo._charLevel) * Time.deltaTime); //zu¿ywa f stamy / sekunde
 
             ////Running Speed 
-            if (/*live_charStats.currentMoveInputDirection != Vector3.zero &&*/ !live_charStats.charStatus._isJumping && !live_charStats.fov._closeRangeSkill.skill_input && live_charStats.charStats._stam > 5f
+            if (*//*live_charStats.currentMoveInputDirection != Vector3.zero &&*//* !live_charStats.charStatus._isJumping && !live_charStats.fov._closeRangeSkill.skill_input && live_charStats.charStats._stam > 5f
                 && live_charStats.fov._targetAquired && !live_charStats.charInput._secondary && live_charStats.charComponents._navMeshAgent.remainingDistance > 2 * live_charStats.fov._closeRangeSkillMinRadius)
                 //dodatnkowy warunek ->biega tylko jak targetAquired=true, kolejny warnek jeœli nie castuje!!, Kolejny warunek jeœli agent.eemainingDistance > 2* attack range
             {
@@ -220,7 +220,7 @@ public class CharacterMovement : MonoBehaviour
     {
         if (!live_charStats.charStatus._isGrounded)
         {
-            //live_charStats.currentMoveVector.y -= live_charStats.currentGravity * Time.deltaTime/*(Time.deltaTime / 2f)*/;  //moveVector to szybkoœæ poruszania siê wiêc gravity/delta.time (grawitacja/klatkê) jest prawid³owo jako przyspieszenie
+            //live_charStats.currentMoveVector.y -= live_charStats.currentGravity * Time.deltaTime/*(Time.deltaTime / 2f)*//*;  //moveVector to szybkoœæ poruszania siê wiêc gravity/delta.time (grawitacja/klatkê) jest prawid³owo jako przyspieszenie
                                                                                                                             //(Time.fixedDeltaTime / 1f) = klatki / sekunde     
             
             live_charStats.charMove._moveVector.y = Mathf.MoveTowards(live_charStats.charMove._moveVector.y, -live_charStats.charMove._gravity, 1f); //move towards dzia³a lepiej, wiêkszy przyrost na pocz¹tku                                                                                                     ////(Time.deltaTime / 2f) => co 2 klatkê odejmuje wartoœæ
@@ -232,5 +232,5 @@ public class CharacterMovement : MonoBehaviour
             live_charStats.charMove._moveVector.y = 0f;
         }
     }
-
+*//**//**//**/
 }

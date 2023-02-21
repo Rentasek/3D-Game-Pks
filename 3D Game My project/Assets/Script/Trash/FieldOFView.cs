@@ -7,15 +7,15 @@ using UnityEditor;
 using UnityEngine;
 
 public class FieldOFView : MonoBehaviour
-{
+{/*
     [SerializeField] private CharacterStatus live_charStats;
     [SerializeField] private string[] enemiesArray;
 
-    /* private void OnValidate()
+    *//* private void OnValidate()
    {
        live_charStats = GetComponentInParent<CharacterStatus>();
        enemiesArray = live_charStats.currentEnemiesArray;
-   }*/
+   }*//*
 
     // Start is called before the first frame update
     void Start()
@@ -92,12 +92,12 @@ public class FieldOFView : MonoBehaviour
                         live_charStats.fov._targetAquired = false;
                     }
                 }
-                /*else
+                *//*else
                 {
                     live_charStats.fov_targetInDynamicSightRange = false;                     //target nie jest w sight range
                     live_charStats.fov_aquiredTargetGameObject = null;           //ustawia nie znaleziony colliderem game objecta jako null
                     live_charStats.fov_targetAquired = false;
-                }*/
+                }*//*
             }
         }
 
@@ -122,7 +122,7 @@ public class FieldOFView : MonoBehaviour
 
     }
 
-/*#if UNITY_EDITOR //zamiast skryptu w Editor
+*//*#if UNITY_EDITOR //zamiast skryptu w Editor
 
     *//*private void OnDrawGizmos() //rusyje wszystkie
     {
@@ -178,4 +178,5 @@ public class FieldOFView : MonoBehaviour
     }*//*//Zbêdne dziêki wykorzystaniu quaterniona z lokalnym transform.forward
 
 #endif*/
+
 }

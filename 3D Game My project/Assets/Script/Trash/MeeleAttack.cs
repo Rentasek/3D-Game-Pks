@@ -8,7 +8,7 @@ using UnityEngine;
 using UnityEngine.Timeline;
 
 public class MeeleAttack : MonoBehaviour
-{
+{/*
     private int i = 0; //testing...
 
     [SerializeField] private CharacterStatus live_charStats;        //tylko do podgl¹du
@@ -67,8 +67,8 @@ public class MeeleAttack : MonoBehaviour
                 other.GetComponent<CharacterStatus>().charInfo._charLevel = UnityEngine.Random.Range(live_charStats.charInfo._charLevel - 3, live_charStats.charInfo._charLevel + 3);  //po œmierci ustawia level targetu na zbli¿ony do atakuj¹cego
                 live_charStats.charStats._xp += other.GetComponent<CharacterStatus>().charStats._xp_GainedFromKill;
 
-                /* // --> co sie dzieje przy spadku hp do 0 // (animacja znikania jak czacha)
-                 other.GetComponent<CharacterStatus>().currentHP = 0f;  //trik ¿eby nie zmniejszyæ hp poni¿ej 0*/ // zbêdne
+                *//* // --> co sie dzieje przy spadku hp do 0 // (animacja znikania jak czacha)
+                 other.GetComponent<CharacterStatus>().currentHP = 0f;  //trik ¿eby nie zmniejszyæ hp poni¿ej 0*//* // zbêdne
             }
 
             i++;  //zmienna testing only
@@ -90,5 +90,5 @@ public class MeeleAttack : MonoBehaviour
         }
     }
 
-
+*/
 }

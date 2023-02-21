@@ -1,12 +1,12 @@
-﻿using PlasticPipe.PlasticProtocol.Messages;
-using Unity.VisualScripting;
+﻿//using PlasticPipe.PlasticProtocol.Messages;
+//using Unity.VisualScripting;
 using UnityEditor;
 using UnityEngine;
 
 
-[CustomEditor(typeof(Skill))]
-public class Editor_SkillEditor : Editor
-{
+//[CustomEditor(typeof(Skill))]
+public class Editor_SkillEditor //: Editor
+{/*
     Skill skill;
 
     public override void OnInspectorGUI()
@@ -57,4 +57,5 @@ public class Editor_SkillEditor : Editor
     {
         skill = (Skill)target;
     }
+*/
 }

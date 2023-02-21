@@ -5,11 +5,11 @@ using UnityEngine;
 using UnityEngine.AI;
 
 public class AIController : MonoBehaviour
-{
+{/*
     public NavMeshAgent agent;
     //public Transform playerTransform;
-    /*public LayerMask whatIsGround;
-    //public LayerMask whatIsPlayer;*/
+    *//*public LayerMask whatIsGround;
+    //public LayerMask whatIsPlayer;*//*
 
 
     public string[] enemiesArray;
@@ -104,8 +104,8 @@ public class AIController : MonoBehaviour
             {
                 live_charStats.charInput._secondary = false;
                 //Jabky coœ nie dzia³a³o to odblokowaæ
-                /*if (live_charStats.navMeAge_targetInDynamicSightRange && !live_charStats.navMeAge_targetInAttackRange && !live_charStats.inputCasting) Chasing();
-                if (live_charStats.navMeAge_targetInDynamicSightRange && live_charStats.navMeAge_targetInAttackRange && !live_charStats.inputCasting) Attacking();*/
+                *//*if (live_charStats.navMeAge_targetInDynamicSightRange && !live_charStats.navMeAge_targetInAttackRange && !live_charStats.inputCasting) Chasing();
+                if (live_charStats.navMeAge_targetInDynamicSightRange && live_charStats.navMeAge_targetInAttackRange && !live_charStats.inputCasting) Attacking();*//*
             }
             if (live_charStats.fov._targetInDynamicSightRange && !live_charStats.fov._targetInAttackRange && !live_charStats.charInput._secondary) Chasing();
             if (live_charStats.fov._targetInDynamicSightRange && live_charStats.fov._targetInAttackRange && !live_charStats.charInput._secondary) Attacking();
@@ -245,9 +245,9 @@ public class AIController : MonoBehaviour
         live_charStats.navMeshAge._walkPoint = transform.position; //debugging ¿eby nie próbowa³ uciekaæ
 
         agent.SetDestination(live_charStats.navMeshAge._walkPoint);
-        /*agent.stoppingDistance = live_charStats.navMeAge_attackRange;
+        *//*agent.stoppingDistance = live_charStats.navMeAge_attackRange;
         //Zatrzymanie agenta przy ataku
-        //agent.isStopped = true;*/
+        //agent.isStopped = true;*//*
     }
 
     private void Attacking()
@@ -258,4 +258,5 @@ public class AIController : MonoBehaviour
         //transform.LookAt(live_charStats.fov_aquiredTargetGameObject.transform);        
         
     }
+*/
 }
