@@ -60,19 +60,22 @@ public class Skill : MonoBehaviour
     [Tooltip("AudioSource skilla Castable -> Caster"), SerializeField] public AudioSource skill_AudioSourceCastable;
     [Tooltip("AudioSource skilla Hold -> Caster"), SerializeField] public AudioSource skill_AudioSourceHold;
     [Tooltip("VFX skilla -> Caster"), CanBeNull, SerializeField] public VisualEffect skill_CastingVisualEffect;
-    
+
+    private bool testBool = false;
+
     private void OnValidate()
     {
         skill = this;
         //QuickSetup(); 
-        if(live_charStats.charInfo._isPlayer)
-        {
-            Debug.Log("0 -" + scrObj_Skill.skill_EffectTypeArray[0]);
-            Debug.Log("1 -" + scrObj_Skill.skill_EffectTypeArray[1]);
-            Debug.Log("2 -" + scrObj_Skill.skill_EffectTypeArray[2]);
-        }       
 
-    }
+                /*if(live_charStats.charInfo._isPlayer)
+                {
+                    Debug.Log("0 -" + scrObj_Skill.skill_EffectTypeArray[0]);
+                    Debug.Log("1 -" + scrObj_Skill.skill_EffectTypeArray[1]);
+                    Debug.Log("2 -" + scrObj_Skill.skill_EffectTypeArray[2]);
+                }  */
+
+        }
 
     private void FixedUpdate()
     {
@@ -254,6 +257,36 @@ public class Skill : MonoBehaviour
             }
         }
     }     
+
+    private void Skill_NewSkillMechanic(ScrObj_skill scrObj_Skill)
+    {
+        switch (scrObj_Skill.new_EnumCastingType)
+        {
+            case ScrObj_skill.New_EnumCastingType.Instant:
+                {
+                    for (int i = 0; i < scrObj_Skill.new_TargetType.Length; i++)
+                    {
+                        switch (scrObj_Skill.new_TargetType[i].new_EnumTargetType)
+                        {
+                            case ScrObj_skill.New_EnumTargetType.Self:
+                                for (int j = 0; j < scrObj_Skill.new_TargetType[i].new_EffectType.Length; j++)
+                                {
+                                    switch (scrObj_Skill.new_TargetType[i].new_EffectType[j].new_EnumEffectType)
+                                    {
+                                        case ScrObj_skill.New_EnumEffectType.HealOverTime:
+
+                                            break;
+
+                                    }
+                                }
+                                break;   
+                        }
+                    }
+                    break;
+                }
+        }
+
+    }
 
 #if UNITY_EDITOR //zamiast skryptu w Editor
 
