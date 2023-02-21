@@ -3,6 +3,7 @@ using System.Reflection;
 using Unity.VisualScripting;
 using UnityEditor;
 using UnityEngine;
+using UnityEngine.UIElements;
 using static ScrObj_skill;
 
 [CustomPropertyDrawer(typeof(PropertyAttribute_NamedArrayAttribute))]
@@ -21,6 +22,18 @@ public class PropertyDrawer_NamedArrayDrawer : PropertyDrawer
         }
     }
 }
+
+[CustomPropertyDrawer(typeof(PropertyAttribute_NamedArrayAttribute_new))]
+public class PropertyDrawer_NamedArrayDrawer_new : PropertyDrawer
+{
+    public override void OnGUI(Rect rect, SerializedProperty property, GUIContent label)
+    {
+        int pos = int.Parse(property.propertyPath.Split('[', ']')[1]);
+        //draw field
+        EditorGUI.PropertyField(rect, property, new GUIContent(((PropertyAttribute_NamedArrayAttribute_new)attribute).names[pos]), true); //Rysowanie samego property Fielda      
+    }
+}
+
 
 [CustomPropertyDrawer(typeof(PropertyAttribute_EnumNamedArrayAttribute))]
 public class PropertyDrawer_EnumNamedArray : PropertyDrawer

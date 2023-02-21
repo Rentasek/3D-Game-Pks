@@ -10,6 +10,16 @@ public class PropertyAttribute_NamedArrayAttribute : PropertyAttribute
     }
 }
 
+public class PropertyAttribute_NamedArrayAttribute_new : PropertyAttribute
+{
+    public readonly string[] names;
+    public PropertyAttribute_NamedArrayAttribute_new(string[] names)
+    {
+        this.names = names;
+    }
+}
+
+
 public class PropertyAttribute_EnumNamedArrayAttribute : PropertyAttribute
 {    
     public string[] names;
