@@ -1,6 +1,7 @@
 ﻿using Cinemachine;
 using JetBrains.Annotations;
 using System;
+using System.Runtime.Serialization;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.VFX;
@@ -81,6 +82,84 @@ public class ScrObj_skill : ScriptableObject
      [Tooltip("VFX - Maxymalny Lifetime particali")] public float skill_LifetimeMax;
      [Tooltip("VFX - Kierunek i prędkość (wektor) rozchodzenia się particali")] public float skill_MovingTowardsFactor;*/
 
+   /* [Flags] public enum New_EnumEffectType
+    { 
+        none = 0,
+        hit = 2,
+        damageOverTime = 4,
+        heal = 8,
+        healOverTime = 16,
+        summon = 32
+    }*/
+    
+    public enum New_EnumEffectType
+    { 
+        None,
+        Hit,
+        DamageOverTime,
+        Heal,
+        HealOverTime,
+        Summon
+    }
+    public enum New_EnumCastingType 
+    { 
+        Castable,
+        Instant,
+        Hold
+    }
+
+    public enum New_EnumTargetType 
+    { 
+        Melee,
+        Cone,
+        Projectile,
+        AreaOfEffectMouse,
+        Self,
+        Chain,
+        Pierce,
+        Boom
+    }
+
+    public enum New_EnumResourceType { health, mana, stamina }
+    
+
+    [Serializable]
+    public class New_EffectType
+    {    
+        [Tooltip("Jaki SkillEffect jeset użyty na Targetach?")] public New_EnumEffectType new_EnumEffectType;
+        [Tooltip("Jaki Resource zużywa do Skilla?")] public New_EnumResourceType new_ResourceType;
+
+        [Header("SkillDamage/Cost")]
+        [Tooltip("Bazowy Resource cost skilla")] public float skill_BaseResourceCost;
+        [Tooltip("Bazowy Damage skilla")] public float skill_BaseDamage;
+        [Tooltip("Multiplier do Levela i BonusCharStats do obliczeń [0.1f] -> na każdy lev i na każdy BonusDMG dodaje 0.1f BAZOWYCH DMG")] public float skill_Multiplier;
+    }
+
+    [Serializable]
+    public class New_TargetType
+    {
+        [Tooltip("Na jakie targety działa SkillEffect?")] public New_EnumTargetType new_EnumTargetType;
+        [Tooltip("Jaki SkillEffect jeset użyty na Targetach?")] public New_EffectType[] new_EffectType;
+
+        [Header("SkillRange")]
+        [Tooltip("Bazowy Minimalny Radius skilla")] public float skill_MinRadius;
+        [Tooltip("Bazowy Minimalny Kąt skilla")] public float skill_MinAngle;
+        [Tooltip("Bazowy Maxymalny Radius skilla")] public float skill_MaxRadius;
+        [Tooltip("Bazowy Maxymalny Kąt skilla")] public float skill_MaxAngle;
+
+        [Header("SkillTime")]
+        [Tooltip("Ile czasu potrzeba do Max/Min Radius")] public float skill_TimeMaxRadius;
+        [Tooltip("Ile czasu potrzeba do Max/Min Angle")] public float skill_TimeMaxAngle;
+        
+        [Header("SkillObstacles")]
+        [Tooltip("Layer Mask z przeszkodami przez które nie da się atakować(z klasy skill)")] public LayerMask skill_ObstaclesMask; //Obstacles dla skilla
+
+    }
+
+    [Tooltip("Który rodzaj castowania aktywuje SkillEfect ?")] public New_EnumCastingType new_EnumCastingType;
+    [Tooltip("Na jakie targety działa SkillEffect?")] public New_TargetType[] new_TargetType;
+
+
     #region TestingCustomPropertyArray
     [Serializable]
     public class CosixClass
@@ -91,7 +170,7 @@ public class ScrObj_skill : ScriptableObject
         [Tooltip("Bazowy Maxymalny Radius skilla")] public float flaot_3;
         [Tooltip("Bazowy Maxymalny Kąt skilla")] public float flaot_4;
     }
-    [PropertyAttribute_EnumNamedNestedArray(typeof(Skill_CastingType))] public CosixClass[] cosixClasses = new CosixClass[3];
+    [PropertyAttribute_EnumNamedNestedArray(typeof(Skill_CastingType)), HideInInspector] public CosixClass[] cosixClasses = new CosixClass[3];
     //public CosixClass cosixClasses;
     #endregion
 }
