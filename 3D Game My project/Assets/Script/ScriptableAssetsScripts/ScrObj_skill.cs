@@ -102,10 +102,10 @@ public class ScrObj_skill : ScriptableObject
         Summon
     }
     public enum New_EnumCastingType 
-    { 
-        Castable,
+    {
         Instant,
-        Hold
+        Hold,
+        Castable
     }
 
     public enum New_EnumTargetType 
