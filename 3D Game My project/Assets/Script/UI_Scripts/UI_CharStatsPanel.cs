@@ -102,7 +102,7 @@ public class UI_CharStatsPanel : MonoBehaviour, IPlayerUpdate
                     break;
 
                 case CharStat.CloseRangeAttResourceCost:
-                    selectedStatCurrentFloat[i] = live_charStats.fov._closeRangeSkill.skill_currentResourceCost;
+                    selectedStatCurrentFloat[i] = live_charStats.fov._closeRangeSkill._resourceCost;
                     selectedStatCurrentName[i] = "Melee Attack Stamina Cost";
                     break;
 

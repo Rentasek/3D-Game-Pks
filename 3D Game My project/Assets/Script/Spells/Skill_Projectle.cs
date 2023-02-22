@@ -16,7 +16,7 @@ public class Skill_Projectle : MonoBehaviour
     {
         if (skill!=null)
         {
-            if(skill.skill_EnemiesArray.Contains(other.tag)) 
+            if(skill._enemiesArray.Contains(other.tag)) 
             {
                 if (skill.skill_targetColliders.IndexOf(other) < 0) //sprawdza czy nie ma na liœcie. Je¿eli IndexOf < 0 czyli nie ma obiektów z tym indexem
                 {
@@ -45,7 +45,7 @@ public class Skill_Projectle : MonoBehaviour
     {
         if (skill != null)
         {
-            if (skill.skill_EnemiesArray.Contains(other.tag))
+            if (skill._enemiesArray.Contains(other.tag))
             {
                 skill.skill_IsCastingInstant = true;
             }
@@ -64,7 +64,7 @@ public class Skill_Projectle : MonoBehaviour
     {
         if (skill != null)
         {
-            if (skill.skill_EnemiesArray.Contains(other.tag))
+            if (skill._enemiesArray.Contains(other.tag))
             {
                 skill.skill_IsCastingInstant = true;
             }
