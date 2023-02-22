@@ -19,7 +19,7 @@ public class ScrObj_skill : ScriptableObject
     [Tooltip("Na jakie targety działa SkillEffect?")] public Skill_TargetType skill_TargetType;
 
     public enum Skill_ResourceType { health, mana, stamina }
-    [Tooltip("Jaki Resource zużywa do Skilla?")] public Skill_ResourceType skill_ResourceType;
+    [Tooltip("Jaki Resource zużywa do Skilla?")] public Skill_ResourceType _resourceType;
 
     public enum Skill_EffectTypeArray { none, hit, boom, pierce, chain, damageOverTime, healOverTime, heal, summon }
     [Tooltip("Jaki SkillEffect jeset użyty na Targetach?") ,PropertyAttribute_EnumNamedArray(typeof(Skill_CastingType))] public Skill_EffectTypeArray[] skill_EffectTypeArray = new Skill_EffectTypeArray[3]; //Max 3 elementy
@@ -38,9 +38,9 @@ public class ScrObj_skill : ScriptableObject
     [Tooltip("Bazowy Cooldown skilla")] public float skill_BaseCooldown;
 
     [Header("SkillDamage/Cost")]
-    [Tooltip("Bazowy Resource cost skilla")] public float skill_BaseResourceCost;
+    [Tooltip("Bazowy Resource cost skilla")] public float _baseResourceCost;
     [Tooltip("Bazowy Damage skilla")] public float skill_BaseDamage;    
-    [Tooltip("Multiplier do Levela i BonusCharStats do obliczeń [0.1f] -> na każdy lev i na każdy BonusDMG dodaje 0.1f BAZOWYCH DMG")] public float skill_Multiplier;
+    [Tooltip("Multiplier do Levela i BonusCharStats do obliczeń [0.1f] -> na każdy lev i na każdy BonusDMG dodaje 0.1f BAZOWYCH DMG")] public float _multiplier;
 
     [Header("SkillObstacles")]
     [Tooltip("Layer Mask z przeszkodami przez które nie da się atakować(z klasy skill)")] public LayerMask skill_ObstaclesMask; //Obstacles dla skilla
@@ -55,7 +55,7 @@ public class ScrObj_skill : ScriptableObject
     [Space]
     [CanBeNull, Tooltip("AudioClip skilla -> Target")] public AudioClip skill_OnTargetHitAudioClip;
     [Space]
-    [CanBeNull, Tooltip("AudioVolume skilla -> Caster")] public float skill_CastingAudioVolume;
+    [CanBeNull, Tooltip("AudioVolume skilla -> Caster")] public float skill_CasterAudioVolume;
     [CanBeNull, Tooltip("AudioVolume skilla -> Target")] public float skill_OnTargetHitAudioVolume;
     [Space]
     [CanBeNull, Tooltip("Prefab z VisualEffectem pojawiający się na przeciwniku -> Target ")] public GameObject skill_OnTargetHitVisualEffectPrefab;
@@ -110,6 +110,7 @@ public class ScrObj_skill : ScriptableObject
 
     public enum New_EnumTargetType 
     { 
+        None,
         Melee,
         Cone,
         Projectile,
@@ -119,20 +120,15 @@ public class ScrObj_skill : ScriptableObject
         Pierce,
         Boom
     }
-
-    public enum New_EnumResourceType { health, mana, stamina }
     
 
     [Serializable]
     public class New_EffectType
     {    
-        [Tooltip("Jaki SkillEffect jeset użyty na Targetach?")] public New_EnumEffectType new_EnumEffectType;
-        [Tooltip("Jaki Resource zużywa do Skilla?")] public New_EnumResourceType new_ResourceType;
+        [Tooltip("Jaki SkillEffect jeset użyty na Targetach?")] public New_EnumEffectType new_EnumEffectType;        
 
-        [Header("SkillDamage/Cost")]
-        [Tooltip("Bazowy Resource cost skilla")] public float skill_BaseResourceCost;
-        [Tooltip("Bazowy Damage skilla")] public float skill_BaseDamage;
-        [Tooltip("Multiplier do Levela i BonusCharStats do obliczeń [0.1f] -> na każdy lev i na każdy BonusDMG dodaje 0.1f BAZOWYCH DMG")] public float skill_Multiplier;
+        [Header("SkillDamage")]        
+        [Tooltip("Bazowy Damage skilla")] public float _baseDamage;        
     }
 
     [Serializable]
@@ -142,23 +138,23 @@ public class ScrObj_skill : ScriptableObject
         [Tooltip("Jaki SkillEffect jeset użyty na Targetach?")] public New_EffectType[] new_EffectType;
 
         [Header("SkillRange")]
-        [Tooltip("Bazowy Minimalny Radius skilla")] public float skill_MinRadius;
-        [Tooltip("Bazowy Minimalny Kąt skilla")] public float skill_MinAngle;
-        [Tooltip("Bazowy Maxymalny Radius skilla")] public float skill_MaxRadius;
-        [Tooltip("Bazowy Maxymalny Kąt skilla")] public float skill_MaxAngle;
+        [Tooltip("Bazowy Minimalny Radius skilla")] public float _minRadius;
+        [Tooltip("Bazowy Minimalny Kąt skilla")] public float _minAngle;
+        [Tooltip("Bazowy Maxymalny Radius skilla")] public float _maxRadius;
+        [Tooltip("Bazowy Maxymalny Kąt skilla")] public float _maxAngle;
 
         [Header("SkillTime")]
-        [Tooltip("Ile czasu potrzeba do Max/Min Radius")] public float skill_TimeMaxRadius;
-        [Tooltip("Ile czasu potrzeba do Max/Min Angle")] public float skill_TimeMaxAngle;
+        [Tooltip("Ile czasu potrzeba do Max/Min Radius")] public float _timeMaxRadius;
+        [Tooltip("Ile czasu potrzeba do Max/Min Angle")] public float _timeMaxAngle;
         
         [Header("SkillObstacles")]
-        [Tooltip("Layer Mask z przeszkodami przez które nie da się atakować(z klasy skill)")] public LayerMask skill_ObstaclesMask; //Obstacles dla skilla
-
+        [Tooltip("Layer Mask z przeszkodami przez które nie da się atakować(z klasy skill)")] public LayerMask _obstaclesMask; //Obstacles dla skilla           
     }
-
     [Tooltip("Który rodzaj castowania aktywuje SkillEfect ?")] public New_EnumCastingType new_EnumCastingType;
     [Tooltip("Na jakie targety działa SkillEffect?")] public New_TargetType[] new_TargetType;
-
+    [Space]
+    [Tooltip("Maxymalna ilość TargetTypów dla skilla")] public int maxTargetTypes;
+    [Tooltip("Maxymalna ilość EffectTypów dla pojedynczego TargetType")] public int maxEffectTypes;
 
     #region TestingCustomPropertyArray
     [Serializable]

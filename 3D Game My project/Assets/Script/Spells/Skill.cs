@@ -35,14 +35,15 @@ public class Skill : MonoBehaviour
     [Tooltip("Bool zwracany true jeśli jest holdCast (CastingType -> Hold)"), SerializeField] public bool skill_IsCastingHold;
 
     [Header("SkillDamage/Cost - current")]
-    [Tooltip("Aktualny Resource cost skilla"), SerializeField] public float skill_currentResourceCost;
+    [Tooltip("Aktualny Resource cost skilla"), SerializeField] public float _resourceCost;
     [Tooltip("Resource type dla Skilla (HP,Mana,Stamina value (float)) -> z live_charStats"), SerializeField] public float skill_currentResource;
     [Tooltip("Aktualny Damage skilla (zwracany po przeliczeniu)"), SerializeField] public float skill_currentDamage;    
     
     [Header("Targets")]
-    [Tooltip("Enemies Array z klasy scr_skill(do bazowego enemies array dopisane Destructibles, (Metoda EnemyArraySelector)"), SerializeField, TagField] public string[] skill_EnemiesArray; //Pozwala na wybór Enemies przy pomocy Tag     
+    [Tooltip("Enemies Array z klasy scr_skill(do bazowego enemies array dopisane Destructibles, (Metoda EnemyArraySelector)"), SerializeField, TagField] public string[] _enemiesArray; //Pozwala na wybór Enemies przy pomocy Tag     
     [Tooltip("Zwracana lista wszystkich colliderów w zasięgu skilla"), CanBeNull, SerializeField] public Collider[] skill_allLocalColliders = new Collider[30];
-    [Tooltip("Zwracana lista colliderów zgodnych z parametrami(EnemyTag,InCurrentRadius,InCurrentAngle)"), CanBeNull, SerializeField] public List<Collider> skill_targetColliders;    
+    [Tooltip("Zwracana lista colliderów zgodnych z parametrami(EnemyTag,InCurrentRadius,InCurrentAngle)"), CanBeNull, SerializeField] public List<Collider> skill_targetColliders;
+
     [Tooltip("GameObject skilla (castera) -> potrzebny do transform"), SerializeField] public GameObject skill_casterGameobject;
 
     [Header("Skill Cone Settings")]
@@ -59,23 +60,57 @@ public class Skill : MonoBehaviour
     [Tooltip("AudioSource skilla Instant -> Caster"), SerializeField] public AudioSource skill_AudioSourceInstant;
     [Tooltip("AudioSource skilla Castable -> Caster"), SerializeField] public AudioSource skill_AudioSourceCastable;
     [Tooltip("AudioSource skilla Hold -> Caster"), SerializeField] public AudioSource skill_AudioSourceHold;
+
+    
+    
+    
+    [Tooltip("AudioSource skilla -> Caster"), SerializeField] public AudioSource skill_AudioSourceCaster;
     [Tooltip("VFX skilla -> Caster"), CanBeNull, SerializeField] public VisualEffect skill_CastingVisualEffect;
 
-    private bool testBool = false;
+
+    [Serializable]
+    public class EffectDynamicValues
+    {
+        [Tooltip("Aktualny Damage skilla (zwracany po przeliczeniu)"), SerializeField] public float _currentDamage;
+    }    
+    
+    [Serializable]
+    public class TargetDynamicValues
+    {
+        [Header("Skill Cone Settings")]
+        [Tooltip("Bool zwracający czy w Range jest przeciwnik"), CanBeNull, SerializeField] public bool _targetInRange;
+        [Tooltip("Bool zwracający czy w Angle(i Range) jest przeciwnik"), CanBeNull, SerializeField] public bool _targetInAngle;
+        [Space]
+        [Tooltip("Aktualny Radius skilla"), CanBeNull, SerializeField] public float _currentRadius;
+        [Tooltip("Aktualny Kąt skilla"), CanBeNull, SerializeField] public float _currentAngle;
+        [Space]
+        [Tooltip("(ref/refrence) Aktualny wektor(kierunek) w którum porusza się currentRadius skilla"), CanBeNull, SerializeField] public float _currentVectorRadius;
+        [Tooltip("(ref/refrence) Aktualny wektor(kierunek) w którum porusza się currentAngle skilla"), CanBeNull, SerializeField] public float _currentVectorAngle;
+
+
+        [Space]
+        [Tooltip("Zwracana lista wszystkich colliderów w zasięgu skilla"), CanBeNull, SerializeField] public Collider[] _allLocalColliders = new Collider[40];
+        [Tooltip("Zwracana lista colliderów zgodnych z parametrami(EnemyTag,InCurrentRadius,InCurrentAngle)"), CanBeNull, SerializeField] public List<Collider> _targetColliders;
+
+        public EffectDynamicValues[] effectDynamicValues = new EffectDynamicValues[10];
+    }
+    public TargetDynamicValues[] targetDynamicValues = new TargetDynamicValues[10];
+
+
 
     private void OnValidate()
     {
         skill = this;
-        //QuickSetup(); 
+        //QuickSetup(live_charStats, scrObj_Skill, skill);  
 
-                /*if(live_charStats.charInfo._isPlayer)
-                {
-                    Debug.Log("0 -" + scrObj_Skill.skill_EffectTypeArray[0]);
-                    Debug.Log("1 -" + scrObj_Skill.skill_EffectTypeArray[1]);
-                    Debug.Log("2 -" + scrObj_Skill.skill_EffectTypeArray[2]);
-                }  */
+        /*if(live_charStats.charInfo._isPlayer)
+        {
+            Debug.Log("0 -" + scrObj_Skill.skill_EffectTypeArray[0]);
+            Debug.Log("1 -" + scrObj_Skill.skill_EffectTypeArray[1]);
+            Debug.Log("2 -" + scrObj_Skill.skill_EffectTypeArray[2]);
+        }  */
 
-        }
+    }
 
     private void FixedUpdate()
     {
@@ -100,7 +135,7 @@ public class Skill : MonoBehaviour
     /// <br>skill_CastingVisualEffect</br>
     /// <br>ScrObj_skill.Skill_InputType</br>
     /// </summary>
-    void QuickSetup()
+    void QuickSetup(CharacterStatus live_charStats, ScrObj_skill scrObj_Skill, Skill skill)
     {
         skill = this;
 
@@ -113,7 +148,7 @@ public class Skill : MonoBehaviour
         switch (scrObj_Skill.skill_InputType)
         {
             case ScrObj_skill.Skill_InputType.primary:
-                live_charStats.charSkillCombat._primarySkill = skill;                
+                live_charStats.charSkillCombat._primarySkill = skill;
                 break;
             case ScrObj_skill.Skill_InputType.secondary:
                 live_charStats.charSkillCombat._secondarySkill = skill;
@@ -260,32 +295,53 @@ public class Skill : MonoBehaviour
 
     private void Skill_NewSkillMechanic(ScrObj_skill scrObj_Skill)
     {
-        switch (scrObj_Skill.new_EnumCastingType)
+        skill_CanCast = !skill.skill_otherInput && !live_charStats.charStatus._isDead;
+
+
+        if (skill.skill_input && skill.skill_CanCast) 
         {
-            case ScrObj_skill.New_EnumCastingType.Instant:
+            for (int i = 0; i < scrObj_Skill.new_TargetType.Length; i++)
+            {
+                for (int j = 0; j < scrObj_Skill.new_TargetType[i].new_EffectType.Length; j++)
                 {
-                    for (int i = 0; i < scrObj_Skill.new_TargetType.Length; i++)
+                    switch (scrObj_Skill.new_EnumCastingType)
                     {
-                        switch (scrObj_Skill.new_TargetType[i].new_EnumTargetType)
-                        {
-                            case ScrObj_skill.New_EnumTargetType.Self:
-                                for (int j = 0; j < scrObj_Skill.new_TargetType[i].new_EffectType.Length; j++)
+                       
+                        case ScrObj_skill.New_EnumCastingType.Instant:
+                            {
+                                // static casting dla Instant
+                            }
+                            break;
+
+                        case ScrObj_skill.New_EnumCastingType.Hold:
+                            {
+                                if (!live_charStats.charStatus._isRunning || live_charStats.charMove._moveSpeed <= 0.2f)
                                 {
-                                    switch (scrObj_Skill.new_TargetType[i].new_EffectType[j].new_EnumEffectType)
-                                    {
-                                        case ScrObj_skill.New_EnumEffectType.HealOverTime:
-
-                                            break;
-
-                                    }
+                                    // static casting dla Hold
                                 }
-                                break;   
-                        }
-                    }
-                    break;
-                }
-        }
+                            }
+                            break;
 
+                        case ScrObj_skill.New_EnumCastingType.Castable:
+                            {
+                                if (!live_charStats.charStatus._isRunning || live_charStats.charMove._moveSpeed <= 0.2f)
+                                {
+                                    // static casting dla Castable
+                                }
+                            }
+                            break;
+                    }
+                }
+            }
+        }
+        else
+        {
+            Static_SkillForge.Utils.Skill_ResetCasting(scrObj_Skill, skill, live_charStats);
+            for (int i = 0; i < scrObj_Skill.new_TargetType.Length; i++) //Reset całej tablicy targetType 
+            {                
+                Static_SkillForge.Utils.Skill_Target_Reset(skill, i); //Reset TargetList w targetTypeIndexie
+            }                
+        }
     }
 
 #if UNITY_EDITOR //zamiast skryptu w Editor

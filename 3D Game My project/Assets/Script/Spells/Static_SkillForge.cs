@@ -30,7 +30,7 @@ public static class Static_SkillForge
 
             if (skill.skill_input && skill.skill_CanCast && Utils.Skill_ResourceTypeCurrentFloatReadOnly(scrObj_Skill, live_charStats) > 0)
             {
-                if (Utils.Skill_ResourceTypeCurrentFloatReadOnly(scrObj_Skill, live_charStats) > skill.skill_currentResourceCost)   //Jeśli nie castuje i ma właśnie zacząć //Start Casting
+                if (Utils.Skill_ResourceTypeCurrentFloatReadOnly(scrObj_Skill, live_charStats) > skill._resourceCost)   //Jeśli nie castuje i ma właśnie zacząć //Start Casting
                 {
 
                     #region IsCasting -> Instant
@@ -54,26 +54,26 @@ public static class Static_SkillForge
                         #region AudioClipy //Specjalnie puszczane przy instant ale po animatorze
                         if (scrObj_Skill.skill_OneShotOverlapAudioClip != null)
                         {
-                            skill.skill_AudioSourceInstant.volume = scrObj_Skill.skill_CastingAudioVolume;
-                            skill.skill_AudioSourceInstant.PlayOneShot(scrObj_Skill.skill_OneShotOverlapAudioClip, scrObj_Skill.skill_CastingAudioVolume);
+                            skill.skill_AudioSourceInstant.volume = scrObj_Skill.skill_CasterAudioVolume;
+                            skill.skill_AudioSourceInstant.PlayOneShot(scrObj_Skill.skill_OneShotOverlapAudioClip, scrObj_Skill.skill_CasterAudioVolume);
                         }
 
                         if (scrObj_Skill.skill_OneShotNonOverlapAudioClip != null && !skill.skill_AudioSourceHold.isPlaying)
                         {
-                            skill.skill_AudioSourceHold.volume = scrObj_Skill.skill_CastingAudioVolume;
-                            skill.skill_AudioSourceHold.PlayOneShot(scrObj_Skill.skill_OneShotNonOverlapAudioClip, scrObj_Skill.skill_CastingAudioVolume);
+                            skill.skill_AudioSourceHold.volume = scrObj_Skill.skill_CasterAudioVolume;
+                            skill.skill_AudioSourceHold.PlayOneShot(scrObj_Skill.skill_OneShotNonOverlapAudioClip, scrObj_Skill.skill_CasterAudioVolume);
                         }
 
                         if (scrObj_Skill.skill_TimeCastOverlapAudioClip != null)
                         {
-                            skill.skill_AudioSourceCastable.volume = scrObj_Skill.skill_CastingAudioVolume;
+                            skill.skill_AudioSourceCastable.volume = scrObj_Skill.skill_CasterAudioVolume;
                             skill.skill_AudioSourceCastable.clip = scrObj_Skill.skill_TimeCastOverlapAudioClip;
                             skill.skill_AudioSourceCastable.PlayScheduled(scrObj_Skill.skill_TimeCast);
                         }
 
                         if (scrObj_Skill.skill_TimeCastNonOverlapAudioClip != null && !skill.skill_AudioSourceCastable.isPlaying)
                         {
-                            skill.skill_AudioSourceCastable.volume = scrObj_Skill.skill_CastingAudioVolume;
+                            skill.skill_AudioSourceCastable.volume = scrObj_Skill.skill_CasterAudioVolume;
                             skill.skill_AudioSourceCastable.clip = scrObj_Skill.skill_TimeCastNonOverlapAudioClip;
                             skill.skill_AudioSourceCastable.PlayScheduled(scrObj_Skill.skill_TimeCast);
                         }
@@ -117,6 +117,81 @@ public static class Static_SkillForge
 
         }
         #endregion
+
+        #region CastingInstant
+        /// <summary>
+        /// Metoda odpowiedzialna za VFX, animacje Animatora, Audio i odpalenie TargetType[i] skilla        
+        /// <br><i>Rodzaj castowania -> <b>Instant</b> działa w momencie użycia (ograniczone cooldownem)</i></br>        
+        /// </summary>
+        /// <param name="scrObj_Skill">Scriptable Object Skilla</param>
+        /// <param name="skill">Ten GameObject skill</param>
+        /// <param name="live_charStats">Live_charStats Castera</param>
+        public static void CastingInstant(ScrObj_skill scrObj_Skill, Skill skill, CharacterStatus live_charStats, int targetTypeIndex, int effectTypeIndex)
+        {
+            if (Utils.Skill_ResourceTypeCurrentFloatReadOnly(scrObj_Skill, live_charStats) > 0)
+            {
+                if (Utils.Skill_ResourceTypeCurrentFloatReadOnly(scrObj_Skill, live_charStats) > skill._resourceCost)   //Jeśli nie castuje i ma właśnie zacząć //Start Casting
+                {                    
+                    if (skill.skill_currentCooldownRemaining <= 0.05f)  //Jeśli zostało 0.05f lub mniej cooldownu może użyć instanta
+                    {
+
+                        if (skill.skill_CastingVisualEffect != null) skill.skill_CastingVisualEffect.Play(); //może się odpalić tylko raz przy każdym inpucie, nie może się nadpisać -> taki sam efekt jak przy GetKeyDown
+
+                        Utils.Skill_StopAllAnimatorMovement(scrObj_Skill, live_charStats);
+
+                        if (!string.IsNullOrWhiteSpace(scrObj_Skill.skill_AnimatorBoolName)) live_charStats.charComponents._Animator.SetBool(scrObj_Skill.skill_AnimatorBoolName, true);
+                        if (!string.IsNullOrWhiteSpace(scrObj_Skill.skill_AnimatorTriggerName)) live_charStats.charComponents._Animator.SetTrigger(scrObj_Skill.skill_AnimatorTriggerName);
+
+                        switch (scrObj_Skill.new_TargetType[targetTypeIndex].new_EnumTargetType)
+                        {
+                            case ScrObj_skill.New_EnumTargetType.None:
+                                break;
+                            case ScrObj_skill.New_EnumTargetType.Melee:
+                                break;
+                            case ScrObj_skill.New_EnumTargetType.Cone:
+                                break;
+                            case ScrObj_skill.New_EnumTargetType.Projectile:
+                                break;
+                            case ScrObj_skill.New_EnumTargetType.AreaOfEffectMouse:
+                                break;
+                            case ScrObj_skill.New_EnumTargetType.Self:
+                                break;
+                            case ScrObj_skill.New_EnumTargetType.Pierce:
+                                break;
+                            case ScrObj_skill.New_EnumTargetType.Chain:
+                                break;
+                            case ScrObj_skill.New_EnumTargetType.Boom:
+                                break;                                
+                        }
+                        skill.skill_currentCooldownRemaining = 1f; //Ustawia cooldown czyli IsCastingInstant wychodzi z true (raz) ale przy następnej klatce już nie wejdzie do if bo ma cooldown
+
+                        if (!string.IsNullOrWhiteSpace(scrObj_Skill.skill_AnimatorFloatName)) live_charStats.charComponents._Animator.SetFloat(scrObj_Skill.skill_AnimatorFloatName, skill.skill_currentComboProgress); //przed updatem comboProgress
+                        skill.skill_currentComboProgress += 0.5f;
+                        if (skill.skill_currentComboProgress >= 1) skill.skill_currentComboProgress = 0f;
+
+                        #region AudioClipy //Specjalnie puszczane przy instant ale po animatorze
+                        if (scrObj_Skill.skill_OneShotOverlapAudioClip != null)
+                        {
+                            skill.skill_AudioSourceCaster.volume = scrObj_Skill.skill_CasterAudioVolume;
+                            skill.skill_AudioSourceCaster.PlayOneShot(scrObj_Skill.skill_OneShotOverlapAudioClip, scrObj_Skill.skill_CasterAudioVolume);
+                        }
+                        #endregion
+                    } 
+                    live_charStats.charStatus._isCasting = true;
+                }
+                else
+                {
+                    Utils.Skill_ResetCasting(scrObj_Skill, skill, live_charStats);
+                    Utils.Skill_Target_Reset(skill, targetTypeIndex); //Reset TargetList w targetTypeIndexie
+                }
+            }
+            else
+            {
+                Utils.Skill_ResetCasting(scrObj_Skill, skill, live_charStats);
+                Utils.Skill_Target_Reset(skill, targetTypeIndex); //Reset TargetList w targetTypeIndexie
+            }
+        }
+        #endregion
     }
     #endregion CastingType
 
@@ -145,9 +220,9 @@ public static class Static_SkillForge
             {
                 for (int i = 0; i < Physics.OverlapSphereNonAlloc(skill.skill_casterGameobject.transform.position, skill.skill_currentRadius, skill.skill_allLocalColliders); i++)
                 {
-                    for (int j = 0; j < skill.skill_EnemiesArray.Length; j++)
+                    for (int j = 0; j < skill._enemiesArray.Length; j++)
                     {
-                        if (skill.skill_allLocalColliders[i].CompareTag(skill.skill_EnemiesArray[j]))
+                        if (skill.skill_allLocalColliders[i].CompareTag(skill._enemiesArray[j]))
                         {
                             skill.skill_targetInRange = true; //target jest w breath range
 
@@ -182,6 +257,57 @@ public static class Static_SkillForge
                 Utils.Skill_Target_Reset(skill);
             }
         }
+        #endregion
+
+        #region OverlapSphereNonAloc_NewMechanics
+        /// <summary>nowy OverlapSphereNonAloc ma swoje plusy bo nie tworzy nowego array przy kazdym Cast ale ogólnie niewiele zmienia a trzeba robić dodatkową tablicę niedynamiczną
+        /// Szuka targetów w dynamic Cone Radius
+        /// <br><i>Zwraca do Skill Objectu listę colliderów zgodnych z parametrami(EnemyTag,InCurrentRadius,InCurrentAngle) </i></br> 
+        /// </summary>
+        /// <param name="scrObj_Skill">Scriptable Object Skilla</param>
+        /// <param name="skill">Ten GameObject skill</param>
+        /// <param name="live_charStats">Live_charStats Castera</param>
+        public static void Skill_Cone_Target(ScrObj_skill scrObj_Skill, Skill skill, CharacterStatus live_charStats, int targetTypeIndex, int effectTypeIndex)
+        {        
+            for (int i = 0; i < Physics.OverlapSphereNonAlloc(skill.skill_casterGameobject.transform.position, skill.skill_currentRadius, skill.targetDynamicValues[targetTypeIndex]._allLocalColliders); i++)
+            {
+                for (int j = 0; j < skill._enemiesArray.Length; j++)
+                {
+                    if (skill.targetDynamicValues[targetTypeIndex]._allLocalColliders[i].CompareTag(skill._enemiesArray[j]))
+                    {
+                        skill.targetDynamicValues[targetTypeIndex]._targetInRange = true; //target jest w breath range
+
+                        Vector3 directionToTarget = (skill.targetDynamicValues[targetTypeIndex]._allLocalColliders[i].transform.position - skill.skill_casterGameobject.transform.position).normalized; //0-1(normalized) różnica pomiędzy targetem a characterem Vector3.normalized ==> vector (kierunek w którym od niego znajduje się target)
+                                                                                                                                                                        //sprawdzanie aktualnie ostatniego elementu z listy
+                        if (Vector3.Angle(skill.skill_casterGameobject.transform.forward, directionToTarget) < skill.skill_currentAngle / 2)
+                        //sprawdzanie angle wektora forward charactera i direction to target
+                        //target może być na + albo - od charactera dlatego w każdą stronę angle / 2
+                        {
+                            if (!Physics.Raycast(skill.skill_casterGameobject.transform.position, directionToTarget, Vector3.Distance(skill.skill_casterGameobject.transform.position, skill.targetDynamicValues[targetTypeIndex]._allLocalColliders[i].transform.position), scrObj_Skill.new_TargetType[targetTypeIndex]._obstaclesMask))    //dodatkowo sprawdza Raycastem czy nie ma przeszkody pomiędzy playerem a targetem //  
+                            {
+                                skill.targetDynamicValues[targetTypeIndex]._targetInAngle = true;
+
+                                if (skill.targetDynamicValues[targetTypeIndex]._targetColliders.IndexOf(skill.targetDynamicValues[targetTypeIndex]._allLocalColliders[i]) < 0) //sprawdza czy nie ma na liście. Jeżeli IndexOf < 0 czyli nie ma obiektów z tym indexem
+                                {
+                                    skill.targetDynamicValues[targetTypeIndex]._targetColliders.Add(skill.targetDynamicValues[targetTypeIndex]._allLocalColliders[i]); //przypisuje do listy colliders jeśli ma taga z listy enemies
+                                }
+                                else
+                                {
+                                    skill.targetDynamicValues[targetTypeIndex]._targetColliders.Remove(skill.targetDynamicValues[targetTypeIndex]._allLocalColliders[i]);
+                                    if (skill.targetDynamicValues[targetTypeIndex]._targetColliders.Count <= 0) skill.targetDynamicValues[targetTypeIndex]._targetInAngle = false; //jeśli nie ma żadnych targetów w Cone
+                                }
+                            }
+
+                        }
+                    }
+                }
+            }
+            if (skill.targetDynamicValues[targetTypeIndex]._targetColliders.Count > 0) 
+            {
+                //EffectType
+            }
+        }
+
         #endregion
 
         #region Działający Stary OverlapSphere
@@ -257,9 +383,9 @@ public static class Static_SkillForge
             {
                 for (int i = 0; i < Physics.OverlapSphereNonAlloc(skill.skill_casterGameobject.transform.position, skill.skill_currentRadius,skill.skill_allLocalColliders); i++)
                 {
-                    for (int j = 0; j < skill.skill_EnemiesArray.Length; j++)
+                    for (int j = 0; j < skill._enemiesArray.Length; j++)
                     {
-                        if (skill.skill_allLocalColliders[i].CompareTag(skill.skill_EnemiesArray[j]))
+                        if (skill.skill_allLocalColliders[i].CompareTag(skill._enemiesArray[j]))
                         {
                             skill.skill_targetInRange = true; //target jest w Radius range
 
@@ -392,18 +518,18 @@ public static class Static_SkillForge
 
                 ///Metoda zużywania Resourca wybranego w scriptableObject
                 ///Musi być "przypisana" do elementu objectu!!! (live_charStats.currentHP = wtedy trafia bezpośrednio tam gdzie ma być) Jeśli będzie return (float) trzeba użyć switcha wyżej (poza tą metodą/klasą) co może być niepotrzebne
-                switch (scrObj_Skill.skill_ResourceType)
+                switch (scrObj_Skill._resourceType)
                 {
                     case ScrObj_skill.Skill_ResourceType.health:
-                        live_charStats.charStats._hp = Mathf.MoveTowards(live_charStats.charStats._hp, -skill.skill_currentResourceCost, skill.skill_currentResourceCost * Time.deltaTime);    // ResourceCost / Sek 
+                        live_charStats.charStats._hp = Mathf.MoveTowards(live_charStats.charStats._hp, -skill._resourceCost, skill._resourceCost * Time.deltaTime);    // ResourceCost / Sek 
                         break;
 
                     case ScrObj_skill.Skill_ResourceType.mana:
-                        live_charStats.charStats._mp = Mathf.MoveTowards(live_charStats.charStats._mp, -skill.skill_currentResourceCost, skill.skill_currentResourceCost * Time.deltaTime);    // ResourceCost / Sek 
+                        live_charStats.charStats._mp = Mathf.MoveTowards(live_charStats.charStats._mp, -skill._resourceCost, skill._resourceCost * Time.deltaTime);    // ResourceCost / Sek 
                         break;
 
                     case ScrObj_skill.Skill_ResourceType.stamina:
-                        live_charStats.charStats._stam = Mathf.MoveTowards(live_charStats.charStats._stam, -skill.skill_currentResourceCost, skill.skill_currentResourceCost * Time.deltaTime);     // ResourceCost / Sek 
+                        live_charStats.charStats._stam = Mathf.MoveTowards(live_charStats.charStats._stam, -skill._resourceCost, skill._resourceCost * Time.deltaTime);     // ResourceCost / Sek 
                         break;
                 }
             }
@@ -420,7 +546,6 @@ public static class Static_SkillForge
         public static void Skill_Hit(ScrObj_skill scrObj_Skill, Skill skill, CharacterStatus live_charStats, bool isCastingType)
         {
             Utils.Skill_EffectValuesUpdate(scrObj_Skill, skill, live_charStats, live_charStats.charComponents._characterBonusStats); //nie chce mi się dopisywać linka do CharacterBonusStats :P
-
             if (isCastingType)
             {
                 for (int i = 0; i < skill.skill_targetColliders.Count; i++)
@@ -430,23 +555,61 @@ public static class Static_SkillForge
 
                 ///Metoda zużywania Resourca wybranego w scriptableObject
                 ///Musi być "przypisana" do elementu objectu!!! (live_charStats.currentHP = wtedy trafia bezpośrednio tam gdzie ma być) Jeśli będzie return (float) trzeba użyć switcha wyżej (poza tą metodą/klasą) co może być niepotrzebne
-                switch (scrObj_Skill.skill_ResourceType)
+                switch (scrObj_Skill._resourceType)
                 {
                     case ScrObj_skill.Skill_ResourceType.health:
-                        live_charStats.charStats._hp -= skill.skill_currentResourceCost; // ResourceCost Instant
+                        live_charStats.charStats._hp -= skill._resourceCost; // ResourceCost Instant
                         break;
 
                     case ScrObj_skill.Skill_ResourceType.mana:
-                        live_charStats.charStats._mp -= skill.skill_currentResourceCost;  // ResourceCost Instant
+                        live_charStats.charStats._mp -= skill._resourceCost;  // ResourceCost Instant
                         break;
 
                     case ScrObj_skill.Skill_ResourceType.stamina:
-                        live_charStats.charStats._stam -= skill.skill_currentResourceCost; // ResourceCost Instant
+                        live_charStats.charStats._stam -= skill._resourceCost; // ResourceCost Instant
                         break;
                 }
             }
         }
         #endregion
+
+        #region Skill_Hit_newMechanisc
+        /// <summary>
+        /// Hit Instant - Target Colliderów na Collider List
+        /// <br>Dziala z nową mechaniką targetType[]</br>
+        /// </summary>
+        /// <param name="scrObj_Skill">Scriptable Object Skilla</param>
+        /// <param name="skill">Ten GameObject skill</param>
+        /// <param name="live_charStats">Live_charStats Castera</param>
+        public static void Skill_Hit_new(ScrObj_skill scrObj_Skill, Skill skill, CharacterStatus live_charStats, int targetTypeIndex, int effectTypeIndex)
+        {
+            Utils.Skill_EffectValuesUpdate_new(scrObj_Skill, skill, live_charStats, live_charStats.charComponents._characterBonusStats, targetTypeIndex, effectTypeIndex); //nie chce mi się dopisywać linka do CharacterBonusStats :P
+
+            for (int i = 0; i < skill.targetDynamicValues[targetTypeIndex]._targetColliders.Count; i++)
+            {
+                skill.targetDynamicValues[targetTypeIndex]._targetColliders[i].GetComponent<CharacterStatus>().TakeDamgeInstant(skill.targetDynamicValues[targetTypeIndex].effectDynamicValues[effectTypeIndex]._currentDamage, live_charStats);
+            }
+
+            ///Metoda zużywania Resourca wybranego w scriptableObject
+            ///Musi być "przypisana" do elementu objectu!!! (live_charStats.currentHP = wtedy trafia bezpośrednio tam gdzie ma być) Jeśli będzie return (float) trzeba użyć switcha wyżej (poza tą metodą/klasą) co może być niepotrzebne
+            switch (scrObj_Skill._resourceType)
+            {
+                case ScrObj_skill.Skill_ResourceType.health:
+                    live_charStats.charStats._hp -= skill._resourceCost; // ResourceCost Instant
+                    break;
+
+                case ScrObj_skill.Skill_ResourceType.mana:
+                    live_charStats.charStats._mp -= skill._resourceCost;  // ResourceCost Instant
+                    break;
+
+                case ScrObj_skill.Skill_ResourceType.stamina:
+                    live_charStats.charStats._stam -= skill._resourceCost; // ResourceCost Instant
+                    break;
+            }
+        }
+        #endregion
+
+
 
         #region Skill_HealOverTime
         /// <summary>
@@ -468,18 +631,18 @@ public static class Static_SkillForge
 
                 ///Metoda zużywania Resourca wybranego w scriptableObject
                 ///Musi być "przypisana" do elementu objectu!!! (live_charStats.currentHP = wtedy trafia bezpośrednio tam gdzie ma być) Jeśli będzie return (float) trzeba użyć switcha wyżej (poza tą metodą/klasą) co może być niepotrzebne
-                switch (scrObj_Skill.skill_ResourceType)
+                switch (scrObj_Skill._resourceType)
                 {
                     case ScrObj_skill.Skill_ResourceType.health:
-                        live_charStats.charStats._hp = Mathf.MoveTowards(live_charStats.charStats._hp, -skill.skill_currentResourceCost, skill.skill_currentResourceCost * Time.deltaTime);    // ResourceCost / Sek 
+                        live_charStats.charStats._hp = Mathf.MoveTowards(live_charStats.charStats._hp, -skill._resourceCost, skill._resourceCost * Time.deltaTime);    // ResourceCost / Sek 
                         break;
 
                     case ScrObj_skill.Skill_ResourceType.mana:
-                        live_charStats.charStats._mp = Mathf.MoveTowards(live_charStats.charStats._mp, -skill.skill_currentResourceCost, skill.skill_currentResourceCost * Time.deltaTime);    // ResourceCost / Sek 
+                        live_charStats.charStats._mp = Mathf.MoveTowards(live_charStats.charStats._mp, -skill._resourceCost, skill._resourceCost * Time.deltaTime);    // ResourceCost / Sek 
                         break;
 
                     case ScrObj_skill.Skill_ResourceType.stamina:
-                        live_charStats.charStats._stam = Mathf.MoveTowards(live_charStats.charStats._stam, -skill.skill_currentResourceCost, skill.skill_currentResourceCost * Time.deltaTime);     // ResourceCost / Sek 
+                        live_charStats.charStats._stam = Mathf.MoveTowards(live_charStats.charStats._stam, -skill._resourceCost, skill._resourceCost * Time.deltaTime);     // ResourceCost / Sek 
                         break;
                 }
             }
@@ -506,18 +669,18 @@ public static class Static_SkillForge
 
                 ///Metoda zużywania Resourca wybranego w scriptableObject
                 ///Musi być "przypisana" do elementu objectu!!! (live_charStats.currentHP = wtedy trafia bezpośrednio tam gdzie ma być) Jeśli będzie return (float) trzeba użyć switcha wyżej (poza tą metodą/klasą) co może być niepotrzebne
-                switch (scrObj_Skill.skill_ResourceType)
+                switch (scrObj_Skill._resourceType)
                 {
                     case ScrObj_skill.Skill_ResourceType.health:
-                        live_charStats.charStats._hp -= skill.skill_currentResourceCost; // ResourceCost Instant
+                        live_charStats.charStats._hp -= skill._resourceCost; // ResourceCost Instant
                         break;
 
                     case ScrObj_skill.Skill_ResourceType.mana:
-                        live_charStats.charStats._mp -= skill.skill_currentResourceCost;  // ResourceCost Instant
+                        live_charStats.charStats._mp -= skill._resourceCost;  // ResourceCost Instant
                         break;
 
                     case ScrObj_skill.Skill_ResourceType.stamina:
-                        live_charStats.charStats._stam -= skill.skill_currentResourceCost; // ResourceCost Instant
+                        live_charStats.charStats._stam -= skill._resourceCost; // ResourceCost Instant
                         break;
                 }
             }
@@ -557,9 +720,9 @@ public static class Static_SkillForge
         /// <param name="live_charStats">Live_charStats Castera</param>
         public static void Skill_EnemyArraySelector(Skill skill, CharacterStatus live_charStats)
         {
-            skill.skill_EnemiesArray = new string[live_charStats.charInfo._enemiesArray.Length + 1];              //tworzy array +1 od current enemies arraya
-            live_charStats.charInfo._enemiesArray.CopyTo(skill.skill_EnemiesArray, 0);                                     //kopiuje current enemies arraya od indexu 0
-            skill.skill_EnemiesArray[skill.skill_EnemiesArray.Length - 1] = "Destructibles";                                  //wstawia jako ostatni index Destructibles żeby zawsze można było go zniszczyć           
+            skill._enemiesArray = new string[live_charStats.charInfo._enemiesArray.Length + 1];              //tworzy array +1 od current enemies arraya
+            live_charStats.charInfo._enemiesArray.CopyTo(skill._enemiesArray, 0);                                     //kopiuje current enemies arraya od indexu 0
+            skill._enemiesArray[skill._enemiesArray.Length - 1] = "Destructibles";                                  //wstawia jako ostatni index Destructibles żeby zawsze można było go zniszczyć           
         }
 
         #endregion
@@ -729,7 +892,7 @@ public static class Static_SkillForge
         {
             float currentResource = new();
 
-            switch (scrObj_Skill.skill_ResourceType)
+            switch (scrObj_Skill._resourceType)
             {
                 case ScrObj_skill.Skill_ResourceType.health:
                     currentResource = live_charStats.charStats._hp;
@@ -749,27 +912,6 @@ public static class Static_SkillForge
         #endregion
 
         #region Skill_EffectValuesUpdate
-
-        /*/// <summary> OLD CODE
-        /// Update wartości Damage / Cost / Cooldown przed użyciem skilla (obliczanie z currentCharLevel i bonusCharStats )
-        /// </summary>
-        /// <param name="skill_currentDamage">Aktualny Damage skilla</param>
-        /// <param name="skill_currentMPCost">Aktualny MP cost skilla</param>
-        /// <param name="skill_currentCooldown">Aktualny Cooldown skilla</param>
-        /// <param name="skill_BaseDamage">Bazowy Damage skilla</param>
-        /// <param name="skill_BaseResourceCost">Bazowy Resource cost skilla</param>
-        /// <param name="skill_BaseCooldown">Bazowy Cooldown skilla</param>
-        /// <param name="skill_Multiplier">Multiplier do Levela i BonusCharStats do obliczeń [0.1f] -> na każdy lev i na każdy BonusDMG dodaje 0.1f BAZOWYCH DMG</param>
-        /// <param name="currentCharLevel">aktualny Level do obliczeń</param>
-        /// <param name="currentBonusSkillDamage">Aktualby bonus damage do skilla</param>
-        public static void Skill_ValuesUpdate(float skill_currentDamage, float skill_currentMPCost, float skill_currentCooldown, float skill_BaseDamage, float skill_BaseResourceCost, float skill_BaseCooldown,
-            float skill_Multiplier, int currentCharLevel, float currentBonusSkillDamage)
-        {
-            skill_currentDamage = skill_BaseDamage + (skill_BaseDamage * (currentCharLevel * skill_Multiplier)) + (skill_BaseDamage * (currentBonusSkillDamage * skill_Multiplier)); //+bonus
-            skill_currentMPCost = skill_BaseResourceCost + (skill_BaseResourceCost * (currentCharLevel * skill_Multiplier));
-            skill_currentCooldown = skill_BaseCooldown;
-        }*/
-
         /// <summary>
         /// Update wartości Damage / Cost  przed użyciem skilla (obliczanie z currentCharLevel i bonusCharStats )
         /// Wykorzystany w skill_Effects
@@ -781,13 +923,37 @@ public static class Static_SkillForge
         {
             if (skill == live_charStats.fov._spellRangeSkill)
             {
-                skill.skill_currentDamage = scrObj_Skill.skill_BaseDamage + (scrObj_Skill.skill_BaseDamage * (live_charStats.charInfo._charLevel * scrObj_Skill.skill_Multiplier)) + (scrObj_Skill.skill_BaseDamage * (currentCharacterBonusStats.bonus_Skill_Damage * scrObj_Skill.skill_Multiplier)); //+bonus
-                skill.skill_currentResourceCost = scrObj_Skill.skill_BaseResourceCost + (scrObj_Skill.skill_BaseResourceCost * (live_charStats.charInfo._charLevel * scrObj_Skill.skill_Multiplier));
+                skill.skill_currentDamage = scrObj_Skill.skill_BaseDamage + (scrObj_Skill.skill_BaseDamage * (live_charStats.charInfo._charLevel * scrObj_Skill._multiplier)) + (scrObj_Skill.skill_BaseDamage * (currentCharacterBonusStats.bonus_Skill_Damage * scrObj_Skill._multiplier)); //+bonus
+                skill._resourceCost = scrObj_Skill._baseResourceCost + (scrObj_Skill._baseResourceCost * (live_charStats.charInfo._charLevel * scrObj_Skill._multiplier));
             }
             else if(skill == live_charStats.fov._closeRangeSkill)
             {
-                skill.skill_currentDamage = scrObj_Skill.skill_BaseDamage + (scrObj_Skill.skill_BaseDamage * (live_charStats.charInfo._charLevel * scrObj_Skill.skill_Multiplier)) + (scrObj_Skill.skill_BaseDamage * (currentCharacterBonusStats.bonus_currentDamageCombo * scrObj_Skill.skill_Multiplier)); //+bonus
-                skill.skill_currentResourceCost = scrObj_Skill.skill_BaseResourceCost + (scrObj_Skill.skill_BaseResourceCost * (live_charStats.charInfo._charLevel * scrObj_Skill.skill_Multiplier));
+                skill.skill_currentDamage = scrObj_Skill.skill_BaseDamage + (scrObj_Skill.skill_BaseDamage * (live_charStats.charInfo._charLevel * scrObj_Skill._multiplier)) + (scrObj_Skill.skill_BaseDamage * (currentCharacterBonusStats.bonus_currentDamageCombo * scrObj_Skill._multiplier)); //+bonus
+                skill._resourceCost = scrObj_Skill._baseResourceCost + (scrObj_Skill._baseResourceCost * (live_charStats.charInfo._charLevel * scrObj_Skill._multiplier));
+            }
+        }
+        #endregion
+
+        #region Skill_EffectValuesUpdate_NewMechanics
+        /// <summary>
+        /// Update wartości Damage / Cost  przed użyciem skilla (obliczanie z currentCharLevel i bonusCharStats )
+        /// <br>Dziala z nową mechaniką targetType[]</br>
+        /// Wykorzystany w skill_Effects
+        /// </summary>
+        /// <param name="scrObj_Skill">Scriptable Object Skilla</param>
+        /// <param name="skill">Ten GameObject skill</param>
+        /// <param name="live_charStats">Live_charStats Castera</param>
+        public static void Skill_EffectValuesUpdate_new(ScrObj_skill scrObj_Skill, Skill skill, CharacterStatus live_charStats, CharacterBonusStats currentCharacterBonusStats, int targetTypeIndex, int effectTypeIndex)
+        {
+            if (skill == live_charStats.fov._spellRangeSkill)
+            {
+                skill.targetDynamicValues[targetTypeIndex].effectDynamicValues[effectTypeIndex]._currentDamage = scrObj_Skill.new_TargetType[targetTypeIndex].new_EffectType[effectTypeIndex]._baseDamage + (scrObj_Skill.new_TargetType[targetTypeIndex].new_EffectType[effectTypeIndex]._baseDamage * (live_charStats.charInfo._charLevel * scrObj_Skill._multiplier)) + (scrObj_Skill.new_TargetType[targetTypeIndex].new_EffectType[effectTypeIndex]._baseDamage * (currentCharacterBonusStats.bonus_Skill_Damage * scrObj_Skill._multiplier)); //+bonus
+                skill._resourceCost = scrObj_Skill._baseResourceCost + (scrObj_Skill._baseResourceCost * (live_charStats.charInfo._charLevel * scrObj_Skill._multiplier));
+            }
+            else if (skill == live_charStats.fov._closeRangeSkill)
+            {
+                skill.targetDynamicValues[targetTypeIndex].effectDynamicValues[effectTypeIndex]._currentDamage = scrObj_Skill.new_TargetType[targetTypeIndex].new_EffectType[effectTypeIndex]._baseDamage + (scrObj_Skill.new_TargetType[targetTypeIndex].new_EffectType[effectTypeIndex]._baseDamage * (live_charStats.charInfo._charLevel * scrObj_Skill._multiplier)) + (scrObj_Skill.new_TargetType[targetTypeIndex].new_EffectType[effectTypeIndex]._baseDamage * (currentCharacterBonusStats.bonus_currentDamageCombo * scrObj_Skill._multiplier)); //+bonus
+                skill._resourceCost = scrObj_Skill._baseResourceCost + (scrObj_Skill._baseResourceCost * (live_charStats.charInfo._charLevel * scrObj_Skill._multiplier));
             }
         }
         #endregion
@@ -809,48 +975,35 @@ public static class Static_SkillForge
             if (skill.skill_currentCooldownRemaining <= 0.05f) skill.skill_currentComboProgress = Mathf.MoveTowards(skill.skill_currentComboProgress, 0f, Time.deltaTime / scrObj_Skill.skill_BaseCooldown );   //aktualny combo progress spada do zera w czasie (1sek * (1/basecooldown)) czyli 30f -> 0f w 30sek spada tylko jeśli nie jest na cooldownie
 
             if (skill.skill_currentCooldownRemaining >= 0.06f) { skill.skill_IsCastingInstant = false; } //Reset Instanta na początku każdej klatki jeśli jest na cooldown
+        
+        }
+        #endregion
+
+        #region Skill_EveryFrameValuesUpdate_NewMechanics
+
+        /// <summary>
+        /// Update wartości skilla używany poza iSCasting 
+        /// <br>Dziala z nową mechaniką targetType[]</br>
+        /// Wykorzystany w FixedUpdate, musi być na samej górze FixedUpdate ponieważ resetuje IsCasting
+        /// </summary>
+        /// <param name="scrObj_Skill">Scriptable Object Skilla</param>
+        /// <param name="skill">Ten GameObject skill</param>
+        /// <param name="live_charStats">Live_charStats Castera</param>
+        public static void Skill_EveryFrameValuesUpdate_new(ScrObj_skill scrObj_Skill, Skill skill, CharacterStatus live_charStats, CharacterBonusStats currentCharacterBonusStats)
+        {
+            Skill_InputSelector(scrObj_Skill, skill, live_charStats);
+
+            skill.skill_currentCooldownRemaining = Mathf.MoveTowards(skill.skill_currentCooldownRemaining, 0f, Time.deltaTime / scrObj_Skill.skill_BaseCooldown); //cooldown remaining spada do zera w czasie (1sek * 1/basecooldown ) czyli 30f -> 0f w 10sek
+            if (skill.skill_currentCooldownRemaining <= 0.05f) skill.skill_currentComboProgress = Mathf.MoveTowards(skill.skill_currentComboProgress, 0f, Time.deltaTime / scrObj_Skill.skill_BaseCooldown);   //aktualny combo progress spada do zera w czasie (1sek * (1/basecooldown)) czyli 30f -> 0f w 30sek spada tylko jeśli nie jest na cooldownie
+
+            if (skill.skill_currentCooldownRemaining >= 0.06f) { live_charStats.charStatus._isCasting = false; } //Reset Instanta na początku każdej klatki jeśli jest na cooldown
+
+            Skill_Cone_DynamicCone_new(scrObj_Skill, skill, live_charStats);
 
         }
         #endregion
 
         #region Skill_Cone_DynamicCone
-
-        /*/// <summary> OLD CODE
-        /// Mechanika dynamic Cone Radius
-        /// <br><i>Dynamicznie skaluje zasięg i kąt Skilla</i></br>
-        /// </summary>
-        /// <param name="isCasting">Czy castuje?</param>
-        /// <param name="skill_currentRadius">Aktualny Radius skilla</param>
-        /// <param name="skill_currentAngle">Aktualny Kąt skilla</param>
-        /// <param name="skill_MinRadius">Bazowy Minimalny Radius skilla</param>
-        /// <param name="skill_MaxRadius">Bazowy Maxymalny Radius skilla</param>
-        /// <param name="skill_MinAngle">Bazowy Minimalny Kąt skilla</param>
-        /// <param name="skill_MaxAngle">Bazowy Maxymalny Kąt skilla</param>
-        /// <param name="skill_currentVectorRadius">(ref/refrence) Aktualny wektor(kierunek) w którum porusza się currentRadius skilla</param>
-        /// <param name="skill_currentVectorAngle">(ref/refrence) Aktualny wektor(kierunek) w którum porusza się currentAngle skilla</param>
-        /// <param name="skill_TimeMaxRadius">Czas zmiany MinRadius -> MaxRadius i vice-versa</param>
-        /// <param name="skill_TimeMaxAngle">Czas zmiany MinAngle -> MaxAngle i vice-versa</param>
-        public static void Skill_Cone_DynamicCone(bool isCasting, float skill_currentRadius, float skill_currentAngle, float skill_MinRadius, float skill_MaxRadius,
-            float skill_MinAngle, float skill_MaxAngle, float skill_currentVectorRadius, float skill_currentVectorAngle, float skill_TimeMaxRadius, float skill_TimeMaxAngle)
-        {
-            if (isCasting)
-            {
-                skill_currentRadius = Mathf.SmoothDamp(skill_currentRadius, skill_MaxRadius, ref skill_currentVectorRadius, skill_TimeMaxRadius);
-                //dynamiczny BreathCone radius -> ++ on input
-
-                skill_currentAngle = Mathf.SmoothDamp(skill_currentAngle, skill_MaxAngle, ref skill_currentVectorAngle, skill_TimeMaxAngle);
-                //dynamiczny BreathCone Angle -> ++ on input
-            }
-            else
-            {
-                skill_currentRadius = Mathf.SmoothDamp(skill_currentRadius, skill_MinRadius, ref skill_currentVectorRadius, skill_TimeMaxRadius);
-                //dynamiczny BreathCone radius -> -- off input
-
-                skill_currentAngle = Mathf.SmoothDamp(skill_currentAngle, skill_MinAngle, ref skill_currentVectorAngle, skill_TimeMaxAngle);
-                //dynamiczny BreathCone Angle -> -- off 
-            }
-            Debug.Log(nameof(Skill_Cone_DynamicCone));
-        }*/
 
         /// <summary>
         /// Mechanika Dynamicznego Range/Angle Cone
@@ -877,6 +1030,40 @@ public static class Static_SkillForge
                 skill.skill_currentAngle = Mathf.SmoothDamp(skill.skill_currentAngle, scrObj_Skill.skill_MinAngle, ref skill.skill_currentVectorAngle, scrObj_Skill.skill_TimeMaxAngle);
                 //dynamiczny BreathCone Angle -> -- off 
             }
+        }
+        #endregion
+
+        #region Skill_Cone_DynamicCone_NewMechanics
+
+        /// <summary>
+        /// Mechanika Dynamicznego Range/Angle Cone
+        /// <br>Dziala z nową mechaniką targetType[]</br>
+        /// <br><i>Dynamicznie skaluje zasięg i kąt Skilla</i></br>
+        /// </summary>
+        /// <param name="scrObj_Skill">Scriptable Object Skilla</param>
+        /// <param name="skill">Ten GameObject skill</param>
+        /// <param name="live_charStats">Live_charStats Castera</param>
+        public static void Skill_Cone_DynamicCone_new(ScrObj_skill scrObj_Skill, Skill skill, CharacterStatus live_charStats)
+        {
+            for (int i = 0; i < scrObj_Skill.new_TargetType.Length; i++) //Dla wszsytkich Elementów w TargetType[]
+            {
+                if (live_charStats.charStatus._isCasting)
+                {
+                    skill.targetDynamicValues[i]._currentRadius = Mathf.SmoothDamp(skill.targetDynamicValues[i]._currentRadius, scrObj_Skill.new_TargetType[i]._maxRadius, ref skill.targetDynamicValues[i]._currentVectorRadius, scrObj_Skill.new_TargetType[i]._timeMaxRadius);
+                    //dynamiczny BreathCone radius -> ++ on input
+
+                    skill.targetDynamicValues[i]._currentAngle = Mathf.SmoothDamp(skill.targetDynamicValues[i]._currentAngle, scrObj_Skill.new_TargetType[i]._maxAngle, ref skill.targetDynamicValues[i]._currentVectorAngle, scrObj_Skill.new_TargetType[i]._timeMaxAngle);
+                    //dynamiczny BreathCone Angle -> ++ on input
+                }
+                else
+                {
+                    skill.targetDynamicValues[i]._currentRadius = Mathf.SmoothDamp(skill.targetDynamicValues[i]._currentRadius, scrObj_Skill.new_TargetType[i]._minRadius, ref skill.targetDynamicValues[i]._currentVectorRadius, scrObj_Skill.new_TargetType[i]._timeMaxRadius);
+                    //dynamiczny BreathCone radius -> -- off input
+
+                    skill.targetDynamicValues[i]._currentAngle = Mathf.SmoothDamp(skill.targetDynamicValues[i]._currentAngle, scrObj_Skill.new_TargetType[i]._minAngle, ref skill.targetDynamicValues[i]._currentVectorAngle, scrObj_Skill.new_TargetType[i]._timeMaxAngle);
+                    //dynamiczny BreathCone Angle -> -- off 
+                }
+            }            
         }
         #endregion
 
@@ -908,6 +1095,17 @@ public static class Static_SkillForge
             skill.skill_targetInAngle = false;
             skill.skill_targetInRange = false;
             skill.skill_targetColliders.Clear();  //czyszczenie listy colliderów
+        }
+
+        /// <summary>
+        /// Resetuje Boole targetInRange/Angle oraz listę Colliderów -> New
+        /// </summary>
+        /// <param name="skill">Ten GameObject skill</param>
+        public static void Skill_Target_Reset(Skill skill, int targetTypeIndex)
+        {
+            skill.targetDynamicValues[targetTypeIndex]._targetInAngle = false;
+            skill.targetDynamicValues[targetTypeIndex]._targetInRange = false;
+            skill.targetDynamicValues[targetTypeIndex]._targetColliders.Clear(); //czyszczenie listy colliderów            
         }
         #endregion
 
@@ -953,6 +1151,32 @@ public static class Static_SkillForge
             skill.skill_IsCastingFinishedCastable = false;
 
             Skill_Target_Reset(skill); //Reset TargetList
+        }
+        #endregion
+
+        #region Skill_ResetCasting_newMechanics
+
+        /// <summary>
+        /// Reset wszystkich Static metod Casting
+        /// </summary>
+        /// <param name="scrObj_Skill">Scriptable Object Skilla</param>
+        /// <param name="skill">Ten GameObject skill</param>
+        /// <param name="live_charStats">Live_charStats Castera</param> 
+        public static void Skill_ResetCasting(ScrObj_skill scrObj_Skill, Skill skill, CharacterStatus live_charStats)
+        {
+            if (skill.skill_CastingVisualEffect != null) skill.skill_CastingVisualEffect.Stop();
+            if (!string.IsNullOrWhiteSpace(scrObj_Skill.skill_AnimatorBoolName)) live_charStats.charComponents._Animator.SetBool(scrObj_Skill.skill_AnimatorBoolName, false);
+            if (!string.IsNullOrWhiteSpace(scrObj_Skill.skill_AnimatorTriggerName)) live_charStats.charComponents._Animator.ResetTrigger(scrObj_Skill.skill_AnimatorTriggerName);
+
+            if (skill.skill_AudioSourceCaster != null)
+            {
+                skill.skill_AudioSourceCaster.volume = Mathf.MoveTowards(skill.skill_AudioSourceCaster.volume, 0, Time.deltaTime / 2); //obniza volume 1-> 0 w 2sek
+                if (skill.skill_AudioSourceCaster.volume <= 0.05f) { skill.skill_AudioSourceCaster.Stop(); }
+            }
+
+            live_charStats.charStatus._isCasting = false;
+
+            //skill.skill_currentCastingProgress = 0f; //reset progressu przy przerwaniu casta / niespełnieniu warunków    
         }
         #endregion
 
