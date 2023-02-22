@@ -114,7 +114,7 @@ public class UI_SkillFrame : MonoBehaviour, IPlayerUpdate
             case CharStat.CloseRangeAttDamage:
                 if (live_charStats.fov._closeRangeSkill != null)
                 {
-                    Static_SkillForge.Utils.Skill_EffectValuesUpdate(live_charStats.fov._closeRangeSkill.scrObj_Skill, live_charStats.fov._closeRangeSkill.skill, live_charStats, currentCharacterBonusStats);
+                    SkillForge.Utils.Skill_EffectValuesUpdate(live_charStats.fov._closeRangeSkill.scrObj_Skill, live_charStats.fov._closeRangeSkill.skill, live_charStats, currentCharacterBonusStats);
                     skill_BonusFloat = currentCharacterBonusStats.bonus_currentDamageCombo;
                     skill_OutputFloat = live_charStats.fov._closeRangeSkill.skill_currentDamage;
                 }
@@ -125,7 +125,7 @@ public class UI_SkillFrame : MonoBehaviour, IPlayerUpdate
             case CharStat.SpellRangeAttDamage:
                 if (live_charStats.fov._spellRangeSkill != null)
                 {
-                    Static_SkillForge.Utils.Skill_EffectValuesUpdate(live_charStats.fov._spellRangeSkill.scrObj_Skill, live_charStats.fov._spellRangeSkill.skill, live_charStats, currentCharacterBonusStats);
+                    SkillForge.Utils.Skill_EffectValuesUpdate(live_charStats.fov._spellRangeSkill.scrObj_Skill, live_charStats.fov._spellRangeSkill.skill, live_charStats, currentCharacterBonusStats);
                     skill_BonusFloat = currentCharacterBonusStats.bonus_Skill_Damage;
                     skill_OutputFloat = live_charStats.fov._spellRangeSkill.skill_currentDamage;
                 }
@@ -177,7 +177,7 @@ public class UI_SkillFrame : MonoBehaviour, IPlayerUpdate
                 {
                     skill_BonusFloat = currentCharacterBonusStats.bonus_currentDamageCombo;
                     skill_OutputFloat = live_charStats.fov._closeRangeSkill.skill_currentDamage;
-                    Static_SkillForge.Utils.Skill_EffectValuesUpdate(live_charStats.fov._closeRangeSkill.scrObj_Skill, live_charStats.fov._closeRangeSkill.skill, live_charStats, currentCharacterBonusStats);
+                    SkillForge.Utils.Skill_EffectValuesUpdate(live_charStats.fov._closeRangeSkill.scrObj_Skill, live_charStats.fov._closeRangeSkill.skill, live_charStats, currentCharacterBonusStats);
                 }
                 break;
 
@@ -186,7 +186,7 @@ public class UI_SkillFrame : MonoBehaviour, IPlayerUpdate
                 {
                     skill_BonusFloat = currentCharacterBonusStats.bonus_Skill_Damage;
                     skill_OutputFloat = live_charStats.fov._spellRangeSkill.skill_currentDamage;
-                    Static_SkillForge.Utils.Skill_EffectValuesUpdate(live_charStats.fov._spellRangeSkill.scrObj_Skill, live_charStats.fov._spellRangeSkill.skill, live_charStats, currentCharacterBonusStats);
+                    SkillForge.Utils.Skill_EffectValuesUpdate(live_charStats.fov._spellRangeSkill.scrObj_Skill, live_charStats.fov._spellRangeSkill.skill, live_charStats, currentCharacterBonusStats);
                 }
                 break;
 
