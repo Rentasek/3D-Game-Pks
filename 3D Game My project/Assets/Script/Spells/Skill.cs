@@ -24,13 +24,13 @@ public class Skill : MonoBehaviour
     [Tooltip("Lokalny boolean CanCast dla tego skilla dla klasy skill"), SerializeField] public bool skill_CanCast;
 
     [Header("Current IsCasting Values")]
-    [Tooltip("Aktualny index Castowania -> currentCastingIndex z arraya EffetType [i]")]private int currentCastingIndex;
+   // [Tooltip("Aktualny index Castowania -> currentCastingIndex z arraya EffetType [i]")]private int currentCastingIndex;
     [Tooltip("Bool zwracany true jeśli jest skończy castableCast (CastingType -> Finished Castable)"), SerializeField] public bool skill_IsCastingFinishedCastable;
     [Tooltip("Aktualny progress Castowania (CastingType -> Castable)"), SerializeField] public float skill_currentCastingProgress;
     [Space]
     [Tooltip("Bool zwracany true jeśli jest instantCast (CastingType -> Instant)"), SerializeField] public bool skill_IsCastingInstant;
     [Tooltip("Aktualny progress Cooldown skilla "), Range(0f, 1f), SerializeField] public float skill_currentCooldownRemaining;
-    [Tooltip("Aktualny progress ComboValue skilla"), Range(0f, 2f), SerializeField] public float skill_currentComboProgress;
+    [Tooltip("Aktualny progress ComboValue skilla"), Range(0f, 2f), SerializeField] public float _currentComboProgress;
     [Space]
     [Tooltip("Bool zwracany true jeśli jest holdCast (CastingType -> Hold)"), SerializeField] public bool skill_IsCastingHold;
 
@@ -67,6 +67,9 @@ public class Skill : MonoBehaviour
     [Tooltip("AudioSource skilla -> Caster"), SerializeField] public AudioSource skill_AudioSourceCaster;
     [Tooltip("VFX skilla -> Caster"), CanBeNull, SerializeField] public VisualEffect skill_CastingVisualEffect;
 
+    [SerializeField] public int iterationCounter = 0;
+
+    public bool _isUsingSkill = false;
 
     [Serializable]
     public class EffectDynamicValues
@@ -85,8 +88,7 @@ public class Skill : MonoBehaviour
         [Tooltip("Aktualny Kąt skilla"), CanBeNull, SerializeField] public float _currentAngle;
         [Space]
         [Tooltip("(ref/refrence) Aktualny wektor(kierunek) w którum porusza się currentRadius skilla"), CanBeNull, SerializeField] public float _currentVectorRadius;
-        [Tooltip("(ref/refrence) Aktualny wektor(kierunek) w którum porusza się currentAngle skilla"), CanBeNull, SerializeField] public float _currentVectorAngle;
-
+        [Tooltip("(ref/refrence) Aktualny wektor(kierunek) w którum porusza się currentAngle skilla"), CanBeNull, SerializeField] public float _currentVectorAngle;        
 
         [Space]
         [Tooltip("Zwracana lista wszystkich colliderów w zasięgu skilla"), CanBeNull, SerializeField] public Collider[] _allLocalColliders = new Collider[40];
@@ -114,7 +116,11 @@ public class Skill : MonoBehaviour
 
     private void FixedUpdate()
     {
-        Static_SkillForge.Utils.Skill_EveryFrameValuesUpdate(scrObj_Skill, skill, live_charStats, currentCharacterBonusStats);        
+
+        Skill_NewSkillMechanic(scrObj_Skill, skill, live_charStats, currentCharacterBonusStats);
+
+        /*OLD CODE
+         * SkillForge.Utils.Skill_EveryFrameValuesUpdate(scrObj_Skill, skill, live_charStats, currentCharacterBonusStats);        
              
         Skill_UniversalCasting(scrObj_Skill);
 
@@ -123,7 +129,8 @@ public class Skill : MonoBehaviour
         if (live_charStats.charStatus._isCasting && skill_CanCast)
         {     
             Skill_EffectTypeArray(scrObj_Skill, skill);
-        }
+        }*/
+        Debug.Log("Iteration Counter : " + iterationCounter);       
     }
 
     /// <summary>
@@ -155,7 +162,7 @@ public class Skill : MonoBehaviour
                 break;
         }
 
-        Static_SkillForge.Utils.Skill_EnemyArraySelector(skill, live_charStats);
+        SkillForge.Utils.Skill_EnemyArraySelector(skill, live_charStats);
 
         //Skills Select By MaxRange
         if (live_charStats.charSkillCombat._primarySkill != null && live_charStats.charSkillCombat._secondarySkill != null)
@@ -177,6 +184,8 @@ public class Skill : MonoBehaviour
         }
     }
 
+    #region OLD_SkillUniversalCastingPackcage
+    #region Skill_UniversalCasting
     /// <summary>
     /// Metoda odpowiedzialna za wystartowanie skilla
     /// <br><i>Sprawdza warunek CanCast oraz w zależności od tego czy biega wyłącza odpowiednie CastingType</i></br>
@@ -188,49 +197,51 @@ public class Skill : MonoBehaviour
 
         if (skill_CanCast)  //CanCast jest wykorzystane w inpucie więc warunkiem nie może być resource!!!
         {
-            Static_SkillForge.CastingType.Skill_CastingUniversal_VFX_Audio(scrObj_Skill, skill, live_charStats);
+            SkillForge.CastingType.Skill_CastingUniversal_VFX_Audio(scrObj_Skill, skill, live_charStats);
 
-           /* brzydko wygląda na NonPlayerach
-            * if (live_charStats.charStatus._isRunning || live_charStats.charMove._moveSpeed > live_charStats.charMove._walkSpeed)  //Jeśli biegnie lub speed jest większy od walkSpeed to resetuje wszystkie casty oprócz Instant
-            {
-                Static_SkillForge.Utils.Skill_ResetAnyCastingExceptInstant(scrObj_Skill, skill, live_charStats);
-            }*/
+            /* brzydko wygląda na NonPlayerach
+             * if (live_charStats.charStatus._isRunning || live_charStats.charMove._moveSpeed > live_charStats.charMove._walkSpeed)  //Jeśli biegnie lub speed jest większy od walkSpeed to resetuje wszystkie casty oprócz Instant
+             {
+                 Static_SkillForge.Utils.Skill_ResetAnyCastingExceptInstant(scrObj_Skill, skill, live_charStats);
+             }*/
 
             if (live_charStats.charInfo._isPlayer) //W miare na nonPlayerach
             {
                 if (live_charStats.charStatus._isRunning || live_charStats.charMove._moveSpeed > live_charStats.charMove._walkSpeed)  //Jeśli biegnie lub speed jest większy od walkSpeed to resetuje wszystkie casty oprócz Instant
                 {
-                    Static_SkillForge.Utils.Skill_ResetAnyCastingExceptInstant(scrObj_Skill, skill, live_charStats);
+                    SkillForge.Utils.Skill_ResetAnyCastingExceptInstant(scrObj_Skill, skill, live_charStats);
                 }
             }
             else
             {
                 if (live_charStats.charStatus._isRunning || live_charStats.charMove._moveSpeed > live_charStats.charMove._walkSpeed)
                 {
-                    Static_SkillForge.Utils.Skill_ResetAnyCasting(scrObj_Skill, skill, live_charStats);
+                    SkillForge.Utils.Skill_ResetAnyCasting(scrObj_Skill, skill, live_charStats);
                 }
             }
 
         }
-        else { Static_SkillForge.Utils.Skill_ResetAnyCasting(scrObj_Skill, skill, live_charStats); }
+        else { SkillForge.Utils.Skill_ResetAnyCasting(scrObj_Skill, skill, live_charStats); }
 
 
 
 
-        if (live_charStats.charStatus._isDead) { Static_SkillForge.Utils.Skill_ResetAnyCasting(scrObj_Skill, skill, live_charStats); }
-    }    
+        if (live_charStats.charStatus._isDead) { SkillForge.Utils.Skill_ResetAnyCasting(scrObj_Skill, skill, live_charStats); }
+    }
+    #endregion
 
+    #region Skill_EffectTypeArray
     private void Skill_EffectTypeArray(ScrObj_skill scrObj_Skill, Skill skill)
     {
-        for (currentCastingIndex = 0; currentCastingIndex < scrObj_Skill.skill_EffectTypeArray.Length; currentCastingIndex++)
-        {   
+        for (int currentCastingIndex = 0; currentCastingIndex < scrObj_Skill.skill_EffectTypeArray.Length; currentCastingIndex++)
+        {
             switch (scrObj_Skill.skill_EffectTypeArray[currentCastingIndex])
             {
                 case ScrObj_skill.Skill_EffectTypeArray.none:
                     break;
 
                 case ScrObj_skill.Skill_EffectTypeArray.hit:
-                    Static_SkillForge.EffectType.Skill_Hit(scrObj_Skill, skill, live_charStats, Static_SkillForge.Utils.Skill_CastingTypeCurrentFloatReadOnly(currentCastingIndex, skill));
+                    SkillForge.EffectType.Skill_Hit(scrObj_Skill, skill, live_charStats, SkillForge.Utils.Skill_CastingTypeCurrentFloatReadOnly(currentCastingIndex, skill));
                     break;
 
                 case ScrObj_skill.Skill_EffectTypeArray.boom:
@@ -243,23 +254,25 @@ public class Skill : MonoBehaviour
                     break;
 
                 case ScrObj_skill.Skill_EffectTypeArray.damageOverTime:
-                    Static_SkillForge.EffectType.Skill_DamageOverTime(scrObj_Skill, skill, live_charStats, Static_SkillForge.Utils.Skill_CastingTypeCurrentFloatReadOnly(currentCastingIndex, skill));
+                    SkillForge.EffectType.Skill_DamageOverTime(scrObj_Skill, skill, live_charStats, SkillForge.Utils.Skill_CastingTypeCurrentFloatReadOnly(currentCastingIndex, skill));
                     break;
 
                 case ScrObj_skill.Skill_EffectTypeArray.healOverTime:
-                    Static_SkillForge.EffectType.Skill_HealOverTime(scrObj_Skill, skill, live_charStats, Static_SkillForge.Utils.Skill_CastingTypeCurrentFloatReadOnly(currentCastingIndex, skill));
+                    SkillForge.EffectType.Skill_HealOverTime(scrObj_Skill, skill, live_charStats, SkillForge.Utils.Skill_CastingTypeCurrentFloatReadOnly(currentCastingIndex, skill));
                     break;
 
                 case ScrObj_skill.Skill_EffectTypeArray.heal:
-                    Static_SkillForge.EffectType.Skill_HealOverTime(scrObj_Skill, skill, live_charStats, Static_SkillForge.Utils.Skill_CastingTypeCurrentFloatReadOnly(currentCastingIndex, skill));
+                    SkillForge.EffectType.Skill_HealOverTime(scrObj_Skill, skill, live_charStats, SkillForge.Utils.Skill_CastingTypeCurrentFloatReadOnly(currentCastingIndex, skill));
                     break;
 
                 case ScrObj_skill.Skill_EffectTypeArray.summon:
                     break;
             }
-        }        
+        }
     }
+    #endregion
 
+    #region Skill_TargetType
     private void Skill_TargetType(ScrObj_skill scrObj_Skill)
     {
         if (!live_charStats.charStatus._isDead /*&& live_charStats.skill_CanCast*/) //tylko dla żywych :P
@@ -267,11 +280,11 @@ public class Skill : MonoBehaviour
             switch (scrObj_Skill.skill_TargetType)
             {
                 case ScrObj_skill.Skill_TargetType.melee:
-                    Static_SkillForge.TargetType.Skill_Melee_Target(scrObj_Skill, skill, live_charStats);
+                    SkillForge.TargetType.Skill_Melee_Target(scrObj_Skill, skill, live_charStats);
                     break;
 
                 case ScrObj_skill.Skill_TargetType.cone:
-                    Static_SkillForge.TargetType.Skill_Cone_Target(scrObj_Skill, skill, live_charStats);
+                    SkillForge.TargetType.Skill_Cone_Target(scrObj_Skill, skill, live_charStats);
                     break;
 
                 case ScrObj_skill.Skill_TargetType.projectile:
@@ -283,7 +296,7 @@ public class Skill : MonoBehaviour
                     break;
 
                 case ScrObj_skill.Skill_TargetType.self:
-                    Static_SkillForge.TargetType.Skill_Self_Target(scrObj_Skill, skill, live_charStats);
+                    SkillForge.TargetType.Skill_Self_Target(scrObj_Skill, skill, live_charStats);
                     break;
 
                 case ScrObj_skill.Skill_TargetType.summon:
@@ -291,56 +304,52 @@ public class Skill : MonoBehaviour
                     break;
             }
         }
-    }     
+    }
+    #endregion
+    #endregion
 
-    private void Skill_NewSkillMechanic(ScrObj_skill scrObj_Skill)
+    private void Skill_NewSkillMechanic(ScrObj_skill scrObj_Skill, Skill skill, CharacterStatus live_charStats, CharacterBonusStats currentCharacterBonusStats)
     {
-        skill_CanCast = !skill.skill_otherInput && !live_charStats.charStatus._isDead;
+        SkillForge.Utils.Skill_EveryFrameValuesUpdate_new(scrObj_Skill, skill, live_charStats, currentCharacterBonusStats);
 
+        skill_CanCast = !skill.skill_otherInput && !live_charStats.charStatus._isDead;
 
         if (skill.skill_input && skill.skill_CanCast) 
         {
-            for (int i = 0; i < scrObj_Skill.new_TargetType.Length; i++)
+            
+            switch (scrObj_Skill.new_EnumCastingType)
             {
-                for (int j = 0; j < scrObj_Skill.new_TargetType[i].new_EffectType.Length; j++)
-                {
-                    switch (scrObj_Skill.new_EnumCastingType)
+                case ScrObj_skill.New_EnumCastingType.Instant:
                     {
-                       
-                        case ScrObj_skill.New_EnumCastingType.Instant:
-                            {
-                                // static casting dla Instant
-                            }
-                            break;
-
-                        case ScrObj_skill.New_EnumCastingType.Hold:
-                            {
-                                if (!live_charStats.charStatus._isRunning || live_charStats.charMove._moveSpeed <= 0.2f)
-                                {
-                                    // static casting dla Hold
-                                }
-                            }
-                            break;
-
-                        case ScrObj_skill.New_EnumCastingType.Castable:
-                            {
-                                if (!live_charStats.charStatus._isRunning || live_charStats.charMove._moveSpeed <= 0.2f)
-                                {
-                                    // static casting dla Castable
-                                }
-                            }
-                            break;
+                        SkillForge.CastingType.CastingInstant(scrObj_Skill, skill, live_charStats);    // static casting dla Instant
                     }
-                }
+                    break;
+                case ScrObj_skill.New_EnumCastingType.Hold:
+                    {
+                        if (!live_charStats.charStatus._isRunning || live_charStats.charMove._moveSpeed <= 0.2f)
+                        {
+                            SkillForge.CastingType.CastingHold(scrObj_Skill, skill, live_charStats);   // static casting dla Hold
+                        }
+                    }
+                    break;
+                case ScrObj_skill.New_EnumCastingType.Castable:
+                    {
+                        if (!live_charStats.charStatus._isRunning || live_charStats.charMove._moveSpeed <= 0.2f)
+                        {
+                            SkillForge.CastingType.CastingCastable(scrObj_Skill, skill, live_charStats);    // static casting dla Castable
+                        }
+                    }
+                    break;
             }
         }
         else
         {
-            Static_SkillForge.Utils.Skill_ResetCasting(scrObj_Skill, skill, live_charStats);
-            for (int i = 0; i < scrObj_Skill.new_TargetType.Length; i++) //Reset całej tablicy targetType 
+            _isUsingSkill = false;
+            SkillForge.Utils.Skill_ResetCastingAndVFXAnimsAudio(scrObj_Skill, skill, live_charStats);
+            for (int targetTypeIndex = 0; targetTypeIndex < scrObj_Skill.new_TargetType.Length; targetTypeIndex++) //Dla wszystkich Elementów w TargetType[] //Reset całej tablicy targetType 
             {                
-                Static_SkillForge.Utils.Skill_Target_Reset(skill, i); //Reset TargetList w targetTypeIndexie
-            }                
+                SkillForge.Utils.Skill_ResetTargetList(scrObj_Skill, skill, live_charStats, targetTypeIndex); //Reset TargetList w targetTypeIndexie
+            }            
         }
     }
 
