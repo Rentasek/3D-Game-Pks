@@ -90,20 +90,22 @@ public class Skill : MonoBehaviour
         [Tooltip("(ref/refrence) Aktualny wektor(kierunek) w którum porusza się currentRadius skilla"), CanBeNull, SerializeField] public float _currentVectorRadius;
         [Tooltip("(ref/refrence) Aktualny wektor(kierunek) w którum porusza się currentAngle skilla"), CanBeNull, SerializeField] public float _currentVectorAngle;        
 
-        [Space]
-        [Tooltip("Zwracana lista wszystkich colliderów w zasięgu skilla"), CanBeNull, SerializeField] public Collider[] _allLocalColliders = new Collider[40];
+        [Space]        
         [Tooltip("Zwracana lista colliderów zgodnych z parametrami(EnemyTag,InCurrentRadius,InCurrentAngle)"), CanBeNull, SerializeField] public List<Collider> _targetColliders;
 
-        public EffectDynamicValues[] effectDynamicValues = new EffectDynamicValues[10];
+        public EffectDynamicValues[] effectDynamicValues = new EffectDynamicValues[3];
     }
-    public TargetDynamicValues[] targetDynamicValues = new TargetDynamicValues[10];
+    public TargetDynamicValues[] targetDynamicValues = new TargetDynamicValues[3];
 
 
 
     private void OnValidate()
     {
         skill = this;
-        //QuickSetup(live_charStats, scrObj_Skill, skill);  
+
+        QuickSetup(scrObj_Skill, skill, live_charStats);
+
+        DynamicTargetArraySetup(scrObj_Skill, skill);
 
         /*if(live_charStats.charInfo._isPlayer)
         {
@@ -141,11 +143,12 @@ public class Skill : MonoBehaviour
     /// <br>skill_AudioSource</br>
     /// <br>skill_CastingVisualEffect</br>
     /// <br>ScrObj_skill.Skill_InputType</br>
-    /// </summary>
-    void QuickSetup(CharacterStatus live_charStats, ScrObj_skill scrObj_Skill, Skill skill)
+    /// </summary> 
+    /// <param name="scrObj_Skill">Scriptable Object Skilla</param>
+    /// <param name="skill">Ten GameObject skill</param>
+    /// <param name="live_charStats">Live_charStats Castera</param>
+    private void QuickSetup( ScrObj_skill scrObj_Skill, Skill skill, CharacterStatus live_charStats)
     {
-        skill = this;
-
         live_charStats = GetComponentInParent<CharacterStatus>();
         currentCharacterBonusStats= GetComponentInParent<CharacterBonusStats>();
         skill_casterGameobject = gameObject;
@@ -162,26 +165,41 @@ public class Skill : MonoBehaviour
                 break;
         }
 
+       
+
         SkillForge.Utils.Skill_EnemyArraySelector(skill, live_charStats);
 
         //Skills Select By MaxRange
         if (live_charStats.charSkillCombat._primarySkill != null && live_charStats.charSkillCombat._secondarySkill != null)
         {
-            if (live_charStats.charSkillCombat._primarySkill.scrObj_Skill.skill_MaxRadius < live_charStats.charSkillCombat._secondarySkill.scrObj_Skill.skill_MaxRadius)
+            if (live_charStats.charSkillCombat._primarySkill.scrObj_Skill._skillMaxRadius < live_charStats.charSkillCombat._secondarySkill.scrObj_Skill._skillMaxRadius)
             {
                 live_charStats.fov._closeRangeSkill = live_charStats.charSkillCombat._primarySkill;
-                live_charStats.fov._spellRangeSkill = live_charStats.charSkillCombat._secondarySkill;
-                live_charStats.fov._closeRangeSkillMinRadius = live_charStats.charSkillCombat._primarySkill.scrObj_Skill.skill_MinRadius;
-                live_charStats.fov._spellRangeSkillMaxRadius = live_charStats.charSkillCombat._secondarySkill.scrObj_Skill.skill_MaxRadius;
+                live_charStats.fov._spellRangeSkill = live_charStats.charSkillCombat._secondarySkill;                
+                live_charStats.fov._spellRangeSkillMaxRadius = live_charStats.charSkillCombat._secondarySkill.scrObj_Skill._skillMaxRadius;
             }
             else
             {
                 live_charStats.fov._closeRangeSkill = live_charStats.charSkillCombat._secondarySkill;
                 live_charStats.fov._spellRangeSkill = live_charStats.charSkillCombat._primarySkill;
-                live_charStats.fov._closeRangeSkillMinRadius = live_charStats.charSkillCombat._secondarySkill.scrObj_Skill.skill_MinRadius;
-                live_charStats.fov._spellRangeSkillMaxRadius = live_charStats.charSkillCombat._primarySkill.scrObj_Skill.skill_MaxRadius;
+                live_charStats.fov._spellRangeSkillMaxRadius = live_charStats.charSkillCombat._primarySkill.scrObj_Skill._skillMaxRadius;
             }
         }
+    }
+
+    /// <summary>
+    /// Ustawianie długości tablic dla dynamicznych klas targetDynamicValues i effectDynamicValues
+    /// </summary>
+    /// <param name="scrObj_Skill">Scriptable Object Skilla</param>
+    /// <param name="skill">Ten GameObject skill</param>
+    void DynamicTargetArraySetup(ScrObj_skill scrObj_Skill, Skill skill)
+    {
+        skill.targetDynamicValues = new TargetDynamicValues[scrObj_Skill.new_TargetType.Length];
+        
+        /*for (int i = 0; i < skill.targetDynamicValues.Length; i++)
+        {
+            skill.targetDynamicValues[i].effectDynamicValues = new EffectDynamicValues[scrObj_Skill.new_TargetType[i].new_EffectType.Length];
+        }*/
     }
 
     #region OLD_SkillUniversalCastingPackcage
