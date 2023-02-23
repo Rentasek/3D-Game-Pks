@@ -88,7 +88,7 @@ public static class LiveCharStats_Base
                         live_charStats.fov._targetAquired = false;
                         live_charStats.fov._targetInAttackRange = false;
                         live_charStats.fov._targetInSpellRange = false;
-                        Utils.CloseRangeInputSwitcher(live_charStats, live_charStats.fov._closeRangeSkill);    //Attacking z przypisania input=live_charStats.fov._targetInAttackRange
+                        //Utils.CloseRangeInputSwitcher(live_charStats, live_charStats.fov._closeRangeSkill);    //Attacking z przypisania input=live_charStats.fov._targetInAttackRange
                                                                                                                //może być wyrzucony do startowego FoV pod Dynamic Checkiem, tak naprawdę powinno być w AIController
                     }
                 }
@@ -99,7 +99,7 @@ public static class LiveCharStats_Base
                     live_charStats.fov._targetAquired = false;
                     live_charStats.fov._targetInAttackRange = false;
                     live_charStats.fov._targetInSpellRange = false;
-                    Utils.CloseRangeInputSwitcher(live_charStats, live_charStats.fov._closeRangeSkill);    //Attacking z przypisania input=live_charStats.fov._targetInAttackRange
+                    //Utils.CloseRangeInputSwitcher(live_charStats, live_charStats.fov._closeRangeSkill);    //Attacking z przypisania input=live_charStats.fov._targetInAttackRange
                 }
             }                    
         }
@@ -132,14 +132,14 @@ public static class LiveCharStats_Base
                     live_charStats.fov._aquiredTargetGameObject = targetCollider.gameObject;           //ustawia znaleziony colliderem game objecta jako target
                     live_charStats.fov._targetAquired = true;
 
-                    if (distanceToTarget <= live_charStats.fov._closeRangeSkill.scrObj_Skill.skill_MinRadius + 0.5f)
+                    if (distanceToTarget <= live_charStats.charComponents._characterController.radius * 4)
                     {                        
                         live_charStats.fov._targetInAttackRange = true;
                         live_charStats.fov._targetInSpellRange = true;                        
                         Utils.CloseRangeInputSwitcher(live_charStats, live_charStats.fov._closeRangeSkill);    //Attacking z przypisania input=live_charStats.fov._targetInAttackRange
                         return;
                     }
-                    else if (distanceToTarget <= (live_charStats.fov._spellRangeSkill.scrObj_Skill.skill_MaxRadius * live_charStats.fov._AISpellRangeSkillRadiusFromMax) + 0.5f)
+                    else if (distanceToTarget <= (live_charStats.fov._spellRangeSkill.scrObj_Skill._skillMaxRadius * live_charStats.fov._AISpellRangeSkillRadiusFromMax))
                     {                        
                         live_charStats.fov._targetInAttackRange = false;
                         live_charStats.fov._targetInSpellRange = true;                        
@@ -293,7 +293,7 @@ public static class LiveCharStats_Base
 
     private static void CheckForTargetInSpellRange(CharacterStatus live_charStats, Skill skill_SpellRange)
     {
-        foreach (Collider collider in Physics.OverlapSphere(live_charStats.gameObject.transform.position, skill_SpellRange.scrObj_Skill.skill_MaxRadius * live_charStats.fov._AISpellRangeSkillRadiusFromMax)) //dla każdego collidera w zasięgu spella
+        foreach (Collider collider in Physics.OverlapSphere(live_charStats.gameObject.transform.position, skill_SpellRange.scrObj_Skill._skillMaxRadius * live_charStats.fov._AISpellRangeSkillRadiusFromMax)) //dla każdego collidera w zasięgu spella
         {
             if (live_charStats.charInfo._enemiesArray.Contains(collider.tag))                                         //jeśli ma tag zawarty w arrayu enemiesArray
             {
@@ -317,71 +317,65 @@ public static class LiveCharStats_Base
     /// </summary>
     /// <param name="live_charStats">Attached CharacterStatus object / Przypięty obiekt CharacterStatus</param>
     public static void AIControllerCheck(CharacterStatus live_charStats)
-    {
+    {        
         //wyłączone player input na postaci gracza
         if (!live_charStats.charInfo._playerInputEnable && live_charStats.charComponents._navMeshAgent.enabled && live_charStats.charInfo._isPlayer)
         {
             live_charStats.charComponents._navMeshAgent.SetDestination(live_charStats.navMeshAge._walkPoint);
 
-            if (!live_charStats.charInput._mouseCurrentMoving && !live_charStats.charInput._secondary)     //mouse input -> wyłącza CheckTagetInRange //dodatkowo input casting
+            if (!live_charStats.charInput._mouseCurrentMoving && !live_charStats.fov._spellRangeSkill.skill_input)     //mouse input -> wyłącza CheckTagetInRange //dodatkowo input casting
             {                
                 FieldOfViewTarget(live_charStats);
-            }
 
-            if (live_charStats.fov._closeRangeSkill.skill_input)
-            {
-                //debugging if not null
-                if (live_charStats.fov._aquiredTargetGameObject != null && !live_charStats.charInput._mouseCurrentMoving) //przy wciskaniu przucisku porusazania się nie lockuje targetu
+                if (live_charStats.fov._targetInAttackRange)
                 {
                     Attacking(live_charStats);
-                    //live_charStats.gameObject.transform.LookAt(live_charStats.fov._aquiredTargetGameObject.transform);//Enemy jest zwrócony w stronę Playera
-                    //live_charStats.navMeshAge._walkPoint = live_charStats.fov._aquiredTargetGameObject.transform.position;
-                    //StopMovementNavMeshAgent(live_charStats);
                 }
-            }
-            else live_charStats.charComponents._navMeshAgent.isStopped = false; //żeby odblokować agenta po atakowaniu
-
-            // Jeśli dystans do walkPoint jest mniejszy niż 1f resetuje walkPointSet (wykorzystanie live_charStats.currentNavMeshAgent.*)            
-            if (live_charStats.charComponents._navMeshAgent.remainingDistance <= live_charStats.fov._closeRangeSkillMinRadius + 0.5f)
-            {
-                live_charStats.navMeshAge._walkPoint = live_charStats.gameObject.transform.position;
-            }
-
-            if (live_charStats.fov._targetInDynamicSightRange && !live_charStats.fov._targetInAttackRange) Chasing(live_charStats); // player bez inputa ściga tylko przy close sight range
-
-            if (live_charStats.charInput._mouseCurrentMoving) live_charStats.navMeshAge._walkPoint = live_charStats.navMeshAge._mouseWalkPoint; //mouse input -> ovveriride walkPointSet z CheckRange
-        }
-        else
-        //wyłączone player input na każdej innej postaci
-        if (!live_charStats.charInfo._playerInputEnable && live_charStats.charComponents._navMeshAgent.enabled && !live_charStats.charInfo._isPlayer)
-        {
-            FieldOfViewTarget(live_charStats);
-
-            if (!live_charStats.fov._targetInDynamicSightRange && !live_charStats.fov._targetAquired && !live_charStats.fov._targetInAttackRange && !live_charStats.fov._spellRangeSkill.skill_input) Patrolling(live_charStats);
-
-            //AI_Castowanie Spelli
-            if (live_charStats.fov._spellRangeSkill != null && live_charStats.fov._targetAquired && live_charStats.fov._targetInSpellRange && !live_charStats.fov._targetInAttackRange)
-            {
-                if (live_charStats.charStats._mp <= 10f)    //jeśli zejdzie do 10 many to nie castuje
+                else
                 {
-                    switch (live_charStats.fov._spellRangeSkill.scrObj_Skill.skill_InputType)   //to tak jakby komuś chciało się podmienic na inputPrimary dla AI dać Casta a na secondary Melle
+                    live_charStats.fov._closeRangeSkill.skill_input = false;
+                    switch (live_charStats.fov._closeRangeSkill.scrObj_Skill.skill_InputType)
                     {
                         case ScrObj_skill.Skill_InputType.primary:
                             live_charStats.charInput._primary = false;
                             break;
                         case ScrObj_skill.Skill_InputType.secondary:
                             live_charStats.charInput._secondary = false;
-                            break;                            
+                            break;
                     }
-                }
-                else if (live_charStats.charStats._mp >= 70f)   //jeśli nie osiągnie 70 many to nie castuje
-                {
-                    AI_SpellCast(live_charStats);
+                    //AI_Chasing  //Jeśli target w dynamicRange
+                    if (live_charStats.fov._targetInDynamicSightRange && live_charStats.fov._targetAquired && !live_charStats.fov._spellRangeSkill.skill_input) { Chasing(live_charStats); } //!live_charStats.fov._spellRangeSkill.skill_input żeby nie przerywał casta
+                    else //Jeśli !targetAquired lub !dynamicRange
+                    {
+                        //AI_Patrolling można włączyć na postaci gracza
+                        //if (!live_charStats.fov._spellRangeSkill.skill_input) { Patrolling(live_charStats); }   //!live_charStats.fov._spellRangeSkill.skill_input żeby nie przerywał casta
+
+                        //AI_Stopping -> Jeśli dystans do walkPoint jest mniejszy niż charController.radius*2 resetuje walkPointSet (wykorzystanie live_charStats.currentNavMeshAgent.*)            
+                        if (live_charStats.charComponents._navMeshAgent.remainingDistance <= live_charStats.charComponents._characterController.radius * 4)
+                        {
+                            StopMovementNavMeshAgent(live_charStats);
+                        }
+                    }
                 }
             }
             else
             {
-                switch (live_charStats.fov._spellRangeSkill.scrObj_Skill.skill_InputType)
+                live_charStats.navMeshAge._walkPoint = live_charStats.navMeshAge._mouseWalkPoint; //mouse input -> ovveriride walkPointSet z CheckRange
+            }            
+        }
+
+        else
+        //wyłączone player input na każdej innej postaci
+        if (!live_charStats.charInfo._playerInputEnable && live_charStats.charComponents._navMeshAgent.enabled && !live_charStats.charInfo._isPlayer)
+        {
+            FieldOfViewTarget(live_charStats);
+
+            //Ai_Attack CloseRange
+            if (live_charStats.fov._targetInAttackRange && !live_charStats.fov._spellRangeSkill.skill_input) { Attacking(live_charStats); }
+            else //Jeśli target nie w AttackRange
+            { 
+                live_charStats.fov._closeRangeSkill.skill_input = false;
+                switch (live_charStats.fov._closeRangeSkill.scrObj_Skill.skill_InputType)
                 {
                     case ScrObj_skill.Skill_InputType.primary:
                         live_charStats.charInput._primary = false;
@@ -390,9 +384,51 @@ public static class LiveCharStats_Base
                         live_charStats.charInput._secondary = false;
                         break;
                 }
+                //AI_Castowanie Spelli
+                if (live_charStats.fov._targetInSpellRange)
+                {
+                    if (live_charStats.charStats._mp <= 10f)    //jeśli zejdzie do 10 many to nie castuje
+                    {
+                        //live_charStats.fov._spellRangeSkill.skill_input = false;
+                        switch (live_charStats.fov._spellRangeSkill.scrObj_Skill.skill_InputType)
+                        {
+                            case ScrObj_skill.Skill_InputType.primary:
+                                live_charStats.charInput._primary = false;
+                                break;
+                            case ScrObj_skill.Skill_InputType.secondary:
+                                live_charStats.charInput._secondary = false;
+                                break;
+                        }
+                        //AI_Chasing kiedy nie castuje w SpellRange
+                        Chasing(live_charStats);                 
+                    }
+                    else if (live_charStats.charStats._mp >= 70f)   //jeśli nie osiągnie 70 many to nie castuje
+                    {
+                        AI_SpellCast(live_charStats);
+                    }
+                }
+                else //Jeśli target nie w SpellRange
+                {
+                    //live_charStats.fov._spellRangeSkill.skill_input = false;
+                    switch (live_charStats.fov._spellRangeSkill.scrObj_Skill.skill_InputType)
+                    {
+                        case ScrObj_skill.Skill_InputType.primary:
+                            live_charStats.charInput._primary = false;
+                            break;
+                        case ScrObj_skill.Skill_InputType.secondary:
+                            live_charStats.charInput._secondary = false;
+                            break;
+                    }
+                    //AI_Chasing  //Jeśli target w dynamicRange
+                    if (live_charStats.fov._targetInDynamicSightRange && live_charStats.fov._targetAquired && !live_charStats.fov._spellRangeSkill.skill_input) { Chasing(live_charStats); } //!live_charStats.fov._spellRangeSkill.skill_input żeby nie przerywał casta
+                    else //Jeśli !targetAquired lub !dynamicRange
+                    {   //AI_Patrolling
+                        if (!live_charStats.fov._spellRangeSkill.skill_input) { Patrolling(live_charStats); }   //!live_charStats.fov._spellRangeSkill.skill_input żeby nie przerywał casta                        
+                    }
+                }
+
             }
-            if (live_charStats.fov._targetInDynamicSightRange && !live_charStats.fov._targetInAttackRange && !live_charStats.fov._spellRangeSkill.skill_input) Chasing(live_charStats);
-            if (live_charStats.fov._targetInDynamicSightRange && live_charStats.fov._targetInAttackRange && !live_charStats.fov._spellRangeSkill.skill_input) Attacking(live_charStats);
+
         }
 
         if (live_charStats.charStatus._isDead) { StopMovementNavMeshAgent(live_charStats); } //Stop Nav Mesh Agent przy śmierci        
@@ -410,7 +446,7 @@ public static class LiveCharStats_Base
         }
 
         // Jeśli dystans do walkPoint jest mniejszy niż 1f resetuje walkPointSet i szuka nowego (wykorzystanie live_charStats.currentNavMeshAgent.*)
-        if (live_charStats.charComponents._navMeshAgent.remainingDistance < live_charStats.fov._closeRangeSkillMinRadius + 0.5f) live_charStats.navMeshAge._walkPointSet = false;
+        if (live_charStats.charComponents._navMeshAgent.remainingDistance < live_charStats.charComponents._characterController.radius * 4f) live_charStats.navMeshAge._walkPointSet = false;
     }
 
     private static void SearchForWalkPoint(CharacterStatus live_charStats)
@@ -459,20 +495,23 @@ public static class LiveCharStats_Base
     /// <param name="live_charStats"></param>   
     private static void AI_SpellCast(CharacterStatus live_charStats)   
     {
-        if (!Physics.Raycast(live_charStats.gameObject.transform.position, live_charStats.gameObject.transform.forward, live_charStats.fov._spellRangeSkill.scrObj_Skill.skill_MaxRadius * live_charStats.fov._AISpellRangeSkillRadiusFromMax, live_charStats.fov._obstaclesLayerMask)) //raycast żeby nie bił przez ściany
+        if (live_charStats.fov._spellRangeSkill != null && live_charStats.fov._targetAquired)
         {
-            switch (live_charStats.fov._spellRangeSkill.scrObj_Skill.skill_InputType)
+            if (!Physics.Raycast(live_charStats.gameObject.transform.position, live_charStats.gameObject.transform.forward, live_charStats.fov._spellRangeSkill.scrObj_Skill._skillMaxRadius * live_charStats.fov._AISpellRangeSkillRadiusFromMax, live_charStats.fov._obstaclesLayerMask)) //raycast żeby nie bił przez ściany
             {
-                case ScrObj_skill.Skill_InputType.primary:
-                    live_charStats.charInput._primary = true;
-                    break;
-                case ScrObj_skill.Skill_InputType.secondary:
-                    live_charStats.charInput._secondary = true;
-                    break;
-            }
+                //live_charStats.fov._spellRangeSkill.skill_input = true;
 
-            live_charStats.gameObject.transform.LookAt(live_charStats.fov._aquiredTargetGameObject.transform);
-            live_charStats.charComponents._navMeshAgent.SetDestination(live_charStats.gameObject.transform.position);
+                switch (live_charStats.fov._spellRangeSkill.scrObj_Skill.skill_InputType)
+                {
+                    case ScrObj_skill.Skill_InputType.primary:
+                        live_charStats.charInput._primary = true;
+                        break;
+                    case ScrObj_skill.Skill_InputType.secondary:
+                        live_charStats.charInput._secondary = true;
+                        break;
+                }
+                StopMovementNavMeshAgent(live_charStats);               
+            }
         }
     }
 
@@ -480,7 +519,14 @@ public static class LiveCharStats_Base
     {        
         live_charStats.navMeshAge._walkPoint = live_charStats.gameObject.transform.position;
         live_charStats.charComponents._navMeshAgent.SetDestination(live_charStats.navMeshAge._walkPoint);
-        if (live_charStats.fov._aquiredTargetGameObject != null) live_charStats.gameObject.transform.LookAt(live_charStats.fov._aquiredTargetGameObject.transform, Vector3.up);
+        if (live_charStats.fov._aquiredTargetGameObject != null) 
+        {
+            Vector3 directionToTarget = (live_charStats.fov._aquiredTargetGameObject.transform.position - live_charStats.gameObject.transform.position).normalized;
+            if (Vector3.Angle(live_charStats.gameObject.transform.forward, directionToTarget) > 30) //Sprawdzanie czy nie widzi targetu w małym kącie, żeby nie spamował LookAt
+            {
+                live_charStats.gameObject.transform.LookAt(live_charStats.fov._aquiredTargetGameObject.transform, Vector3.up);
+            }                
+        }
 
         //live_charStats.currentNavMeshAgent.isStopped = true;
     }
@@ -492,7 +538,18 @@ public static class LiveCharStats_Base
             StopMovementNavMeshAgent(live_charStats);
             Debug.Log("Attacking!!");
         }
-        
+        //live_charStats.fov._closeRangeSkill.skill_input = true;
+
+        switch (live_charStats.fov._closeRangeSkill.scrObj_Skill.skill_InputType)
+        {
+            case ScrObj_skill.Skill_InputType.primary:
+                live_charStats.charInput._primary = true;
+                break;
+            case ScrObj_skill.Skill_InputType.secondary:
+                live_charStats.charInput._secondary = true;
+                break;
+        }
+
     }
 
     #endregion
@@ -563,8 +620,8 @@ public static class LiveCharStats_Base
 
             ////Running Speed 
             if (live_charStats.charMove._moveInputDirection != Vector3.zero && !live_charStats.charStatus._isJumping && !live_charStats.fov._closeRangeSkill.skill_input && live_charStats.charStats._stam > 5f
-                && live_charStats.fov._targetAquired && !live_charStats.fov._spellRangeSkill.skill_input && live_charStats.charComponents._navMeshAgent.remainingDistance > 2 * live_charStats.fov._closeRangeSkillMinRadius)
-            //dodatnkowy warunek ->biega tylko jak targetAquired=true, kolejny warnek jeśli nie castuje!!, Kolejny warunek jeśli agent.eemainingDistance > 2* attack range
+                && live_charStats.fov._targetAquired && !live_charStats.fov._spellRangeSkill.skill_input && live_charStats.charComponents._navMeshAgent.remainingDistance > live_charStats.charComponents._characterController.radius * 5)
+            //dodatnkowy warunek ->biega tylko jak targetAquired=true, kolejny warnek jeśli nie castuje!!, Kolejny warunek jeśli agent.remainingDistance > _characterController.radius * 5
             {
                 //live_charStats.charComponents._Animator.ResetTrigger("MeeleAttack");
                 localSpeedIndex = 2;
