@@ -41,7 +41,7 @@ public class Skill : MonoBehaviour
     
     [Header("Targets")]
     [Tooltip("Enemies Array z klasy scr_skill(do bazowego enemies array dopisane Destructibles, (Metoda EnemyArraySelector)"), SerializeField, TagField] public string[] _enemiesArray; //Pozwala na wybór Enemies przy pomocy Tag     
-    [Tooltip("Zwracana lista wszystkich colliderów w zasięgu skilla"), CanBeNull, SerializeField] public Collider[] skill_allLocalColliders = new Collider[30];
+    [Tooltip("Zwracana lista wszystkich colliderów w zasięgu skilla"), CanBeNull, SerializeField] public Collider[] _allLocalColliders = new Collider[30];
     [Tooltip("Zwracana lista colliderów zgodnych z parametrami(EnemyTag,InCurrentRadius,InCurrentAngle)"), CanBeNull, SerializeField] public List<Collider> skill_targetColliders;
 
     [Tooltip("GameObject skilla (castera) -> potrzebny do transform"), SerializeField] public GameObject skill_casterGameobject;
