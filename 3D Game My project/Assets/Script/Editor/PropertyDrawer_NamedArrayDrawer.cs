@@ -82,34 +82,4 @@ public class PropertyDrawer_EnumNamedNestedArray : PropertyDrawer
     }
 }
 
-[CustomPropertyDrawer(typeof(CosixClass))]
-public class PropertyDrawer_CoisxClass : PropertyDrawer
-{
-    /* public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
-     {
-         EditorGUI.BeginProperty(position, label, property);
-
-         SerializedProperty flaot_1 = property.FindPropertyRelative("flaot_1");
-         SerializedProperty flaot_2 = property.FindPropertyRelative("flaot_2");
-         SerializedProperty flaot_3 = property.FindPropertyRelative("flaot_2");
-         SerializedProperty flaot_4 = property.FindPropertyRelative("flaot_4");
-
-         Rect labelPosition = new Rect(position.x, position.y, position.width, position.height);
-         position = EditorGUI.PrefixLabel(labelPosition, EditorGUIUtility.GetControlID(FocusType.Passive, new GUIContent(flaot_1.objectReferenceValue !=null?(flaot_1.objectReferenceValue as float).DisName:"Empty";
-
-         EditorGUI.EndProperty();
-
-
-     if(property.isExpanded)
-         {
-             EditorGUI.indentLevel++;
-             //EditorGUI.HelpBox(position, "HepBox", MessageType.Info);
-             //EditorGUI.DrawRect(new Rect(position.position, new Vector2(300, 500)),Color.gray);
-             //EditorGUI.PropertyField(position, property, label, true);
-
-
-             EditorGUI.indentLevel--;
-         }
-     }*/
-}
 

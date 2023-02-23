@@ -73,7 +73,7 @@ public class Player_Input : MonoBehaviour
             }
         }
 
-        if (live_charStats.fov._spellRangeSkill.skill_input)  //lub castujemy
+        if (live_charStats.fov._spellRangeSkill._skillInput)  //lub castujemy
         {
             Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
             if (Physics.Raycast(ray, out RaycastHit hit))
@@ -87,7 +87,7 @@ public class Player_Input : MonoBehaviour
             live_charStats.charInput._primary = false;                  //debugging ¿eby nie blokowa³ siê przy atakowaniu
             live_charStats.fov._targetAquired = true;             //debugging ¿eby nie blokowa³ siê przy atakowaniu
             live_charStats.charStatus._isRunning= false;
-            live_charStats.charSkillCombat._secondarySkill.skill_CanCast = live_charStats.charInput._secondary;  //tylko dla gracza w isometric -> Mo¿na canCastowaæ przerywaj¹c wszystko inne
+            live_charStats.charSkillCombat._secondarySkill._canCast = live_charStats.charInput._secondary;  //tylko dla gracza w isometric -> Mo¿na canCastowaæ przerywaj¹c wszystko inne
             live_charStats.charComponents._navMeshAgent.isStopped = true;
 
         }

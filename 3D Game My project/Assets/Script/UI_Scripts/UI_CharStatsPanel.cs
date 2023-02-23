@@ -92,13 +92,13 @@ public class UI_CharStatsPanel : MonoBehaviour, IPlayerUpdate
                     break;
 
                 case CharStat.CloseRangeAttCooldown:
-                    selectedStatCurrentFloat[i] = live_charStats.fov._closeRangeSkill.scrObj_Skill.skill_BaseCooldown;
+                    selectedStatCurrentFloat[i] = live_charStats.fov._closeRangeSkill.scrObj_Skill._baseCooldown;
                     selectedStatCurrentName[i] = "Melee Attack Cooldown";
                     break;
 
                 case CharStat.CloseRangeAttDamage:
-                    selectedStatCurrentFloat[i] = live_charStats.fov._closeRangeSkill.skill_currentDamage;
-                    selectedStatCurrentName[i] = "Melee Attack Damage";
+                    selectedStatCurrentFloat[i] = live_charStats.charComponents._characterBonusStats.bonus_Skill_Damage;
+                    selectedStatCurrentName[i] = "Melee Attack Bonus";
                     break;
 
                 case CharStat.CloseRangeAttResourceCost:

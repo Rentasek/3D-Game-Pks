@@ -43,7 +43,8 @@ public partial class CameraController : MonoBehaviour
     void Start()
     {
         SearchForPlayer();
-        if(live_charStats.charInfo._playerInputEnable)Invoke(nameof(SwitchCursorOptions), 0.3f); //Specjalnie ustawiony Invoke, aktywuje siê chwile po za³adowaniu bo inaczej nie dzia³a i live_charStats.charInput._enableMouseRotate==false
+        if(live_charStats.charInfo._playerInputEnable)Invoke(nameof(SwitchCursorOptions), 0.3f); //Specjalnie ustawiony Invoke, aktywuje siê chwile po za³adowaniu bo inaczej nie dzia³a i live_charStats.charInput._enableMouseRotate==false             
+
     }
 
     // Update is called once per frame  //update u¿ywaæ do input GetKeyDown, dzia³aj¹ bez laga

@@ -29,7 +29,7 @@ public class CharControler : MonoBehaviour
     {
         if (live_charStats.charInfo._isPlayer) live_charStats.LoadLevel();
         live_charStats.LoadCharStats();
-        live_charStats.SetCharacterPosition();
+        live_charStats.SetCharacterPosition();        
     }
 
     private void OnEnable()
