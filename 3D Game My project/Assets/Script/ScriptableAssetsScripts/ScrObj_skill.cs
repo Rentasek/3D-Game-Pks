@@ -28,7 +28,7 @@ public class ScrObj_skill : ScriptableObject
     [Header("SkillRange")]
     [Tooltip("Bazowy Minimalny Radius skilla")] public float skill_MinRadius;
     [Tooltip("Bazowy Minimalny Kąt skilla")] public float skill_MinAngle;
-    [Tooltip("Bazowy Maxymalny Radius skilla")] public float skill_MaxRadius;
+    [Tooltip("Bazowy Maxymalny Radius skilla. \n Wykorzystany w SkillForge jako OverlapSphereNonAlloc.Range dla wszystkich targetTypów skilla \n oraz do FielOfView SpellRangeChecha")] public float _skillMaxRadius;
     [Tooltip("Bazowy Maxymalny Kąt skilla")] public float skill_MaxAngle;
 
     [Header("SkillTime")]
