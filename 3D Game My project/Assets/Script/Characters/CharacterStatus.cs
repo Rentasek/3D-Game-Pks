@@ -185,15 +185,15 @@ public class CharacterStatus : MonoBehaviour
     {
         [Tooltip("Aktualne Health Points postaci")] public float _hp;
         [Tooltip("Aktualne Maxymalne Health Points postaci")] public float _maxHP;
-
+        [Tooltip("Aktualny Regen Health Points postaci (% z MaxHP)")] public float _regenHP;
         [Space]
         [Tooltip("Aktualne Mana Points postaci")] public float _mp;
         [Tooltip("Aktualne Maxymalne Mana Points postaci")] public float _maxMP;
-
+        [Tooltip("Aktualny Regen Mana Points postaci (% z MaxHP)")] public float _regenMP;
         [Space]
         [Tooltip("Aktualne Stamina Points postaci")] public float _stam;
         [Tooltip("Aktualne Maxymalne Stamin Points postaci")] public float _maxStam;
-
+        [Tooltip("Aktualny Regen Stamina Points postaci (% z MaxHP)")] public float _regenStam;
         [Space]
         [Tooltip("Aktualne ExP postaci")] public float _xp;
         [Tooltip("Aktualne ExP potrzebne do nastêpnego levela")] public float _neededXP;
@@ -403,8 +403,8 @@ public class CharacterStatus : MonoBehaviour
         if (charInfo._isPlayer)
         {
             PlayerPrefs.SetInt("BonusWalkSpeed", (int)charComponents._characterBonusStats.bonus_currentWalkSpeed);
-            PlayerPrefs.SetInt("BonusDamageCombo", (int)charComponents._characterBonusStats.bonus_currentDamageCombo);
-            PlayerPrefs.SetInt("BonusSpellDamage", (int)charComponents._characterBonusStats.bonus_Skill_Damage);
+            PlayerPrefs.SetInt("BonusDamageCombo", (int)charComponents._characterBonusStats.bonus_CloseRangeDamage);
+            PlayerPrefs.SetInt("BonusSpellDamage", (int)charComponents._characterBonusStats.bonus_SpellRangeDamage);
             PlayerPrefs.SetInt("BonusMaxHP", (int)charComponents._characterBonusStats.bonus_currentMaxHP);
             PlayerPrefs.SetInt("BonusMaxMP", (int)charComponents._characterBonusStats.bonus_currentMaxMP);
             PlayerPrefs.SetInt("BonusMaxStam", (int)charComponents._characterBonusStats.bonus_currentMaxStam);
@@ -417,8 +417,8 @@ public class CharacterStatus : MonoBehaviour
         if (charInfo._isPlayer)
         {
             charComponents._characterBonusStats.bonus_currentWalkSpeed = PlayerPrefs.GetInt("BonusWalkSpeed", 0);
-            charComponents._characterBonusStats.bonus_currentDamageCombo = PlayerPrefs.GetInt("BonusDamageCombo", 0);
-            charComponents._characterBonusStats.bonus_Skill_Damage = PlayerPrefs.GetInt("BonusSpellDamage", 0);
+            charComponents._characterBonusStats.bonus_CloseRangeDamage = PlayerPrefs.GetInt("BonusDamageCombo", 0);
+            charComponents._characterBonusStats.bonus_SpellRangeDamage = PlayerPrefs.GetInt("BonusSpellDamage", 0);
             charComponents._characterBonusStats.bonus_currentMaxHP = PlayerPrefs.GetInt("BonusMaxHP", 0);
             charComponents._characterBonusStats.bonus_currentMaxMP = PlayerPrefs.GetInt("BonusMaxMP", 0);
             charComponents._characterBonusStats.bonus_currentMaxStam = PlayerPrefs.GetInt("BonusMaxStam", 0);
@@ -459,11 +459,11 @@ public class CharacterStatus : MonoBehaviour
     public void ResourcesRegen()
     {
         //Stam Regen
-        if (charStats._stam < charStats._maxStam && !charStatus._isRunning)  charStats._stam = Mathf.MoveTowards(charStats._stam, charStats._maxStam, (charComponents._scrObj_CharStats.regenStam + (charComponents._scrObj_CharStats.regenStam * charComponents._scrObj_CharStats.Stam_Multiplier * charInfo._charLevel * 1f) + (charStats._maxStam * 0.1f * charComponents._scrObj_CharStats.Stam_Multiplier)) * Time.deltaTime); //regeneruje f stamy / sekunde
+        if (charStats._stam < charStats._maxStam && !charStatus._isRunning) charStats._stam = Mathf.MoveTowards(charStats._stam, charStats._maxStam, ((charStats._regenStam + charComponents._characterBonusStats.bonus_currentRegenStam * 0.1f) * charStats._maxStam * 0.01f) * Time.deltaTime); //regeneruje % Max stamy / sekunde //+0.1f bonusRegen
         //HP Regen
-        if (charStats._hp < charStats._maxHP) charStats._hp = Mathf.MoveTowards(charStats._hp, charStats._maxHP, (charComponents._scrObj_CharStats.regenHP + (charComponents._scrObj_CharStats.regenHP * charComponents._scrObj_CharStats.HP_Multiplier * charInfo._charLevel * 1f) + (charStats._maxHP * 0.1f * charComponents._scrObj_CharStats.HP_Multiplier)) * Time.deltaTime); //regeneruje f HP / sekunde
+        if (charStats._hp < charStats._maxHP) charStats._hp = Mathf.MoveTowards(charStats._hp, charStats._maxHP, ((charStats._regenHP + charComponents._characterBonusStats.bonus_currentRegenHP * 0.1f) * charStats._maxHP * 0.01f) * Time.deltaTime); //regeneruje % Max HP / sekunde  //+0.1f bonusRegen
         //MP Regen
-        if (charStats._mp < charStats._maxMP) charStats._mp = Mathf.MoveTowards(charStats._mp, charStats._maxMP, (charComponents._scrObj_CharStats.regenMP + (charComponents._scrObj_CharStats.regenMP * charComponents._scrObj_CharStats.MP_Multiplier * charInfo._charLevel * 1f) + (charStats._maxMP * 0.1f * charComponents._scrObj_CharStats.MP_Multiplier)) * Time.deltaTime); //regeneruje f HP / sekunde
+        if (charStats._mp < charStats._maxMP) charStats._mp = Mathf.MoveTowards(charStats._mp, charStats._maxMP, ((charStats._regenMP + charComponents._characterBonusStats.bonus_currentRegenMP * 0.1f) * charStats._maxMP * 0.01f) * Time.deltaTime); //regeneruje % Max MP / sekunde //+0.1f bonusRegen
 
     }
 

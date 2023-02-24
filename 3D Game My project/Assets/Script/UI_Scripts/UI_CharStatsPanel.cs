@@ -97,7 +97,7 @@ public class UI_CharStatsPanel : MonoBehaviour, IPlayerUpdate
                     break;
 
                 case CharStat.CloseRangeAttDamage:
-                    selectedStatCurrentFloat[i] = live_charStats.charComponents._characterBonusStats.bonus_Skill_Damage;
+                    selectedStatCurrentFloat[i] = live_charStats.charComponents._characterBonusStats.bonus_SpellRangeDamage;
                     selectedStatCurrentName[i] = "Melee Attack Bonus";
                     break;
 
@@ -112,8 +112,8 @@ public class UI_CharStatsPanel : MonoBehaviour, IPlayerUpdate
                     break;
 
                 case CharStat.HealthRegenStat:
-                    selectedStatCurrentFloat[i] = live_charStats.charComponents._scrObj_CharStats.regenHP;
-                    selectedStatCurrentName[i] = "Health Regeneration";
+                    selectedStatCurrentFloat[i] = live_charStats.charStats._regenHP;
+                    selectedStatCurrentName[i] = "Health Regeneration (% Max)";
                     break;
 
                 case CharStat.HealthMultiplierStat:
@@ -127,8 +127,8 @@ public class UI_CharStatsPanel : MonoBehaviour, IPlayerUpdate
                     break;
 
                 case CharStat.ManaRegenStat:
-                    selectedStatCurrentFloat[i] = live_charStats.charComponents._scrObj_CharStats.regenMP;
-                    selectedStatCurrentName[i] = "Mana Regeneration";
+                    selectedStatCurrentFloat[i] = live_charStats.charStats._regenMP;
+                    selectedStatCurrentName[i] = "Mana Regeneration (% Max)";
                     break;
 
                 case CharStat.ManaMultiplierStat:
@@ -142,8 +142,8 @@ public class UI_CharStatsPanel : MonoBehaviour, IPlayerUpdate
                     break;
 
                 case CharStat.StaminaRegenStat:
-                    selectedStatCurrentFloat[i] = live_charStats.charComponents._scrObj_CharStats.regenStam;
-                    selectedStatCurrentName[i] = "Stamina Regeneration";
+                    selectedStatCurrentFloat[i] = live_charStats.charStats._regenStam;
+                    selectedStatCurrentName[i] = "Stamina Regeneration (% Max)";
 
                     break;
 

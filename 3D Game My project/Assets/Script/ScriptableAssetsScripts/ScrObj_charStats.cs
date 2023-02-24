@@ -56,15 +56,12 @@ public class ScrObj_charStats : ScriptableObject
     [Space]
     [Header("Character Stats")]
     public float baseHP;    
-    public float regenHP;
     public float HP_Multiplier;
     [Space]
     public float baseMP;    
-    public float regenMP;
     public float MP_Multiplier;
     [Space]
     public float baseStam;
-    public float regenStam;
     public float Stam_Multiplier;
     [Space]
     public float baseNeedXP;
