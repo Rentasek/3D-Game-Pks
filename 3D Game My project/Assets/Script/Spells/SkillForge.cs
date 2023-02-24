@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Linq;
 using Unity.VisualScripting;
 using Unity.VisualScripting.FullSerializer;
@@ -42,18 +43,15 @@ public static class SkillForge
                             {
                                 case ScrObj_skill.TargetType.None:
                                     break;
-                                case ScrObj_skill.TargetType.ConeOnCombo:
-                                    TargetType.Skill_Melee_Target_new(scrObj_Skill, skill, live_charStats, targetTypeIndex);
-                                    break;
-                                case ScrObj_skill.TargetType.ConeOnTime:
+                                case ScrObj_skill.TargetType.DynamicCone:
                                     TargetType.Skill_Cone_Target(scrObj_Skill, skill, live_charStats, targetTypeIndex);
-                                    break;
+                                    break;       
                                 case ScrObj_skill.TargetType.Projectile:
                                     break;
                                 case ScrObj_skill.TargetType.AreaOfEffectMouse:
                                     break;
                                 case ScrObj_skill.TargetType.Self:
-                                    TargetType.Skill_Self_Target_new(scrObj_Skill, skill, live_charStats, targetTypeIndex);
+                                    TargetType.Skill_Self_Target(scrObj_Skill, skill, live_charStats, targetTypeIndex);
                                     break;
                                 case ScrObj_skill.TargetType.Pierce:
                                     break;
@@ -146,18 +144,15 @@ public static class SkillForge
                     {
                         case ScrObj_skill.TargetType.None:
                             break;
-                        case ScrObj_skill.TargetType.ConeOnCombo:
-                            TargetType.Skill_Melee_Target_new(scrObj_Skill, skill, live_charStats, targetTypeIndex);
-                            break;
-                        case ScrObj_skill.TargetType.ConeOnTime:
+                        case ScrObj_skill.TargetType.DynamicCone:
                             TargetType.Skill_Cone_Target(scrObj_Skill, skill, live_charStats, targetTypeIndex);
-                            break;
+                            break;                       
                         case ScrObj_skill.TargetType.Projectile:
                             break;
                         case ScrObj_skill.TargetType.AreaOfEffectMouse:
                             break;
                         case ScrObj_skill.TargetType.Self:
-                            TargetType.Skill_Self_Target_new(scrObj_Skill, skill, live_charStats, targetTypeIndex);
+                            TargetType.Skill_Self_Target(scrObj_Skill, skill, live_charStats, targetTypeIndex);
                             break;
                         case ScrObj_skill.TargetType.Pierce:
                             break;
@@ -231,10 +226,7 @@ public static class SkillForge
                         {
                             case ScrObj_skill.TargetType.None:
                                 break;
-                            case ScrObj_skill.TargetType.ConeOnCombo:
-                                TargetType.Skill_Melee_Target_new(scrObj_Skill, skill, live_charStats, targetTypeIndex);
-                                break;
-                            case ScrObj_skill.TargetType.ConeOnTime:
+                            case ScrObj_skill.TargetType.DynamicCone:
                                 TargetType.Skill_Cone_Target(scrObj_Skill, skill, live_charStats, targetTypeIndex);
                                 break;
                             case ScrObj_skill.TargetType.Projectile:
@@ -242,7 +234,7 @@ public static class SkillForge
                             case ScrObj_skill.TargetType.AreaOfEffectMouse:
                                 break;
                             case ScrObj_skill.TargetType.Self:
-                                TargetType.Skill_Self_Target_new(scrObj_Skill, skill, live_charStats, targetTypeIndex);
+                                TargetType.Skill_Self_Target(scrObj_Skill, skill, live_charStats, targetTypeIndex);
                                 break;
                             case ScrObj_skill.TargetType.Pierce:
                                 break;
@@ -259,12 +251,16 @@ public static class SkillForge
                     {
                         skill._audioSourceCaster.volume = scrObj_Skill._casterAudioVolume;
                         skill._audioSourceCaster.PlayOneShot(scrObj_Skill._onFinishCastingAudioClip, scrObj_Skill._casterAudioVolume);
-                    }
-
-                    skill._currentCastingProgress = 0f;    //reset progressu po wycastowaniu Skilla             
-                    skill._currentCooldownRemaining = 1f;  //Ustawia cooldown po wycastowaniu żeby nie castował znów zbyt szybko, przydatnie jeśli mamy animację po wystrzeleniu
+                    } 
                 }
-               
+                if (skill._currentCastingProgress >= 1f)
+                {
+                    skill._currentCastingProgress = 0f;    //reset progressu po wycastowaniu Skilla             
+                    skill._currentCooldownRemaining = 1f;  //Ustawia cooldown po wycastowaniu żeby nie castował znów zbyt szybko, przydatnie jeśli mamy animację po wystrzeleniu }
+
+                }
+
+
             }
             else
             {
@@ -287,6 +283,7 @@ public static class SkillForge
         #region Skill_Cone_Target         
         /// <summary>nowy OverlapSphereNonAloc ma swoje plusy bo nie tworzy nowego array przy kazdym Cast ale ogólnie niewiele zmienia a trzeba robić dodatkową tablicę niedynamiczną
         /// Szuka targetów w dynamic Cone Radius
+        /// <br>Dziala z nową mechaniką targetType[]</br>
         /// <br><i>Zwraca do Skill Objectu listę colliderów zgodnych z parametrami(EnemyTag,InCurrentRadius,InCurrentAngle) </i></br> 
         /// </summary>
         /// <param name="scrObj_Skill">Scriptable Object Skilla</param>
@@ -386,112 +383,7 @@ public static class SkillForge
                 }
             }
         }    
-        #endregion
-
-        #region Skill_Melee_Target
-        /// <summary>
-        /// Szuka targetów w Melee Radius
-        /// <br>Dziala z nową mechaniką targetType[]</br>
-        /// <br><i>Zwraca do Skill Objectu listę colliderów zgodnych z parametrami(EnemyTag,InCurrentRadius,InCurrentAngle) </i></br> 
-        /// </summary>
-        /// <param name="scrObj_Skill">Scriptable Object Skilla</param>
-        /// <param name="skill">Ten GameObject skill</param>
-        /// <param name="live_charStats">Live_charStats Castera</param>
-        /// <param name="targetTypeIndex">Aktualny [targetTypeIndex] z targetType[]</param>    
-        /// <param name="targetTypeIndex">Aktualny [effectTypeIndex] z effectType[]</param> 
-        public static void Skill_Melee_Target_new(ScrObj_skill scrObj_Skill, Skill skill, CharacterStatus live_charStats, int targetTypeIndex)
-        {
-            Utils.Skill_OnCombo_DynamicCone(scrObj_Skill, skill, live_charStats, targetTypeIndex);
-
-            for (int i = 0; i < Physics.OverlapSphereNonAlloc(skill._casterGameobject.transform.position, scrObj_Skill._skillMaxRadius, skill._allLocalColliders); i++)
-            {    
-                for (int j = 0; j < skill._enemiesArray.Length; j++)
-                {
-                    if (skill._allLocalColliders[i].CompareTag(skill._enemiesArray[j]))
-                    {
-                        float distanceToTarget = Vector3.Distance(skill._allLocalColliders[i].transform.position, skill._casterGameobject.transform.position);
-
-                        if (distanceToTarget <= skill.targetDynamicValues[targetTypeIndex]._currentRadius)
-                        {
-                            skill.targetDynamicValues[targetTypeIndex]._targetInRange = true; //target jest w breath range
-
-                            Vector3 directionToTarget = (skill._allLocalColliders[i].transform.position - skill._casterGameobject.transform.position).normalized; //0-1(normalized) różnica pomiędzy targetem a characterem Vector3.normalized ==> vector (kierunek w którym od niego znajduje się target)
-                                                                                                                                                                       //sprawdzanie aktualnie ostatniego elementu z listy
-                            if (Vector3.Angle(skill._casterGameobject.transform.forward, directionToTarget) < skill.targetDynamicValues[targetTypeIndex]._currentAngle / 2)
-                            //sprawdzanie angle wektora forward charactera i direction to target
-                            //target może być na + albo - od charactera dlatego w każdą stronę angle / 2
-                            {
-                                if (!Physics.Raycast(skill._casterGameobject.transform.position, directionToTarget, distanceToTarget, scrObj_Skill._targetTypes[targetTypeIndex]._obstaclesMask))    //dodatkowo sprawdza Raycastem czy nie ma przeszkody pomiędzy playerem a targetem //  
-                                {
-                                    skill.targetDynamicValues[targetTypeIndex]._targetInAngle = true;
-
-                                    if (skill.targetDynamicValues[targetTypeIndex]._targetColliders.IndexOf(skill._allLocalColliders[i]) < 0) //sprawdza czy nie ma na liście. Jeżeli IndexOf < 0 czyli nie ma obiektów z tym indexem
-                                    {
-                                        skill.targetDynamicValues[targetTypeIndex]._targetColliders.Add(skill._allLocalColliders[i]); //przypisuje do listy colliders jeśli ma taga z listy enemies                                    
-                                    }
-                                    else
-                                    {
-                                        skill.targetDynamicValues[targetTypeIndex]._targetColliders.Remove(skill._allLocalColliders[i]);
-                                        if (skill.targetDynamicValues[targetTypeIndex]._targetColliders.Count <= 0) skill.targetDynamicValues[targetTypeIndex]._targetInAngle = false;  //jeśli nie ma żadnych targetów w Cone Angle
-                                    }
-                                }
-                                else
-                                {
-                                    skill.targetDynamicValues[targetTypeIndex]._targetColliders.Remove(skill._allLocalColliders[i]);
-                                    if (skill.targetDynamicValues[targetTypeIndex]._targetColliders.Count <= 0) skill.targetDynamicValues[targetTypeIndex]._targetInAngle = false;  //jeśli nie ma żadnych targetów w Cone Angle
-                                }
-                            }
-                            else
-                            {
-                                skill.targetDynamicValues[targetTypeIndex]._targetColliders.Remove(skill._allLocalColliders[i]);
-                                if (skill.targetDynamicValues[targetTypeIndex]._targetColliders.Count <= 0) skill.targetDynamicValues[targetTypeIndex]._targetInAngle = false;  //jeśli nie ma żadnych targetów w Cone Angle 
-                            }
-                        }
-                        else
-                        {
-                            skill.targetDynamicValues[targetTypeIndex]._targetColliders.Remove(skill._allLocalColliders[i]);
-                            if (skill.targetDynamicValues[targetTypeIndex]._targetColliders.Count <= 0)
-                            {
-                                skill.targetDynamicValues[targetTypeIndex]._targetInAngle = false;  //jeśli nie ma żadnych targetów w Cone Angle
-                                skill.targetDynamicValues[targetTypeIndex]._targetInRange = false;  //jeśli nie ma żadnych targetów w Cone Radius
-                            }
-                        }
-                    }
-                }
-            }
-
-            if (skill.targetDynamicValues[targetTypeIndex]._targetColliders.Count > 0)
-            {
-                for (int effectTypeIndex = 0; effectTypeIndex < scrObj_Skill._targetTypes[targetTypeIndex]._effectTypes.Length; effectTypeIndex++)
-                {
-                    switch (scrObj_Skill._targetTypes[targetTypeIndex]._effectTypes[effectTypeIndex]._effectType)
-                    {
-                        case ScrObj_skill.EffectType.None:
-                            break;
-
-                        case ScrObj_skill.EffectType.Hit:
-                            EffectType.Skill_Hit(scrObj_Skill, skill, live_charStats, targetTypeIndex, effectTypeIndex);
-                            break;
-
-                        case ScrObj_skill.EffectType.DamageOverTime:
-                            EffectType.Skill_DamageOverTime(scrObj_Skill, skill, live_charStats, targetTypeIndex, effectTypeIndex);
-                            break;
-
-                        case ScrObj_skill.EffectType.Heal:
-                            EffectType.Skill_Heal(scrObj_Skill, skill, live_charStats, targetTypeIndex, effectTypeIndex);
-                            break;
-
-                        case ScrObj_skill.EffectType.HealOverTime:
-                            EffectType.Skill_HealOverTime(scrObj_Skill, skill, live_charStats, targetTypeIndex, effectTypeIndex);
-                            break;
-
-                        case ScrObj_skill.EffectType.Summon:
-                            break;
-                    }
-                }
-            }
-        }
-        #endregion
+        #endregion        
 
         #region Skill_Collider_Target
         /// <summary>
@@ -535,7 +427,7 @@ public static class SkillForge
         /// <param name="live_charStats">Live_charStats Castera</param>
         /// <param name="targetTypeIndex">Aktualny [targetTypeIndex] z targetType[]</param>    
         /// <param name="targetTypeIndex">Aktualny [effectTypeIndex] z effectType[]</param> 
-        public static void Skill_Self_Target_new(ScrObj_skill scrObj_Skill, Skill skill, CharacterStatus live_charStats, int targetTypeIndex)
+        public static void Skill_Self_Target(ScrObj_skill scrObj_Skill, Skill skill, CharacterStatus live_charStats, int targetTypeIndex)
         {
             if (skill.targetDynamicValues[targetTypeIndex]._targetColliders.IndexOf(live_charStats.gameObject.GetComponent<Collider>()) < 0) //sprawdza czy nie ma na liście. Jeżeli IndexOf < 0 czyli nie ma obiektów z tym indexem
             {
@@ -585,8 +477,7 @@ public static class SkillForge
             }
         }
         #endregion
-
-        
+                
     }
     #endregion TargetType
 
@@ -654,6 +545,11 @@ public static class SkillForge
                 skill.targetDynamicValues[targetTypeIndex]._targetColliders[i].GetComponent<CharacterStatus>().TakeDamgeInstant(skill.targetDynamicValues[targetTypeIndex].effectDynamicValues[effectTypeIndex]._currentDamage, live_charStats);
             }
 
+            /*if (live_charStats.charInfo._isPlayer)
+                       {                        
+                           Debug.Log("Aktulany ResourceCost : " + skill._resourceCost);
+                       }*/
+
             ///Metoda zużywania Resourca wybranego w scriptableObject
             ///Musi być "przypisana" do elementu objectu!!! (live_charStats.currentHP = wtedy trafia bezpośrednio tam gdzie ma być) Jeśli będzie return (float) trzeba użyć switcha wyżej (poza tą metodą/klasą) co może być niepotrzebne
             switch (scrObj_Skill._resourceType)
@@ -662,7 +558,7 @@ public static class SkillForge
                     live_charStats.charStats._hp -= skill._resourceCost; // ResourceCost Instant
                     break;
 
-                case ScrObj_skill.ResourceType.mana:
+                case ScrObj_skill.ResourceType.mana:                   
                     live_charStats.charStats._mp -= skill._resourceCost;  // ResourceCost Instant
                     break;
 
@@ -842,14 +738,27 @@ public static class SkillForge
         {
             if (skill == live_charStats.fov._spellRangeSkill)
             {
-                skill.targetDynamicValues[targetTypeIndex].effectDynamicValues[effectTypeIndex]._currentDamage = scrObj_Skill._targetTypes[targetTypeIndex]._effectTypes[effectTypeIndex]._baseDamage + (scrObj_Skill._targetTypes[targetTypeIndex]._effectTypes[effectTypeIndex]._baseDamage * (live_charStats.charInfo._charLevel * scrObj_Skill._multiplier)) + (scrObj_Skill._targetTypes[targetTypeIndex]._effectTypes[effectTypeIndex]._baseDamage * (currentCharacterBonusStats.bonus_Skill_Damage * scrObj_Skill._multiplier)); //+bonus
-                skill._resourceCost = scrObj_Skill._baseResourceCost + (scrObj_Skill._baseResourceCost * (live_charStats.charInfo._charLevel * scrObj_Skill._multiplier));
+                skill.targetDynamicValues[targetTypeIndex].effectDynamicValues[effectTypeIndex]._currentDamage = scrObj_Skill._targetTypes[targetTypeIndex]._effectTypes[effectTypeIndex]._baseDamage + (scrObj_Skill._targetTypes[targetTypeIndex]._effectTypes[effectTypeIndex]._baseDamage * (live_charStats.charInfo._charLevel * scrObj_Skill._multiplier)) + (scrObj_Skill._targetTypes[targetTypeIndex]._effectTypes[effectTypeIndex]._baseDamage * (currentCharacterBonusStats.bonus_SpellRangeDamage * scrObj_Skill._multiplier)); //+bonus
+                //skill._resourceCost = scrObj_Skill._baseResourceCost + (scrObj_Skill._baseResourceCost * (live_charStats.charInfo._charLevel * scrObj_Skill._multiplier)) + (scrObj_Skill._baseResourceCost * (currentCharacterBonusStats.bonus_SpellRangeDamage * scrObj_Skill._multiplier)); // + cost za bonus
             }
             else if (skill == live_charStats.fov._closeRangeSkill)
             {
-                skill.targetDynamicValues[targetTypeIndex].effectDynamicValues[effectTypeIndex]._currentDamage = scrObj_Skill._targetTypes[targetTypeIndex]._effectTypes[effectTypeIndex]._baseDamage + (scrObj_Skill._targetTypes[targetTypeIndex]._effectTypes[effectTypeIndex]._baseDamage * (live_charStats.charInfo._charLevel * scrObj_Skill._multiplier)) + (scrObj_Skill._targetTypes[targetTypeIndex]._effectTypes[effectTypeIndex]._baseDamage * (currentCharacterBonusStats.bonus_currentDamageCombo * scrObj_Skill._multiplier)); //+bonus
-                skill._resourceCost = scrObj_Skill._baseResourceCost + (scrObj_Skill._baseResourceCost * (live_charStats.charInfo._charLevel * scrObj_Skill._multiplier));
+                skill.targetDynamicValues[targetTypeIndex].effectDynamicValues[effectTypeIndex]._currentDamage = scrObj_Skill._targetTypes[targetTypeIndex]._effectTypes[effectTypeIndex]._baseDamage + (scrObj_Skill._targetTypes[targetTypeIndex]._effectTypes[effectTypeIndex]._baseDamage * (live_charStats.charInfo._charLevel * scrObj_Skill._multiplier)) + (scrObj_Skill._targetTypes[targetTypeIndex]._effectTypes[effectTypeIndex]._baseDamage * (currentCharacterBonusStats.bonus_CloseRangeDamage * scrObj_Skill._multiplier)); //+bonus
+                //skill._resourceCost = scrObj_Skill._baseResourceCost + (scrObj_Skill._baseResourceCost * (live_charStats.charInfo._charLevel * scrObj_Skill._multiplier)) + (scrObj_Skill._baseResourceCost * (currentCharacterBonusStats.bonus_CloseRangeDamage * scrObj_Skill._multiplier)); // + cost za bonus;
             }
+
+            /*if (live_charStats.charInfo._isPlayer)
+            {
+                Debug.Log("Bonus Close DMG : " + currentCharacterBonusStats.bonus_CloseRangeDamage);
+                
+                Debug.Log("Bonus Spell DMG : " + currentCharacterBonusStats.bonus_SpellRangeDamage);
+
+                Debug.Log("Aktualne Skill DMG : " + skill.targetDynamicValues[targetTypeIndex].effectDynamicValues[effectTypeIndex]._currentDamage);
+                
+                Debug.Log("Aktulane SkillPointsy : " + currentCharacterBonusStats.bonus_SkillPoints);
+            }*/
+
+
         }
         #endregion
 
@@ -870,11 +779,51 @@ public static class SkillForge
             if (skill._currentCooldownRemaining <= 0.05f) skill._currentComboProgress = Mathf.MoveTowards(skill._currentComboProgress, 0f, Time.deltaTime / scrObj_Skill._baseCooldown);   //aktualny combo progress spada do zera w czasie (1sek * (1/basecooldown)) czyli 30f -> 0f w 30sek spada tylko jeśli nie jest na cooldownie
 
             if (skill._currentCooldownRemaining >= 0.06f) { live_charStats.charStatus._isCasting = false; } //Reset Instanta na początku każdej klatki jeśli jest na cooldown
+
+            //Update ResourceCost 
+            if (skill == live_charStats.fov._spellRangeSkill)
+            {
+                skill._resourceCost = scrObj_Skill._baseResourceCost + (scrObj_Skill._baseResourceCost * (live_charStats.charInfo._charLevel * scrObj_Skill._multiplier)) + (scrObj_Skill._baseResourceCost * (currentCharacterBonusStats.bonus_SpellRangeDamage * scrObj_Skill._multiplier)); // + cost za bonus
+            }
+            else if (skill == live_charStats.fov._closeRangeSkill)
+            {
+                skill._resourceCost = scrObj_Skill._baseResourceCost + (scrObj_Skill._baseResourceCost * (live_charStats.charInfo._charLevel * scrObj_Skill._multiplier)) + (scrObj_Skill._baseResourceCost * (currentCharacterBonusStats.bonus_CloseRangeDamage * scrObj_Skill._multiplier)); // + cost za bonus;
+            }
+
+
         }
         #endregion
 
         #region Dynamic Cone All
         #region Skill_DynamicCone_Update
+        /// <summary>
+        /// <br>Updatuje wszystkie rodzaje DynamicCone w zależności od tego czy isCasting == true/false</br>
+        /// <br>Do metody trzeba podać aktualny [targetTypeIndex] z targetType[]</br>
+        /// </summary>
+        /// <param name="scrObj_Skill">Scriptable Object Skilla</param>
+        /// <param name="skill">Ten GameObject skill</param>
+        /// <param name="live_charStats">Live_charStats Castera</param>
+        /// <param name="targetTypeIndex">Aktualny [targetTypeIndex] z targetType[]</param>
+        public static void Skill_DynamicCone_Update(ScrObj_skill scrObj_Skill, Skill skill, CharacterStatus live_charStats, int targetTypeIndex)
+        {
+            switch (scrObj_Skill._castingType) // Switch wybiera jaki jest oznaczony EnumCastingType w scrObj_Skill
+            {
+                case ScrObj_skill.CastingType.Instant:
+                    Skill_OnCombo_DynamicCone(scrObj_Skill, skill, live_charStats, targetTypeIndex);
+                    break;
+
+                case ScrObj_skill.CastingType.Hold:
+                    Skill_OnTime_DynamicCone(scrObj_Skill, skill, live_charStats, targetTypeIndex);
+                    break;                
+
+                case ScrObj_skill.CastingType.Castable:
+                    Skill_Instant_DynamicCone(scrObj_Skill, skill, live_charStats, targetTypeIndex);
+                    break;
+            }
+        }
+        #endregion
+
+        /*#region Skill_DynamicCone_Update
         /// <summary>
         /// <br>Updatuje wszystkie rodzaje DynamicCone w zależności od tego czy isCasting == true/false</br>
         /// <br>Do metody trzeba podać aktualny [targetTypeIndex] z targetType[]</br>
@@ -917,13 +866,13 @@ public static class SkillForge
                     break;
             }
         }
-        #endregion
+        #endregion*/
 
-        #region Skill_Cone_DynamicCone 
+        #region Skill_OnTime_DynamicCone 
         /// <summary>
-        /// Mechanika Dynamicznego Range/Angle Cone
+        /// Mechanika Dynamicznego Range/Angle Cone dla CastingType.Hold / OnTime_DynamicCone 
         /// <br>Dziala z nową mechaniką targetType[]</br>
-        /// <br><i>Dynamicznie skaluje zasięg i kąt Skilla</i></br>
+        /// <br><i>Dynamicznie skaluje zasięg i kąt Skilla w zależności od czasu castowania</i></br>
         /// </summary>
         /// <param name="scrObj_Skill">Scriptable Object Skilla</param>
         /// <param name="skill">Ten GameObject skill</param>
@@ -951,21 +900,56 @@ public static class SkillForge
 
         #region Skill_OnCombo_DynamicCone
         /// <summary>
-        /// Mechanika Dynamicznego Range/Angle Cone dla TargetType Melee / wykorzystujących OnCombo_DynamicCone 
+        /// Mechanika Dynamicznego Range/Angle Cone dla CastingType.Instant / OnCombo_DynamicCone 
         /// <br>Dziala z nową mechaniką targetType[]</br>
-        /// <br><i>Dynamicznie skaluje zasięg i kąt Skilla</i></br>
+        /// <br><i>Dynamicznie skaluje zasięg i kąt Skilla w zależności od comboProgressu castowania</i></br>
         /// </summary>
         /// <param name="scrObj_Skill">Scriptable Object Skilla</param>
         /// <param name="skill">Ten GameObject skill</param>
         /// <param name="live_charStats">Live_charStats Castera</param>
         public static void Skill_OnCombo_DynamicCone(ScrObj_skill scrObj_Skill, Skill skill, CharacterStatus live_charStats, int targetTypeIndex)
         {
-            if (live_charStats.charStatus._isCasting) { skill.targetDynamicValues[targetTypeIndex]._currentRadius = scrObj_Skill._targetTypes[targetTypeIndex]._maxRadius; }
-            else { skill.targetDynamicValues[targetTypeIndex]._currentRadius = scrObj_Skill._targetTypes[targetTypeIndex]._minRadius; }
+            /*if (live_charStats.charStatus._isCasting) { skill.targetDynamicValues[targetTypeIndex]._currentRadius = scrObj_Skill._targetTypes[targetTypeIndex]._maxRadius; }
+            else { skill.targetDynamicValues[targetTypeIndex]._currentRadius = scrObj_Skill._targetTypes[targetTypeIndex]._minRadius; }*/
 
+            ///DynamicRadius
+            skill.targetDynamicValues[targetTypeIndex]._currentRadius = Mathf.Lerp(scrObj_Skill._targetTypes[targetTypeIndex]._minRadius, scrObj_Skill._targetTypes[targetTypeIndex]._maxRadius, Mathf.InverseLerp(0f, 1.5f, skill._currentComboProgress));
+            
+            ///DynamicAngle
             skill.targetDynamicValues[targetTypeIndex]._currentAngle = Mathf.Lerp(scrObj_Skill._targetTypes[targetTypeIndex]._minAngle, scrObj_Skill._targetTypes[targetTypeIndex]._maxAngle, Mathf.InverseLerp(0f, 1.5f, skill._currentComboProgress));
         }
         #endregion
+
+        #region Skill_Instant_DynamicCone 
+        /// <summary>
+        /// Mechanika Dynamicznego Range/Angle Cone dla CastingType.Castable / InstantMax_DynamicCone
+        /// <br>Dziala z nową mechaniką targetType[]</br>
+        /// <br><i>Dynamicznie skaluje zasięg i kąt Skilla Instantowo ustawia na Max i z czasem spada</i></br>
+        /// </summary>
+        /// <param name="scrObj_Skill">Scriptable Object Skilla</param>
+        /// <param name="skill">Ten GameObject skill</param>
+        /// <param name="live_charStats">Live_charStats Castera</param>
+        public static void Skill_Instant_DynamicCone(ScrObj_skill scrObj_Skill, Skill skill, CharacterStatus live_charStats, int targetTypeIndex)
+        {
+            if (live_charStats.charStatus._isCasting)
+            {
+                skill.targetDynamicValues[targetTypeIndex]._currentRadius = scrObj_Skill._targetTypes[targetTypeIndex]._maxRadius;
+                //dynamiczny BreathCone radius -> ++ on input
+
+                skill.targetDynamicValues[targetTypeIndex]._currentAngle = scrObj_Skill._targetTypes[targetTypeIndex]._maxAngle;
+                //dynamiczny BreathCone Angle -> ++ on input
+            }
+            else
+            {
+                skill.targetDynamicValues[targetTypeIndex]._currentRadius = Mathf.SmoothDamp(skill.targetDynamicValues[targetTypeIndex]._currentRadius, scrObj_Skill._targetTypes[targetTypeIndex]._minRadius, ref skill.targetDynamicValues[targetTypeIndex]._currentVectorRadius, scrObj_Skill._targetTypes[targetTypeIndex]._timeMaxRadius);
+                //dynamiczny BreathCone radius -> -- off input
+
+                skill.targetDynamicValues[targetTypeIndex]._currentAngle = Mathf.SmoothDamp(skill.targetDynamicValues[targetTypeIndex]._currentAngle, scrObj_Skill._targetTypes[targetTypeIndex]._minAngle, ref skill.targetDynamicValues[targetTypeIndex]._currentVectorAngle, scrObj_Skill._targetTypes[targetTypeIndex]._timeMaxAngle);
+                //dynamiczny BreathCone Angle -> -- off 
+            }
+        }
+        #endregion
+
         #endregion
 
         #region Resets_Audio / VFX / Casting / Animator
@@ -1059,6 +1043,15 @@ public static class SkillForge
         }
         #endregion 
         #endregion
+
+        public static IEnumerator WaitForTime(Skill skill)
+        {
+            yield return new WaitForEndOfFrame();
+            skill._currentCastingProgress = 0f;    //reset progressu po wycastowaniu Skilla             
+            skill._currentCooldownRemaining = 1f;  //Ustawia cooldown po wycastowaniu żeby nie castował znów zbyt szybko, przydatnie jeśli mamy animację po wystrzeleniu
+            yield return null;
+
+        }
     }
     #endregion Utils
 }

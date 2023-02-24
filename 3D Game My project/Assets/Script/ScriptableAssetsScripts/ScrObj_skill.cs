@@ -20,7 +20,7 @@ public class ScrObj_skill : ScriptableObject
 
     public enum EffectType { None, Hit, DamageOverTime, Heal, HealOverTime, Summon }
 
-    public enum TargetType { None, ConeOnCombo, ConeOnTime, Projectile, AreaOfEffectMouse, Self, Chain, Pierce, Boom }
+    public enum TargetType { None, DynamicCone, Projectile, AreaOfEffectMouse, Self, Chain, Pierce, Boom }
 
     [Space]
     [Header("SkillRange - wymagany")]

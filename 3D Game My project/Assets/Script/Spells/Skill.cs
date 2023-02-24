@@ -81,7 +81,7 @@ public class Skill : MonoBehaviour
 
     private void FixedUpdate()
     {
-        Skill_SkillCastMechanic(scrObj_Skill, skill, live_charStats, currentCharacterBonusStats);        
+        Skill_SkillCastMechanic(scrObj_Skill, skill, live_charStats, currentCharacterBonusStats);   
     }
 
     #region QuickSetup
