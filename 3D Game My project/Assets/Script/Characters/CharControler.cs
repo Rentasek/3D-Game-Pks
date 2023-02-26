@@ -296,8 +296,12 @@ public class CharControler : MonoBehaviour
         live_charStats.charInput._moving = false;
         live_charStats.charInput._running = false;
         live_charStats.charInput._jumping = false;
-        live_charStats.charInput._primary = false;
-        live_charStats.charInput._secondary = false;       
+
+        if (live_charStats.charSkillCombat._skillArray.Length >= 2 && live_charStats.charSkillCombat._skillArray != null && live_charStats.tag != "Destructibles")
+        {
+            live_charStats.charSkillCombat._skillArray[0]._skillInput = false;
+            live_charStats.charSkillCombat._skillArray[1]._skillInput = false;
+        }
 
         live_charStats.charStatus._isMoving = false;
         live_charStats.charStatus._isJumping = false;        
