@@ -107,7 +107,7 @@ public class Skill : MonoBehaviour
         _audioSourceCaster = GetComponent<AudioSource>(); 
         _castingVisualEffect = GetComponent<VisualEffect>();
 
-        switch (scrObj_Skill._inputType)
+        /*switch (scrObj_Skill._inputType)
         {
             case ScrObj_skill.InputType.primary:
                 live_charStats.charSkillCombat._primarySkill = skill;
@@ -115,11 +115,11 @@ public class Skill : MonoBehaviour
             case ScrObj_skill.InputType.secondary:
                 live_charStats.charSkillCombat._secondarySkill = skill;
                 break;
-        }
+        }*/
 
         SkillForge.Utils.Skill_EnemyArraySelector(skill, live_charStats);
 
-        //Skills Select By MaxRange
+        /*//Skills Select By MaxRange
         if (live_charStats.charSkillCombat._primarySkill != null && live_charStats.charSkillCombat._secondarySkill != null)
         {
             if (live_charStats.charSkillCombat._primarySkill.scrObj_Skill._skillMaxRadius < live_charStats.charSkillCombat._secondarySkill.scrObj_Skill._skillMaxRadius)
@@ -134,7 +134,7 @@ public class Skill : MonoBehaviour
                 live_charStats.fov._spellRangeSkill = live_charStats.charSkillCombat._primarySkill;
                 live_charStats.fov._spellRangeSkillMaxRadius = live_charStats.charSkillCombat._primarySkill.scrObj_Skill._skillMaxRadius;
             }
-        }
+        }*/
     }
     #endregion
 
@@ -157,7 +157,7 @@ public class Skill : MonoBehaviour
 
     private void Skill_SkillCastMechanic(ScrObj_skill scrObj_Skill, Skill skill, CharacterStatus live_charStats, CharacterBonusStats currentCharacterBonusStats)
     {
-        SkillForge.Utils.Skill_EveryFrameValuesUpdate_new(scrObj_Skill, skill, live_charStats, currentCharacterBonusStats);
+        SkillForge.Utils.Skill_EveryFrameValuesUpdate(scrObj_Skill, skill, live_charStats, currentCharacterBonusStats);
 
         _canCast = !skill._skillOtherInput && !live_charStats.charStatus._isDead;
 
