@@ -2,6 +2,7 @@ using Cinemachine;
 using JetBrains.Annotations;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.AI;
 using UnityEngine.UIElements;
@@ -48,8 +49,8 @@ public class CharacterStatus : MonoBehaviour
         public bool _moving;
         public bool _running;
         public bool _jumping;
-        [Tooltip("LMB / LPM")] public bool _primary;
-        [Tooltip("RMB / PPM")] public bool _secondary;
+        //[Tooltip("LMB / LPM")] public bool _primary;
+        //[Tooltip("RMB / PPM")] public bool _secondary;
         [Tooltip("Sensitivity myszki")] public float _rotateSensivity;
         [Tooltip("Czy mo¿na obracaæ myszk¹? - Player (X)")] public bool _enableMouseRotate;
         [Tooltip("Poruszanie siê we wskazany _walkPoint - nadpisanie dzia³ania AIControllera - Player (MiddleMouse)")] public bool _mouseCurrentMoving;     
@@ -110,7 +111,6 @@ public class CharacterStatus : MonoBehaviour
         [Tooltip("Aktualny spellRange pobrany z closeRangeSkill")] public float _spellRangeSkillMaxRadius;
         [CanBeNull, Tooltip("SpellRangeSkill przekazany z klasy Skill")] public Skill _spellRangeSkill;
         [Space]
-        //[Tooltip("Aktualny attackRange pobrany z closeRangeSkill")] public float _closeRangeSkillMinRadius;
         [Tooltip("Podaje true jeœli target jest Aquired i znajduje siê w zasiêgu (MaxRadius) closeRangeSkilla")] public bool _targetInAttackRange;
         [CanBeNull, Tooltip("CloseRangeSkill przekazany z klasy Skill")] public Skill _closeRangeSkill;
         [Space]
@@ -166,11 +166,13 @@ public class CharacterStatus : MonoBehaviour
     [Serializable]
     public class CharSkillCombat
     {
-        [Header("Character Primary/Melee Combat")]
+        /*[Header("Character Primary/Melee Combat")]
         [Tooltip("Skill pod LMB"), CanBeNull] public Skill _primarySkill;        
 
         [Header("Character Secondary/Magic Combat")]
-        [Tooltip("Skill pod RMB"), CanBeNull] public Skill _secondarySkill;
+        [Tooltip("Skill pod RMB"), CanBeNull] public Skill _secondarySkill;*/
+
+        [Tooltip("Tablica Skillów podpiêtych pod postaæ\n [0] -> CloseRange / Primary (Player)\n [1] -> SpellRange / Secondary (Player)"), CanBeNull] public Skill[] _skillArray;
 
         [Tooltip("Kolor Gizmos - AISpellRadius (kolor HDR picker)"), ColorUsageAttribute(true, true)] public Color _editorAISpellRadiusColor;
         [Tooltip("Kolor Gizmos - SkillAngle (kolor HDR picker)"), ColorUsageAttribute(true, true)] public Color _skillAngleColor;
@@ -222,6 +224,7 @@ public class CharacterStatus : MonoBehaviour
     [Tooltip("Komponenty podpiête pod live_charStats")]public CharComponents charComponents;
     #endregion
 
+    #region Save/Load Character
     public void LoadCharStats()
     {
         //Objects
@@ -234,25 +237,28 @@ public class CharacterStatus : MonoBehaviour
             //Skills Select By MaxRange
 
             charComponents._navMeshAgent.stoppingDistance = 0f;
-            if (charSkillCombat._primarySkill != null && charSkillCombat._secondarySkill != null)
+           /* if (charSkillCombat._skillArray != null)
             {
                 if (charSkillCombat._primarySkill.scrObj_Skill._skillMaxRadius < charSkillCombat._secondarySkill.scrObj_Skill._skillMaxRadius)
                 {
                     fov._closeRangeSkill = charSkillCombat._primarySkill;
-                    fov._spellRangeSkill = charSkillCombat._secondarySkill;                    
+                    fov._spellRangeSkill = charSkillCombat._secondarySkill;
                     fov._spellRangeSkillMaxRadius = charSkillCombat._secondarySkill.scrObj_Skill._skillMaxRadius;
                 }
                 else
                 {
                     fov._closeRangeSkill = charSkillCombat._secondarySkill;
-                    fov._spellRangeSkill = charSkillCombat._primarySkill;                   
+                    fov._spellRangeSkill = charSkillCombat._primarySkill;
                     fov._spellRangeSkillMaxRadius = charSkillCombat._primarySkill.scrObj_Skill._skillMaxRadius;
                 }
-            }
-            //charComponents._navMeshAgent.stoppingDistance = fov._closeRangeSkillMinRadius;
-        }
+            }*/
+
+
+        }  
         if (GetComponent<AudioSource>() != null) charComponents._audioSource = GetComponent<AudioSource>();
         if (GetComponent<CharacterBonusStats>() != null) charComponents._characterBonusStats = GetComponent<CharacterBonusStats>();
+
+        if (GetComponentInChildren<Skill>() != null) { SkillsSetup(); }
 
         Utils_BoxSpellsReset();
 
@@ -306,12 +312,12 @@ public class CharacterStatus : MonoBehaviour
         charStats._maxHP = charComponents._scrObj_CharStats.baseHP + (charComponents._scrObj_CharStats.baseHP * (charInfo._charLevel * charComponents._scrObj_CharStats.HP_Multiplier)) + (charComponents._scrObj_CharStats.baseHP * (charComponents._characterBonusStats.bonus_currentMaxHP * charComponents._scrObj_CharStats.HP_Multiplier));   //current staty po przeliczenu multipliera * CharLevel  +bonus        
         charStats._maxMP = charComponents._scrObj_CharStats.baseMP + (charComponents._scrObj_CharStats.baseMP * (charInfo._charLevel * charComponents._scrObj_CharStats.MP_Multiplier)) + (charComponents._scrObj_CharStats.baseMP * (charComponents._characterBonusStats.bonus_currentMaxMP * charComponents._scrObj_CharStats.MP_Multiplier));   //+bonus            
         charStats._maxStam = charComponents._scrObj_CharStats.baseStam + (charComponents._scrObj_CharStats.baseStam * (charInfo._charLevel * charComponents._scrObj_CharStats.Stam_Multiplier)) + (charComponents._scrObj_CharStats.baseStam * (charComponents._characterBonusStats.bonus_currentMaxStam * charComponents._scrObj_CharStats.Stam_Multiplier)); //+bonus  
-        charStats._neededXP = charComponents._scrObj_CharStats.baseNeedXP + (charComponents._scrObj_CharStats.baseNeedXP * (charInfo._charLevel * charComponents._scrObj_CharStats.XP_Multiplier));        
+        charStats._neededXP = charComponents._scrObj_CharStats.baseNeedXP + (charComponents._scrObj_CharStats.baseNeedXP * (charInfo._charLevel * charComponents._scrObj_CharStats.XP_Multiplier));
         charStats._xp_GainedFromKill = charComponents._scrObj_CharStats.XP_GainedFromKill + (charComponents._scrObj_CharStats.XP_GainedFromKill * (charInfo._charLevel * charComponents._scrObj_CharStats.XP_Multiplier));
         charStats._corpseTime = charComponents._scrObj_CharStats.corpseTime;
         charStats._respawnTime = charComponents._scrObj_CharStats.respawnTime;
 
-        
+
         //Damage        
         /*unused Old_DamageVars
          * charSkillCombat.currentDamageCombo = scrObj_CharStats.baseDamageCombo + (scrObj_CharStats.baseDamageCombo * (charInfo.currentCharLevel * scrObj_CharStats.MultiplierDamageCombo)) + (scrObj_CharStats.baseDamageCombo * (currentCharacterBonusStats.bonus_currentDamageCombo * scrObj_CharStatsbo)); //+bonus
@@ -341,14 +347,14 @@ public class CharacterStatus : MonoBehaviour
         //charSkillCombat.currentSpell_Damage = scrObj_CharStats.baseSpell_Damage + (scrObj_CharStats.baseSpell_Damage * (charInfo.currentCharLevel * scrObj_CharStats.MultiplierSpell_Damage)) + (scrObj_CharStats.baseSpell_Damage * (currentCharacterBonusStats.bonus_Skill_Damage * scrObj_CharStats.MultiplierSpell_Damage)); //+bonus
         //charSkillCombat.currentSpell_MPCost = scrObj_CharStats.baseSpell_MPCost + (scrObj_CharStats.baseSpell_Damage * (charInfo.currentCharLevel * scrObj_CharStats.MultiplierSpell_Damage));
         */
-        
+
         SaveBonusStats();
     }
 
     public void LevelGain()
     {
         charStats._xp -= charStats._neededXP; //przerzuca nadwy¿ke xp na next level
-        charInfo._charLevel ++;
+        charInfo._charLevel++;
         LoadCharStats();
     }
 
@@ -370,7 +376,7 @@ public class CharacterStatus : MonoBehaviour
         charStats._xp = PlayerPrefs.GetInt("CharacterCurrentXP", 0);
         LoadBonusStats();
         UpdateBonusStats();
-    } 
+    }
 
 
     ///////////SAVE GAME///////////
@@ -426,14 +432,6 @@ public class CharacterStatus : MonoBehaviour
         }
     }
 
-
-    public void SetCharacterPosition()
-    {
-        charMove._backupPosition = new Vector3(transform.position.x, transform.position.y + 0.5f, transform.position.z); //y+0.5f ¿eby zrespi³ siê powy¿ej terrain
-        charMove._backupRotation = transform.rotation;
-        navMeshAge._spawnPoint = transform.position;
-    }
-
     ///////////////////////////////
     public void ResetLevel()
     {
@@ -448,13 +446,23 @@ public class CharacterStatus : MonoBehaviour
         }
 
     }
+    #endregion
+
+    #region Set/Reset Position
+    public void SetCharacterPosition()
+    {
+        charMove._backupPosition = new Vector3(transform.position.x, transform.position.y + 0.5f, transform.position.z); //y+0.5f ¿eby zrespi³ siê powy¿ej terrain
+        charMove._backupRotation = transform.rotation;
+        navMeshAge._spawnPoint = transform.position;
+    }
 
     public void ResetCharacterPosition()
     {
         //transform.SetPositionAndRotation(charMove._backupPosition, charMove._backupRotation);
-        transform.position= charMove._backupPosition;
-        transform.rotation= charMove._backupRotation;
-    }
+        transform.position = charMove._backupPosition;
+        transform.rotation = charMove._backupRotation;
+    } 
+    #endregion
 
     public void ResourcesRegen()
     {
@@ -468,15 +476,16 @@ public class CharacterStatus : MonoBehaviour
     }
 
     /////////////////////////////////
-    
-    public void TakeDamgeInstant(float damageValue, CharacterStatus attacker)
+
+    #region TakeDamage/Heal
+    public void TakeDamageInstant(float damageValue, CharacterStatus attacker)
     {
         charStats._hp -= damageValue;
         if (charStats._hp <= 0f && !charStatus._isDead) //zadzia³a tylko raz
         {
             attacker.charStats._xp += charStats._xp_GainedFromKill;
             if (gameObject.CompareTag("Monster")) { charInfo._charLevel = UnityEngine.Random.Range(attacker.charInfo._charLevel - 3, attacker.charInfo._charLevel + 3); }  //po œmierci ustawia level targetu na zbli¿ony do atakuj¹cego
-                                                                                                                                                                                                                                  //podbija lvl tylko Monsterów, Playera i Environment nie
+                                                                                                                                                                           //podbija lvl tylko Monsterów, Playera i Environment nie
         }
     }
 
@@ -487,7 +496,7 @@ public class CharacterStatus : MonoBehaviour
         {
             attacker.charStats._xp += charStats._xp_GainedFromKill;
             if (gameObject.CompareTag("Monster")) { charInfo._charLevel = UnityEngine.Random.Range(attacker.charInfo._charLevel - 3, attacker.charInfo._charLevel + 3); }  //po œmierci ustawia level targetu na zbli¿ony do atakuj¹cego
-                                                                                                                                                                                                                                  //podbija lvl tylko Monsterów, Playera i Environment nie
+                                                                                                                                                                           //podbija lvl tylko Monsterów, Playera i Environment nie
         }
     }
 
@@ -502,20 +511,24 @@ public class CharacterStatus : MonoBehaviour
         if (charStats._hp < charStats._maxHP) { charStats._hp = Mathf.MoveTowards(charStats._hp, charStats._maxHP, Time.deltaTime * healValue); }
         else { charStats._hp = charStats._maxHP; }
     }
+    #endregion
 
+    /////////////////////////////////
 
+    #region Utils
     /// <summary>
-    /// Specjalna klasa s³u¿¹ca do resetu spelli na Destructibles poniewa¿ mimo ¿e nie widaæ czasami mo¿e przypisaæ próbowaæ spell (niby sk¹d?)
-    /// Wina tego ¿e Destructiblesy i czary s¹ na tym samym skrypcie 
+    /// Specjalna klasa s³u¿¹ca do resetu spelli na Destructibles poniewa¿ mimo ¿e nie widaæ czasami mo¿e próbowaæ przypisaæ spell (niby sk¹d?)
+    /// Wina tego ¿e Destructiblesy i Charactery s¹ na tym samym skrypcie live_charStats 
     /// </summary>
     public void Utils_BoxSpellsReset()
     {
         if (charInfo._charName == "Box" || gameObject.tag == "Destructibles")
         {
-            charSkillCombat._primarySkill = null;
+            charSkillCombat._skillArray = null;
+            /*charSkillCombat._primarySkill = null;
             charSkillCombat._secondarySkill = null;
             fov._closeRangeSkill = null;
-            fov._spellRangeSkill = null;
+            fov._spellRangeSkill = null;*/
         }
     }
 
@@ -526,4 +539,32 @@ public class CharacterStatus : MonoBehaviour
         charStats._stam = charStats._maxStam;
         fov._AISpellRangeSkillRadiusFromMax = 0.5f;
     }
+
+    private void SkillsSetup()
+    {
+        charSkillCombat._skillArray = GetComponentsInChildren<Skill>();  //za³adowanie wszystkich Skill do arraya
+
+        if (!charInfo._isPlayer)
+        {                                                                                                                            
+            charSkillCombat._skillArray = charSkillCombat._skillArray.OrderBy(x => x.scrObj_Skill._skillMaxRadius).ToArray();   //ustawianie _skill Array w kolejnoœci od najwiêkszego bazowego SkillRange dla non-Playera
+        }
+        else
+        {
+            Skill[] temporaryskillArray = new Skill[charSkillCombat._skillArray.Length];    //ustawienie zale¿ne od tego czy skill jest primary czy secondary [0]=inputType.primary [last]=inputType.secondary (Player)
+            if (charSkillCombat._skillArray.First().scrObj_Skill._inputType == ScrObj_skill.InputType.primary)
+            {
+                temporaryskillArray[0] = charSkillCombat._skillArray.First();
+                temporaryskillArray[1] = charSkillCombat._skillArray.Last();
+            }
+            else
+            {
+                temporaryskillArray[0] = charSkillCombat._skillArray.Last();
+                temporaryskillArray[1] = charSkillCombat._skillArray.First();
+            }
+            charSkillCombat._skillArray = temporaryskillArray;
+        }
+
+        fov._spellRangeSkillMaxRadius = charSkillCombat._skillArray[0].scrObj_Skill._skillMaxRadius;        
+    } 
+    #endregion
 }
