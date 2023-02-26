@@ -68,7 +68,9 @@ public class Skill : MonoBehaviour
     [Header("Utils")]
 
     [Tooltip("AudioSource skilla -> Caster"), SerializeField] public AudioSource _audioSourceCaster;
-    [Tooltip("VFX skilla -> Caster"), CanBeNull, SerializeField] public VisualEffect _castingVisualEffect;  
+    [Tooltip("VFX skilla -> Caster"), CanBeNull, SerializeField] public VisualEffect _castingVisualEffect;
+    [Tooltip("VFX skilla Chain -> Caster"), CanBeNull, SerializeField] public VisualEffect _chainVisualEffect;
+    [Tooltip("VFX skilla Projectile -> Caster"), CanBeNull, SerializeField] public VisualEffect _projectileVisualEffect;
 
     private void OnValidate()
     {
