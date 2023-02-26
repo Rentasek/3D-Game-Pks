@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections;
+using System.Collections.Generic;
 using System.Linq;
 using Unity.VisualScripting;
 using Unity.VisualScripting.FullSerializer;
@@ -504,25 +505,33 @@ public static class SkillForge
                 {
                     if (skill._allLocalColliders[i].CompareTag(skill._enemiesArray[j]))
                     {
-                        float distanceToTarget = Vector3.Distance(skill._allLocalColliders[i].transform.position, skill._casterGameobject.transform.position);
-
-                        if (distanceToTarget <= skill.targetDynamicValues[targetTypeIndex]._currentRadius)
+                        if (skill.targetDynamicValues[targetTypeIndex]._targetColliders.Count < 1)
                         {
-                            skill.targetDynamicValues[targetTypeIndex]._targetInRange = true; //target jest w breath range
+                            float distanceToTarget = Vector3.Distance(skill._allLocalColliders[i].transform.position, skill._casterGameobject.transform.position);
 
-                            Vector3 directionToTarget = (skill._allLocalColliders[i].transform.position - skill._casterGameobject.transform.position).normalized; //0-1(normalized) różnica pomiędzy targetem a characterem Vector3.normalized ==> vector (kierunek w którym od niego znajduje się target)
-                                                                                                                                                                  //sprawdzanie aktualnie ostatniego elementu z listy
-                            if (Vector3.Angle(skill._casterGameobject.transform.forward, directionToTarget) < skill.targetDynamicValues[targetTypeIndex]._currentAngle / 2)
-                            //sprawdzanie angle wektora forward charactera i direction to target
-                            //target może być na + albo - od charactera dlatego w każdą stronę angle / 2
+                            if (distanceToTarget <= skill.targetDynamicValues[targetTypeIndex]._currentRadius)
                             {
-                                if (!Physics.Raycast(skill._casterGameobject.transform.position, directionToTarget, distanceToTarget, scrObj_Skill._targetTypes[targetTypeIndex]._obstaclesMask))    //dodatkowo sprawdza Raycastem czy nie ma przeszkody pomiędzy playerem a targetem //  
-                                {
-                                    skill.targetDynamicValues[targetTypeIndex]._targetInAngle = true;
+                                skill.targetDynamicValues[targetTypeIndex]._targetInRange = true; //target jest w breath range
 
-                                    if (skill.targetDynamicValues[targetTypeIndex]._targetColliders.IndexOf(skill._allLocalColliders[i]) < 0) //sprawdza czy nie ma na liście. Jeżeli IndexOf < 0 czyli nie ma obiektów z tym indexem
+                                Vector3 directionToTarget = (skill._allLocalColliders[i].transform.position - skill._casterGameobject.transform.position).normalized; //0-1(normalized) różnica pomiędzy targetem a characterem Vector3.normalized ==> vector (kierunek w którym od niego znajduje się target)
+                                                                                                                                                                      //sprawdzanie aktualnie ostatniego elementu z listy
+                                if (Vector3.Angle(skill._casterGameobject.transform.forward, directionToTarget) < skill.targetDynamicValues[targetTypeIndex]._currentAngle / 2)
+                                //sprawdzanie angle wektora forward charactera i direction to target
+                                //target może być na + albo - od charactera dlatego w każdą stronę angle / 2
+                                {
+                                    if (!Physics.Raycast(skill._casterGameobject.transform.position, directionToTarget, distanceToTarget, scrObj_Skill._targetTypes[targetTypeIndex]._obstaclesMask))    //dodatkowo sprawdza Raycastem czy nie ma przeszkody pomiędzy playerem a targetem //  
                                     {
-                                        skill.targetDynamicValues[targetTypeIndex]._targetColliders.Add(skill._allLocalColliders[i]); //przypisuje do listy colliders jeśli ma taga z listy enemies        
+                                        skill.targetDynamicValues[targetTypeIndex]._targetInAngle = true;
+
+                                        if (skill.targetDynamicValues[targetTypeIndex]._targetColliders.IndexOf(skill._allLocalColliders[i]) < 0) //sprawdza czy nie ma na liście. Jeżeli IndexOf < 0 czyli nie ma obiektów z tym indexem
+                                        {
+                                            skill.targetDynamicValues[targetTypeIndex]._targetColliders.Add(skill._allLocalColliders[i]); //przypisuje do listy colliders jeśli ma taga z listy enemies        
+                                        }
+                                        else
+                                        {
+                                            skill.targetDynamicValues[targetTypeIndex]._targetColliders.Remove(skill._allLocalColliders[i]);
+                                            if (skill.targetDynamicValues[targetTypeIndex]._targetColliders.Count <= 0) skill.targetDynamicValues[targetTypeIndex]._targetInAngle = false;  //jeśli nie ma żadnych targetów w Cone Angle
+                                        }
                                     }
                                     else
                                     {
@@ -533,24 +542,70 @@ public static class SkillForge
                                 else
                                 {
                                     skill.targetDynamicValues[targetTypeIndex]._targetColliders.Remove(skill._allLocalColliders[i]);
-                                    if (skill.targetDynamicValues[targetTypeIndex]._targetColliders.Count <= 0) skill.targetDynamicValues[targetTypeIndex]._targetInAngle = false;  //jeśli nie ma żadnych targetów w Cone Angle
+                                    if (skill.targetDynamicValues[targetTypeIndex]._targetColliders.Count <= 0) skill.targetDynamicValues[targetTypeIndex]._targetInAngle = false;  //jeśli nie ma żadnych targetów w Cone Angle 
                                 }
                             }
                             else
                             {
                                 skill.targetDynamicValues[targetTypeIndex]._targetColliders.Remove(skill._allLocalColliders[i]);
-                                if (skill.targetDynamicValues[targetTypeIndex]._targetColliders.Count <= 0) skill.targetDynamicValues[targetTypeIndex]._targetInAngle = false;  //jeśli nie ma żadnych targetów w Cone Angle 
+                                if (skill.targetDynamicValues[targetTypeIndex]._targetColliders.Count <= 0)
+                                {
+                                    skill.targetDynamicValues[targetTypeIndex]._targetInAngle = false;  //jeśli nie ma żadnych targetów w Cone Angle
+                                    skill.targetDynamicValues[targetTypeIndex]._targetInRange = false;  //jeśli nie ma żadnych targetów w Cone Radius
+                                }
                             }
                         }
                         else
                         {
-                            skill.targetDynamicValues[targetTypeIndex]._targetColliders.Remove(skill._allLocalColliders[i]);
-                            if (skill.targetDynamicValues[targetTypeIndex]._targetColliders.Count <= 0)
+                            float distanceToTarget = Vector3.Distance(skill._allLocalColliders[i].transform.position, skill.targetDynamicValues[targetTypeIndex]._targetColliders[0].transform.position); //dystans mierzony od [0] targetu na liście
+
+                            if (distanceToTarget <= skill.targetDynamicValues[targetTypeIndex]._currentRadius/2f) //currentRadius dzielony na 2 jako zasięg chaina
                             {
-                                skill.targetDynamicValues[targetTypeIndex]._targetInAngle = false;  //jeśli nie ma żadnych targetów w Cone Angle
-                                skill.targetDynamicValues[targetTypeIndex]._targetInRange = false;  //jeśli nie ma żadnych targetów w Cone Radius
+                                skill.targetDynamicValues[targetTypeIndex]._targetInRange = true; //target jest w breath range
+
+                                Vector3 directionToTarget = (skill._allLocalColliders[i].transform.position - skill._casterGameobject.transform.position).normalized; //0-1(normalized) różnica pomiędzy targetem a characterem Vector3.normalized ==> vector (kierunek w którym od niego znajduje się target)
+                                                                                                                                                                      //sprawdzanie aktualnie ostatniego elementu z listy
+                                if (Vector3.Angle(skill._casterGameobject.transform.forward, directionToTarget) < 360 / 2) // Po 180 w każdą stronę
+                                //sprawdzanie angle wektora forward charactera i direction to target
+                                //target może być na + albo - od charactera dlatego w każdą stronę angle / 2
+                                {
+                                    if (!Physics.Raycast(skill._casterGameobject.transform.position, directionToTarget, distanceToTarget, scrObj_Skill._targetTypes[targetTypeIndex]._obstaclesMask))    //dodatkowo sprawdza Raycastem czy nie ma przeszkody pomiędzy playerem a targetem //  
+                                    {
+                                        skill.targetDynamicValues[targetTypeIndex]._targetInAngle = true;
+
+                                        if (skill.targetDynamicValues[targetTypeIndex]._targetColliders.IndexOf(skill._allLocalColliders[i]) < 0) //sprawdza czy nie ma na liście. Jeżeli IndexOf < 0 czyli nie ma obiektów z tym indexem
+                                        {
+                                            skill.targetDynamicValues[targetTypeIndex]._targetColliders.Add(skill._allLocalColliders[i]); //przypisuje do listy colliders jeśli ma taga z listy enemies        
+                                        }
+                                        else
+                                        {
+                                            skill.targetDynamicValues[targetTypeIndex]._targetColliders.Remove(skill._allLocalColliders[i]);
+                                            if (skill.targetDynamicValues[targetTypeIndex]._targetColliders.Count <= 0) skill.targetDynamicValues[targetTypeIndex]._targetInAngle = false;  //jeśli nie ma żadnych targetów w Cone Angle
+                                        }
+                                    }
+                                    else
+                                    {
+                                        skill.targetDynamicValues[targetTypeIndex]._targetColliders.Remove(skill._allLocalColliders[i]);
+                                        if (skill.targetDynamicValues[targetTypeIndex]._targetColliders.Count <= 0) skill.targetDynamicValues[targetTypeIndex]._targetInAngle = false;  //jeśli nie ma żadnych targetów w Cone Angle
+                                    }
+                                }
+                                else
+                                {
+                                    skill.targetDynamicValues[targetTypeIndex]._targetColliders.Remove(skill._allLocalColliders[i]);
+                                    if (skill.targetDynamicValues[targetTypeIndex]._targetColliders.Count <= 0) skill.targetDynamicValues[targetTypeIndex]._targetInAngle = false;  //jeśli nie ma żadnych targetów w Cone Angle 
+                                }
+                            }
+                            else
+                            {
+                                skill.targetDynamicValues[targetTypeIndex]._targetColliders.Remove(skill._allLocalColliders[i]);
+                                if (skill.targetDynamicValues[targetTypeIndex]._targetColliders.Count <= 0)
+                                {
+                                    skill.targetDynamicValues[targetTypeIndex]._targetInAngle = false;  //jeśli nie ma żadnych targetów w Cone Angle
+                                    skill.targetDynamicValues[targetTypeIndex]._targetInRange = false;  //jeśli nie ma żadnych targetów w Cone Radius
+                                }
                             }
                         }
+                        
                     }
                 }
             }
@@ -561,12 +616,16 @@ public static class SkillForge
             {
                 if (skill._chainVisualEffect != null) ///VFX chainEffect
                 {
-                    skill._chainVisualEffect.SetVector3("_pos1", skill._chainVisualEffect.transform.position + Vector3.up * 0.5f); //caster
+                    skill._chainVisualEffect.SetVector3("_pos1", skill._chainVisualEffect.transform.position/* + Vector3.up * 0.5f*/); //caster
                     skill._chainVisualEffect.SetVector3("_pos4", skill.targetDynamicValues[targetTypeIndex]._targetColliders[0].transform.position + Vector3.up * 0.5f); //pierwszy index na targetCollider List
                     skill._chainVisualEffect.Play();
 
                     for (int k = 0; k < skill.targetDynamicValues[targetTypeIndex]._targetColliders.Count - 1; k++)  //do przedostatniego targetu
                     {
+                        skill._chainVisualEffect.SetVector3("_pos1", skill._chainVisualEffect.transform.position);
+                        skill._chainVisualEffect.SetVector3("_pos4", skill.targetDynamicValues[targetTypeIndex]._targetColliders[0].transform.position + Vector3.up * 0.5f);
+                        skill._chainVisualEffect.Play(); // za każdym razem dodatkowo odpala od castera do 1 targetu z listy
+                        
                         skill._chainVisualEffect.SetVector3("_pos1", skill.targetDynamicValues[targetTypeIndex]._targetColliders[k].transform.position + Vector3.up * 0.5f);
                         skill._chainVisualEffect.SetVector3("_pos4", skill.targetDynamicValues[targetTypeIndex]._targetColliders[k + 1].transform.position + Vector3.up * 0.5f);
                         skill._chainVisualEffect.Play();
@@ -669,7 +728,7 @@ public static class SkillForge
 
             for (int i = 0; i < skill.targetDynamicValues[targetTypeIndex]._targetColliders.Count; i++)
             {
-                skill.targetDynamicValues[targetTypeIndex]._targetColliders[i].GetComponent<CharacterStatus>().TakeDamgeInstant(skill.targetDynamicValues[targetTypeIndex].effectDynamicValues[effectTypeIndex]._currentDamage, live_charStats);
+                skill.targetDynamicValues[targetTypeIndex]._targetColliders[i].GetComponent<CharacterStatus>().TakeDamageInstant(skill.targetDynamicValues[targetTypeIndex].effectDynamicValues[effectTypeIndex]._currentDamage, live_charStats);
             }
 
             /*if (live_charStats.charInfo._isPlayer)
@@ -797,10 +856,11 @@ public static class SkillForge
         }
         #endregion
 
-        #region Skill_InputSelector
-        /// <summary>
+        #region Skill_InputSelector - OLD UNUSED
+        /*/// <summary>
         /// Update skill_input i skill_otherInput w zależności od ustawień w scriptableObjecie
         /// Użyty w skill_Castings
+        /// <br>Prawdpodobnie już nie potrzeba, zrefrencowałem close/Primary i spellRange/Secondary w live_charStats i Input bezpośrednio dziala na Skille</br>
         /// </summary>
         /// <param name="scrObj_Skill">Scriptable Object Skilla</param>
         /// <param name="skill">Ten GameObject skill</param>
@@ -818,7 +878,7 @@ public static class SkillForge
                     skill._skillOtherInput = live_charStats.charInput._primary;
                     break;
             }
-        }
+        }*/
         #endregion
 
         #region Skill_ResourceTypeCurrentFloatReadOnly
@@ -898,9 +958,9 @@ public static class SkillForge
         /// <param name="scrObj_Skill">Scriptable Object Skilla</param>
         /// <param name="skill">Ten GameObject skill</param>
         /// <param name="live_charStats">Live_charStats Castera</param>
-        public static void Skill_EveryFrameValuesUpdate_new(ScrObj_skill scrObj_Skill, Skill skill, CharacterStatus live_charStats, CharacterBonusStats currentCharacterBonusStats)
+        public static void Skill_EveryFrameValuesUpdate(ScrObj_skill scrObj_Skill, Skill skill, CharacterStatus live_charStats, CharacterBonusStats currentCharacterBonusStats)
         {
-            Skill_InputSelector(scrObj_Skill, skill, live_charStats);
+            //Skill_InputSelector(scrObj_Skill, skill, live_charStats);
 
             skill._currentCooldownRemaining = Mathf.MoveTowards(skill._currentCooldownRemaining, 0f, Time.deltaTime / scrObj_Skill._baseCooldown); //cooldown remaining spada do zera w czasie (1sek * 1/basecooldown ) czyli 30f -> 0f w 10sek
             if (skill._currentCooldownRemaining <= 0.05f) skill._currentComboProgress = Mathf.MoveTowards(skill._currentComboProgress, 0f, Time.deltaTime / scrObj_Skill._baseCooldown);   //aktualny combo progress spada do zera w czasie (1sek * (1/basecooldown)) czyli 30f -> 0f w 30sek spada tylko jeśli nie jest na cooldownie
@@ -1131,6 +1191,7 @@ public static class SkillForge
         #region Skill_ResetVFXAnimsAudio
         /// <summary>
         /// Reset wszystkich Static metod Casting oraz VFX i Animatora do Skilla
+        /// <br>Sprawdza jaki Index ma ten skill w ._skillArray i porównuje czy tn drugi nie ma takiej samej nazwy (animator) Float/Bool/Trigger i nie przerywa im casta jeśli tak jest </br>
         /// </summary>
         /// <param name="scrObj_Skill">Scriptable Object Skilla</param>
         /// <param name="skill">Ten GameObject skill</param>
@@ -1138,21 +1199,121 @@ public static class SkillForge
         public static void Skill_ResetVFXAnimsAudio(ScrObj_skill scrObj_Skill, Skill skill, CharacterStatus live_charStats)
         {
             if (skill._castingVisualEffect != null) skill._castingVisualEffect.Stop();
-            if (!string.IsNullOrWhiteSpace(scrObj_Skill._animatorBoolName)) live_charStats.charComponents._Animator.SetBool(scrObj_Skill._animatorBoolName, false);
-            if (!string.IsNullOrWhiteSpace(scrObj_Skill._animatorTriggerName)) live_charStats.charComponents._Animator.ResetTrigger(scrObj_Skill._animatorTriggerName);
-
+            
             if (skill._audioSourceCaster != null)
             {
                 skill._audioSourceCaster.volume = Mathf.MoveTowards(skill._audioSourceCaster.volume, 0, Time.deltaTime / 2); //obniza volume 1-> 0 w 2sek
-                if (skill._audioSourceCaster.volume <= 0.05f) { skill._audioSourceCaster.Stop(); }
-                if (!string.IsNullOrWhiteSpace(scrObj_Skill._animatorFloatName)) live_charStats.charComponents._Animator.SetFloat(scrObj_Skill._animatorFloatName, 0f); // razem z Volume żeby nie resetował instantowo
+                if (skill._audioSourceCaster.volume <= 0.05f)
+                {
+                    Skill_ResetAnimator(scrObj_Skill, skill, live_charStats);
+                    skill._audioSourceCaster.Stop();
+                }
             }
 
             live_charStats.charStatus._isCasting = false;
 
             //skill.skill_currentCastingProgress = 0f; //reset progressu przy przerwaniu casta / niespełnieniu warunków    
         }
-        #endregion        
+        #endregion
+
+        #region Skill_ResetAnimator
+        /// <summary>
+        /// Resetuje zmienne Animatora, switchem sprawdza czy przypadkiem zmienne animatora w other_Skillu nie są takie same, jeśli są to nie resetuje ich jeśli 2 other_Skill jest castowany
+        /// <br><i>Może wymysli się coś lepszego od switcha</i></br>
+        /// </summary>
+        /// <param name="scrObj_Skill">Scriptable Object Skilla</param>
+        /// <param name="skill">Ten GameObject skill</param>
+        /// <param name="live_charStats">Live_charStats Castera</param> 
+        public static void Skill_ResetAnimator(ScrObj_skill scrObj_Skill, Skill skill, CharacterStatus live_charStats)
+        {
+            switch (Array.IndexOf(live_charStats.charSkillCombat._skillArray, skill)) //Index jaki ma ten skill w _skillArray
+            {
+                case 0:
+                    if (!string.IsNullOrWhiteSpace(scrObj_Skill._animatorFloatName))
+                    {
+                        if (live_charStats.charSkillCombat._skillArray[1].scrObj_Skill._animatorFloatName != scrObj_Skill._animatorFloatName)
+                        {   // jeśli drugi skill nie ma takiej samej nazwy float do animatora
+                            live_charStats.charComponents._Animator.SetFloat(scrObj_Skill._animatorFloatName, 0f); //reset float
+                        }
+                        else if (!live_charStats.charSkillCombat._skillArray[1]._skillInput)
+                        {   // i nie castuje
+                            live_charStats.charComponents._Animator.SetFloat(scrObj_Skill._animatorFloatName, 0f); //reset float
+                        }
+                    }
+
+                    if (!string.IsNullOrWhiteSpace(scrObj_Skill._animatorBoolName))
+                    {
+                        if (live_charStats.charSkillCombat._skillArray[1].scrObj_Skill._animatorBoolName != scrObj_Skill._animatorBoolName)
+                        {
+                            // jeśli drugi skill nie ma takiej samej nazwy Bool do animatora
+                            live_charStats.charComponents._Animator.SetBool(scrObj_Skill._animatorBoolName, false); //reset bool
+                        }
+                        else if (!live_charStats.charSkillCombat._skillArray[1]._skillInput)
+                        {
+                            //  i nie castuje
+                            live_charStats.charComponents._Animator.SetBool(scrObj_Skill._animatorBoolName, false); //reset bool
+                        }
+                    }
+
+                    if (!string.IsNullOrWhiteSpace(scrObj_Skill._animatorTriggerName))
+                    {
+                        if (live_charStats.charSkillCombat._skillArray[1].scrObj_Skill._animatorTriggerName != scrObj_Skill._animatorTriggerName)
+                        {
+                            // jeśli drugi skill nie ma takiej samej nazwy trigger do animatora
+                            live_charStats.charComponents._Animator.ResetTrigger(scrObj_Skill._animatorTriggerName);    //reset trigger
+                        }
+                        else if (!live_charStats.charSkillCombat._skillArray[1]._skillInput)
+                        {
+                            //  i nie castuje
+                            live_charStats.charComponents._Animator.ResetTrigger(scrObj_Skill._animatorTriggerName);    //reset trigger
+                        }
+                    }
+                    break;
+
+                case 1:
+                    if (!string.IsNullOrWhiteSpace(scrObj_Skill._animatorFloatName))
+                    {
+                        if (live_charStats.charSkillCombat._skillArray[0].scrObj_Skill._animatorFloatName != scrObj_Skill._animatorFloatName)
+                        {   // jeśli drugi skill nie ma takiej samej nazwy float do animatora
+                            live_charStats.charComponents._Animator.SetFloat(scrObj_Skill._animatorFloatName, 0f); //reset float
+                        }
+                        else if (!live_charStats.charSkillCombat._skillArray[0]._skillInput)
+                        {   // i nie castuje
+                            live_charStats.charComponents._Animator.SetFloat(scrObj_Skill._animatorFloatName, 0f); //reset float
+                        }
+                    }
+
+                    if (!string.IsNullOrWhiteSpace(scrObj_Skill._animatorBoolName))
+                    {
+                        if (live_charStats.charSkillCombat._skillArray[0].scrObj_Skill._animatorBoolName != scrObj_Skill._animatorBoolName)
+                        {
+                            // jeśli drugi skill nie ma takiej samej nazwy Bool do animatora
+                            live_charStats.charComponents._Animator.SetBool(scrObj_Skill._animatorBoolName, false); //reset bool
+                        }
+                        else if (!live_charStats.charSkillCombat._skillArray[0]._skillInput)
+                        {
+                            //  i nie castuje
+                            live_charStats.charComponents._Animator.SetBool(scrObj_Skill._animatorBoolName, false); //reset bool
+                        }
+                    }
+
+                    if (!string.IsNullOrWhiteSpace(scrObj_Skill._animatorTriggerName))
+                    {
+                        if (live_charStats.charSkillCombat._skillArray[0].scrObj_Skill._animatorTriggerName != scrObj_Skill._animatorTriggerName)
+                        {
+                            // jeśli drugi skill nie ma takiej samej nazwy trigger do animatora
+                            live_charStats.charComponents._Animator.ResetTrigger(scrObj_Skill._animatorTriggerName);    //reset trigger
+                        }
+                        else if (!live_charStats.charSkillCombat._skillArray[0]._skillInput)
+                        {
+                            //  i nie castuje
+                            live_charStats.charComponents._Animator.ResetTrigger(scrObj_Skill._animatorTriggerName);    //reset trigger
+                        }
+                    }
+                    break;
+            }
+        }
+        #endregion
 
         #region Skill_StopAllAnimatorMovementOnCast
         /// <summary>
@@ -1163,7 +1324,7 @@ public static class SkillForge
         /// <param name="live_charStats"></param>
         public static void Skill_StopAllAnimatorMovement(ScrObj_skill scrObj_Skill, CharacterStatus live_charStats)
         {
-            if (!string.IsNullOrWhiteSpace(scrObj_Skill._stopOnCastFloatNameAnimator)) live_charStats.charComponents._Animator.SetFloat(scrObj_Skill._stopOnCastFloatNameAnimator, 0.2f);
+            if (!string.IsNullOrWhiteSpace(scrObj_Skill._stopOnCastFloatNameAnimator)) live_charStats.charComponents._Animator.SetFloat(scrObj_Skill._stopOnCastFloatNameAnimator, 0f);
             if (!string.IsNullOrWhiteSpace(scrObj_Skill._stopOnCastTriggerNameAnimator)) live_charStats.charComponents._Animator.ResetTrigger(scrObj_Skill._stopOnCastTriggerNameAnimator);
             if (!string.IsNullOrWhiteSpace(scrObj_Skill._stopOnCastBoolNameAnimator)) live_charStats.charComponents._Animator.SetBool(scrObj_Skill._stopOnCastBoolNameAnimator, false);
 
