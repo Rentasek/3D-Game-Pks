@@ -16,7 +16,7 @@ public static class LiveCharStats_Base
     /// <param name="live_charStats">Attached CharacterStatus object / Przypięty obiekt CharacterStatus</param>
     public static void FieldOfViewTarget(CharacterStatus live_charStats)
     {
-        if (!live_charStats.fov._spellRangeSkill._skillInput) //nie zmniejsza range jeśli castuje
+        if (!live_charStats.charSkillCombat._skillArray[1]._skillInput) //nie zmniejsza range jeśli castuje
         {
             DynamicSightRangeScalling(live_charStats);
         }        
@@ -136,21 +136,21 @@ public static class LiveCharStats_Base
                     {                        
                         live_charStats.fov._targetInAttackRange = true;
                         live_charStats.fov._targetInSpellRange = true;                        
-                        Utils.CloseRangeInputSwitcher(live_charStats, live_charStats.fov._closeRangeSkill);    //Attacking z przypisania input=live_charStats.fov._targetInAttackRange
+                        Utils.CloseRangeInputSwitcher(live_charStats);    //Attacking z przypisania (_skillArray[0]._skillInput = live_charStats.fov._targetInAttackRange)
                         return;
                     }
-                    else if (distanceToTarget <= (live_charStats.fov._spellRangeSkill.scrObj_Skill._skillMaxRadius * live_charStats.fov._AISpellRangeSkillRadiusFromMax))
+                    else if (distanceToTarget <= (live_charStats.charSkillCombat._skillArray[1].scrObj_Skill._skillMaxRadius * live_charStats.fov._AISpellRangeSkillRadiusFromMax))
                     {                        
                         live_charStats.fov._targetInAttackRange = false;
                         live_charStats.fov._targetInSpellRange = true;                        
-                        Utils.CloseRangeInputSwitcher(live_charStats, live_charStats.fov._closeRangeSkill);    //Attacking z przypisania input=live_charStats.fov._targetInAttackRange
+                        Utils.CloseRangeInputSwitcher(live_charStats);    //Attacking z przypisania (_skillArray[1]._skillInput = live_charStats.fov._targetInSpellRange)
                         return;
                     }
                     else
                     {                        
                         live_charStats.fov._targetInAttackRange = false;
                         live_charStats.fov._targetInSpellRange = false;
-                        Utils.CloseRangeInputSwitcher(live_charStats, live_charStats.fov._closeRangeSkill);    //Attacking z przypisania input=live_charStats.fov._targetInAttackRange                        
+                        Utils.CloseRangeInputSwitcher(live_charStats);    //Attacking z przypisania (_skillArray[]._skillInput = live_charStats.fov._targetInAttackRange)                     
                     }
                 }
                 else
@@ -159,7 +159,7 @@ public static class LiveCharStats_Base
                     live_charStats.fov._targetInSpellRange = false;
                     live_charStats.fov._aquiredTargetGameObject = null;           //ustawia nie znaleziony colliderem game objecta jako null                    
                     live_charStats.fov._targetAquired = false;
-                    Utils.CloseRangeInputSwitcher(live_charStats, live_charStats.fov._closeRangeSkill);    //Attacking z przypisania input=live_charStats.fov._targetInAttackRange
+                    Utils.CloseRangeInputSwitcher(live_charStats);    //Attacking z przypisania input=live_charStats.fov._targetInAttackRange
                 }
             }
             else
@@ -168,7 +168,7 @@ public static class LiveCharStats_Base
                 live_charStats.fov._targetInSpellRange = false;
                 live_charStats.fov._aquiredTargetGameObject = null;           //ustawia nie znaleziony colliderem game objecta jako null                    
                 live_charStats.fov._targetAquired = false;
-                Utils.CloseRangeInputSwitcher(live_charStats, live_charStats.fov._closeRangeSkill);    //Attacking z przypisania input=live_charStats.fov._targetInAttackRange
+                Utils.CloseRangeInputSwitcher(live_charStats);    //Attacking z przypisania input=live_charStats.fov._targetInAttackRange
             }
         }
         else
@@ -177,7 +177,7 @@ public static class LiveCharStats_Base
             live_charStats.fov._targetInSpellRange = false;
             live_charStats.fov._aquiredTargetGameObject = null;           //ustawia nie znaleziony colliderem game objecta jako null                    
             live_charStats.fov._targetAquired = false;
-            Utils.CloseRangeInputSwitcher(live_charStats, live_charStats.fov._closeRangeSkill);    //Attacking z przypisania input=live_charStats.fov._targetInAttackRange
+            Utils.CloseRangeInputSwitcher(live_charStats);    //Attacking z przypisania input=live_charStats.fov._targetInAttackRange
         }
     }
     #endregion
@@ -288,7 +288,7 @@ public static class LiveCharStats_Base
         //Jeśli jest w zasięgu ataku, triggeruje booleana inputAttacking w charStats, które posyła go dalej => CharacterMovement
 
         //Attacking z przypisania input=live_charStats.fov._targetInAttackRange, trzeba to gdzieś przenieść
-        Utils.CloseRangeInputSwitcher(live_charStats, skill_CloseRange);
+        Utils.CloseRangeInputSwitcher(live_charStats);
     }
 
     private static void CheckForTargetInSpellRange(CharacterStatus live_charStats, Skill skill_SpellRange)
@@ -333,7 +333,9 @@ public static class LiveCharStats_Base
                 }
                 else
                 {
-                    live_charStats.fov._closeRangeSkill._skillInput = false;
+                    live_charStats.charSkillCombat._skillArray[0]._skillInput = false;
+
+                    /*live_charStats.fov._closeRangeSkill._skillInput = false;
                     switch (live_charStats.fov._closeRangeSkill.scrObj_Skill._inputType)
                     {
                         case ScrObj_skill.InputType.primary:
@@ -342,7 +344,8 @@ public static class LiveCharStats_Base
                         case ScrObj_skill.InputType.secondary:
                             live_charStats.charInput._secondary = false;
                             break;
-                    }
+                    }*/
+
                     //AI_Chasing  //Jeśli target w dynamicRange
                     if (live_charStats.fov._targetInDynamicSightRange && live_charStats.fov._targetAquired && !live_charStats.fov._spellRangeSkill._skillInput) { Chasing(live_charStats); } //!live_charStats.fov._spellRangeSkill.skill_input żeby nie przerywał casta
                     else //Jeśli !targetAquired lub !dynamicRange
@@ -373,8 +376,10 @@ public static class LiveCharStats_Base
             //Ai_Attack CloseRange
             if (live_charStats.fov._targetInAttackRange && !live_charStats.fov._spellRangeSkill._skillInput) { Attacking(live_charStats); }
             else //Jeśli target nie w AttackRange
-            { 
-                live_charStats.fov._closeRangeSkill._skillInput = false;
+            {
+                live_charStats.charSkillCombat._skillArray[0]._skillInput = false;
+
+                /*live_charStats.fov._closeRangeSkill._skillInput = false;
                 switch (live_charStats.fov._closeRangeSkill.scrObj_Skill._inputType)
                 {
                     case ScrObj_skill.InputType.primary:
@@ -383,13 +388,16 @@ public static class LiveCharStats_Base
                     case ScrObj_skill.InputType.secondary:
                         live_charStats.charInput._secondary = false;
                         break;
-                }
+                }*/
+
                 //AI_Castowanie Spelli
                 if (live_charStats.fov._targetInSpellRange)
                 {
                     if (live_charStats.charStats._mp <= 10f)    //jeśli zejdzie do 10 many to nie castuje
                     {
-                        //live_charStats.fov._spellRangeSkill.skill_input = false;
+                        live_charStats.charSkillCombat._skillArray[0]._skillInput = false;
+
+                        /*//live_charStats.fov._spellRangeSkill.skill_input = false;
                         switch (live_charStats.fov._spellRangeSkill.scrObj_Skill._inputType)
                         {
                             case ScrObj_skill.InputType.primary:
@@ -398,7 +406,8 @@ public static class LiveCharStats_Base
                             case ScrObj_skill.InputType.secondary:
                                 live_charStats.charInput._secondary = false;
                                 break;
-                        }
+                        }*/
+
                         //AI_Chasing kiedy nie castuje w SpellRange
                         Chasing(live_charStats);                 
                     }
@@ -409,8 +418,9 @@ public static class LiveCharStats_Base
                 }
                 else //Jeśli target nie w SpellRange
                 {
-                    //live_charStats.fov._spellRangeSkill.skill_input = false;
-                    switch (live_charStats.fov._spellRangeSkill.scrObj_Skill._inputType)
+                    live_charStats.charSkillCombat._skillArray[1]._skillInput = false;
+
+                    /*switch (live_charStats.fov._spellRangeSkill.scrObj_Skill._inputType)
                     {
                         case ScrObj_skill.InputType.primary:
                             live_charStats.charInput._primary = false;
@@ -418,7 +428,8 @@ public static class LiveCharStats_Base
                         case ScrObj_skill.InputType.secondary:
                             live_charStats.charInput._secondary = false;
                             break;
-                    }
+                    }*/
+
                     //AI_Chasing  //Jeśli target w dynamicRange
                     if (live_charStats.fov._targetInDynamicSightRange && live_charStats.fov._targetAquired && !live_charStats.fov._spellRangeSkill._skillInput) { Chasing(live_charStats); } //!live_charStats.fov._spellRangeSkill.skill_input żeby nie przerywał casta
                     else //Jeśli !targetAquired lub !dynamicRange
@@ -499,9 +510,9 @@ public static class LiveCharStats_Base
         {
             if (!Physics.Raycast(live_charStats.gameObject.transform.position, live_charStats.gameObject.transform.forward, live_charStats.fov._spellRangeSkill.scrObj_Skill._skillMaxRadius * live_charStats.fov._AISpellRangeSkillRadiusFromMax, live_charStats.fov._obstaclesLayerMask)) //raycast żeby nie bił przez ściany
             {
-                //live_charStats.fov._spellRangeSkill.skill_input = true;
+                live_charStats.charSkillCombat._skillArray[1]._skillInput = true;
 
-                switch (live_charStats.fov._spellRangeSkill.scrObj_Skill._inputType)
+                /*switch (live_charStats.fov._spellRangeSkill.scrObj_Skill._inputType)
                 {
                     case ScrObj_skill.InputType.primary:
                         live_charStats.charInput._primary = true;
@@ -509,7 +520,8 @@ public static class LiveCharStats_Base
                     case ScrObj_skill.InputType.secondary:
                         live_charStats.charInput._secondary = true;
                         break;
-                }
+                }*/
+
                 StopMovementNavMeshAgent(live_charStats);               
             }
         }
@@ -538,9 +550,10 @@ public static class LiveCharStats_Base
             StopMovementNavMeshAgent(live_charStats);
             Debug.Log("Attacking!!");
         }
-        //live_charStats.fov._closeRangeSkill.skill_input = true;
 
-        switch (live_charStats.fov._closeRangeSkill.scrObj_Skill._inputType)
+        live_charStats.charSkillCombat._skillArray[0]._skillInput = true;
+
+        /*switch (live_charStats.fov._closeRangeSkill.scrObj_Skill._inputType)
         {
             case ScrObj_skill.InputType.primary:
                 live_charStats.charInput._primary = true;
@@ -548,7 +561,7 @@ public static class LiveCharStats_Base
             case ScrObj_skill.InputType.secondary:
                 live_charStats.charInput._secondary = true;
                 break;
-        }
+        }*/
 
     }
 
@@ -760,13 +773,31 @@ public static class LiveCharStats_Base
     private static class Utils
     {
         /// <summary>
-        /// Uruchamia targetInAttackRange dla  skill_CloseRange
+        /// Uruchamia targetInAttackRange dla  skill_CloseRange / _skillArray[0]._skillInput
+        /// <br>oraz targetInSpellRange dla  skill_SpellRange / _skillArray[1]._skillInput </br>
         /// </summary>
         /// <param name="live_charStats"></param>
         /// <param name="skill_CloseRange"></param>
-        public static void CloseRangeInputSwitcher(CharacterStatus live_charStats, Skill skill_CloseRange)
+        public static void SkillRangeInputSwitcher(CharacterStatus live_charStats)
         {
-            switch (skill_CloseRange.scrObj_Skill._inputType)
+            live_charStats.charSkillCombat._skillArray[0]._skillInput = live_charStats.fov._targetInAttackRange;
+            live_charStats.charSkillCombat._skillArray[1]._skillOtherInput = live_charStats.fov._targetInAttackRange;
+
+            live_charStats.charSkillCombat._skillArray[0]._skillInput = live_charStats.fov._targetInSpellRange;
+            live_charStats.charSkillCombat._skillArray[1]._skillOtherInput = live_charStats.fov._targetInSpellRange;            
+        }
+
+        /// <summary>
+        /// Uruchamia targetInAttackRange dla  skill_CloseRange / _skillArray[0]._skillInput
+        /// </summary>
+        /// <param name="live_charStats"></param>
+        /// <param name="skill_CloseRange"></param>
+        public static void CloseRangeInputSwitcher(CharacterStatus live_charStats)
+        {
+            live_charStats.charSkillCombat._skillArray[0]._skillInput = live_charStats.fov._targetInAttackRange;
+            live_charStats.charSkillCombat._skillArray[1]._skillOtherInput = live_charStats.fov._targetInAttackRange;
+
+            /*switch (live_charStats.fov._closeRangeSkill.scrObj_Skill._inputType)
             {
                 case ScrObj_skill.InputType.primary:
                     live_charStats.charInput._primary = live_charStats.fov._targetInAttackRange;
@@ -774,7 +805,7 @@ public static class LiveCharStats_Base
                 case ScrObj_skill.InputType.secondary:
                     live_charStats.charInput._secondary = live_charStats.fov._targetInAttackRange;
                     break;
-            }
+            }*/
         }
 
         /// <summary>
@@ -784,7 +815,10 @@ public static class LiveCharStats_Base
         /// <param name="skill_CloseRange"></param>
         public static void SpellRangeInputSwitcher(CharacterStatus live_charStats)
         {
-            switch (live_charStats.fov._spellRangeSkill.scrObj_Skill._inputType)
+            live_charStats.charSkillCombat._skillArray[1]._skillInput = live_charStats.fov._targetInAttackRange;
+            live_charStats.charSkillCombat._skillArray[0]._skillOtherInput = live_charStats.fov._targetInAttackRange;
+
+            /*switch (live_charStats.fov._spellRangeSkill.scrObj_Skill._inputType)
             {
                 case ScrObj_skill.InputType.primary:
                     live_charStats.charInput._primary = live_charStats.fov._targetInSpellRange;
@@ -792,7 +826,7 @@ public static class LiveCharStats_Base
                 case ScrObj_skill.InputType.secondary:
                     live_charStats.charInput._secondary = live_charStats.fov._targetInSpellRange;
                     break;
-            }
+            }*/
         }
 
         #region SlowMovementOnAttackOrCast
@@ -803,7 +837,7 @@ public static class LiveCharStats_Base
         /// <param name="live_charStats">Live_charStats podpięty do postaci</param>
         public static void SlowMovementOnAttackOrCast(CharacterStatus live_charStats)
         {
-            if (live_charStats.charInput._primary || live_charStats.charInput._secondary && live_charStats.charMove._moveSpeed != 0f)
+            if (live_charStats.charSkillCombat._skillArray[0]._skillInput || live_charStats.charSkillCombat._skillArray[1]._skillInput && live_charStats.charMove._moveSpeed != 0f)
             {
                 switch (live_charStats.charInfo._playerInputEnable)
                 {

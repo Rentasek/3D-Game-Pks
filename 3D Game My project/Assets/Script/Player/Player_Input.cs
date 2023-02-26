@@ -41,8 +41,8 @@ public class Player_Input : MonoBehaviour
         live_charStats.charInput._rotateHorizontal = Input.GetAxis("Horizontal") * live_charStats.charInput._rotateSensivity * Time.deltaTime;
 
         //PimaryAttack
-        live_charStats.charInput._primary = Input.GetKey(KeyCode.Mouse0) /*&& !live_charStats.charStatus._isRunning*/;
-
+        live_charStats.charSkillCombat._skillArray[0]._skillInput = Input.GetKey(KeyCode.Mouse0);
+        live_charStats.charSkillCombat._skillArray[1]._skillOtherInput = Input.GetKey(KeyCode.Mouse0);
     }
 
     /// <summary>
@@ -67,13 +67,15 @@ public class Player_Input : MonoBehaviour
                 live_charStats.fov._targetInAttackRange = false;      //debugging ¿eby nie blokowa³ siê przy atakowaniu
                 live_charStats.fov._targetInDynamicSightRange = false;      //debugging ¿eby nie blokowa³ siê przy atakowaniu
                 //live_charStats.charStatus._isAttacking = false;                     //debugging ¿eby nie blokowa³ siê przy atakowaniu
-                live_charStats.charInput._primary = false;                  //debugging ¿eby nie blokowa³ siê przy atakowaniu
-                live_charStats.charInput._secondary = false;                  //debugging ¿eby nie blokowa³ siê przy atakowaniu
+                live_charStats.charSkillCombat._skillArray[0]._skillInput = false;                  //debugging ¿eby nie blokowa³ siê przy atakowaniu
+                live_charStats.charSkillCombat._skillArray[0]._skillOtherInput = false;                  //debugging ¿eby nie blokowa³ siê przy atakowaniu
+                live_charStats.charSkillCombat._skillArray[1]._skillInput = false;                  //debugging ¿eby nie blokowa³ siê przy atakowaniu
+                live_charStats.charSkillCombat._skillArray[1]._skillOtherInput = false;                  //debugging ¿eby nie blokowa³ siê przy atakowaniu
                 live_charStats.fov._targetAquired = true;             //debugging ¿eby nie blokowa³ siê przy atakowaniu                
             }
         }
 
-        if (live_charStats.fov._spellRangeSkill._skillInput)  //lub castujemy
+        if (live_charStats.charSkillCombat._skillArray[1]._skillInput)  //lub castujemy
         {
             Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
             if (Physics.Raycast(ray, out RaycastHit hit))
@@ -84,10 +86,11 @@ public class Player_Input : MonoBehaviour
             live_charStats.fov._targetInAttackRange = false;      //debugging ¿eby nie blokowa³ siê przy atakowaniu
             live_charStats.fov._targetInDynamicSightRange = false;      //debugging ¿eby nie blokowa³ siê przy atakowaniu
             //live_charStats.charStatus._isAttacking = false;                     //debugging ¿eby nie blokowa³ siê przy atakowaniu
-            live_charStats.charInput._primary = false;                  //debugging ¿eby nie blokowa³ siê przy atakowaniu
+            live_charStats.charSkillCombat._skillArray[0]._skillInput = false;                  //debugging ¿eby nie blokowa³ siê przy atakowaniu
             live_charStats.fov._targetAquired = true;             //debugging ¿eby nie blokowa³ siê przy atakowaniu
             live_charStats.charStatus._isRunning= false;
-            live_charStats.charSkillCombat._secondarySkill._canCast = live_charStats.charInput._secondary;  //tylko dla gracza w isometric -> Mo¿na canCastowaæ przerywaj¹c wszystko inne
+            //live_charStats.charSkillCombat._secondarySkill._canCast = live_charStats.charInput._secondary;  //tylko dla gracza w isometric -> Mo¿na canCastowaæ przerywaj¹c wszystko inne
+            live_charStats.charSkillCombat._skillArray[1]._canCast = live_charStats.charSkillCombat._skillArray[1]._skillInput;  //tylko dla gracza w isometric -> Mo¿na canCastowaæ przerywaj¹c wszystko inne
             live_charStats.charComponents._navMeshAgent.isStopped = true;
 
         }
@@ -135,10 +138,11 @@ public class Player_Input : MonoBehaviour
                     if (live_charStats.charInput._enableMouseRotate) Cursor.lockState = CursorLockMode.Locked; //tutaj live_charStats.charInput._enableMouseRotate dzia³a jak przechowalnia lock.state i przywraca poprzedni stan
                     else Cursor.lockState = CursorLockMode.None;
                 }
-            }           
+            }
 
             //casting Spells
-            if (live_charStats.charInfo._isPlayer) live_charStats.charInput._secondary = Input.GetKey(KeyCode.Mouse1);
+            live_charStats.charSkillCombat._skillArray[1]._skillInput = Input.GetKey(KeyCode.Mouse1);
+            live_charStats.charSkillCombat._skillArray[0]._skillOtherInput = Input.GetKey(KeyCode.Mouse1);            
 
             pauseKeyPressed = Input.GetKeyDown(KeyCode.Escape) && live_charStats.charInfo._isPlayer;
 

@@ -13,14 +13,14 @@ public class UI_DebugConsole : MonoBehaviour, IPlayerUpdate
     private void OnEnable()
     {
         live_charStats = Camera.main.GetComponent<CameraController>().player.GetComponent<CharacterStatus>();
-        secondarySkill = Camera.main.GetComponent<CameraController>().player.GetComponent<CharacterStatus>().charSkillCombat._secondarySkill;
+        secondarySkill = Camera.main.GetComponent<CameraController>().player.GetComponent<CharacterStatus>().charSkillCombat._skillArray[1];
         
     }
 
     public void PlayerUpdate()
     {
         live_charStats = Camera.main.GetComponent<CameraController>().player.GetComponent<CharacterStatus>();
-        secondarySkill = Camera.main.GetComponent<CameraController>().player.GetComponent<CharacterStatus>().charSkillCombat._secondarySkill;
+        secondarySkill = Camera.main.GetComponent<CameraController>().player.GetComponent<CharacterStatus>().charSkillCombat._skillArray[1];
     }
 
     // Start is called before the first frame update
