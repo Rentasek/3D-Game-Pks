@@ -35,10 +35,10 @@ public static class SkillForge
                 if (Utils.Skill_ResourceTypeCurrentFloatReadOnly(scrObj_Skill, live_charStats) > skill._resourceCost)   //Jeśli nie castuje i ma właśnie zacząć //Start Casting
                 {                    
                     if (skill._currentCooldownRemaining <= 0.05f)  //Jeśli zostało 0.05f lub mniej cooldownu może użyć instanta
-                    {
-                        if (skill._castingVisualEffect != null) skill._castingVisualEffect.Play(); //może się odpalić tylko raz przy każdym inpucie, nie może się nadpisać -> taki sam efekt jak przy GetKeyDown
-
+                    {       
                         Utils.Skill_StopAllAnimatorMovement(scrObj_Skill, live_charStats);
+
+                        if (skill._castingVisualEffect != null) skill._castingVisualEffect.Play(); //może się odpalić tylko raz przy każdym inpucie, nie może się nadpisać -> taki sam efekt jak przy GetKeyDown
 
                         for (int targetTypeIndex = 0; targetTypeIndex < scrObj_Skill._targetTypes.Length; targetTypeIndex++)
                         {
@@ -116,10 +116,10 @@ public static class SkillForge
                 if (Utils.Skill_ResourceTypeCurrentFloatReadOnly(scrObj_Skill, live_charStats) > skill._resourceCost)   //Jeśli nie castuje i ma właśnie zacząć //Start Casting
                 {
                     if (skill._currentCooldownRemaining <= 0.05f)  //Jeśli zostało 0.05f lub mniej cooldownu może użyć instanta
-                    {
-                        if (skill._castingVisualEffect != null) skill._castingVisualEffect.Play(); //może się odpalić tylko raz przy każdym inpucie, nie może się nadpisać -> taki sam efekt jak przy GetKeyDown  //Można też ustawić .sendEvent("OnBurst"/"OnPlay") itd
-                        
+                    {                        
                         Utils.Skill_StopAllAnimatorMovement(scrObj_Skill, live_charStats);
+
+                        if (skill._castingVisualEffect != null/* && !skill._castingVisualEffect.HasAnySystemAwake()*/) { skill._castingVisualEffect.Play(); } //może się odpalić tylko raz przy każdym inpucie, nie może się nadpisać jeśli działa -> taki sam efekt jak przy GetKeyDown  //Można też ustawić .sendEvent("OnBurst"/"OnPlay") itd
 
                         if (!string.IsNullOrWhiteSpace(scrObj_Skill._animatorBoolName)) live_charStats.charComponents._Animator.SetBool(scrObj_Skill._animatorBoolName, true);
                         if (!string.IsNullOrWhiteSpace(scrObj_Skill._animatorTriggerName)) live_charStats.charComponents._Animator.SetTrigger(scrObj_Skill._animatorTriggerName);
@@ -505,7 +505,7 @@ public static class SkillForge
                 {
                     if (skill._allLocalColliders[i].CompareTag(skill._enemiesArray[j]))
                     {
-                        if (skill.targetDynamicValues[targetTypeIndex]._targetColliders.Count < 1)
+                        if (skill.targetDynamicValues[targetTypeIndex]._targetColliders.Count < 1) // dodaje tylko do max 1 pozycji
                         {
                             float distanceToTarget = Vector3.Distance(skill._allLocalColliders[i].transform.position, skill._casterGameobject.transform.position);
 
@@ -522,6 +522,7 @@ public static class SkillForge
                                     if (!Physics.Raycast(skill._casterGameobject.transform.position, directionToTarget, distanceToTarget, scrObj_Skill._targetTypes[targetTypeIndex]._obstaclesMask))    //dodatkowo sprawdza Raycastem czy nie ma przeszkody pomiędzy playerem a targetem //  
                                     {
                                         skill.targetDynamicValues[targetTypeIndex]._targetInAngle = true;
+
 
                                         if (skill.targetDynamicValues[targetTypeIndex]._targetColliders.IndexOf(skill._allLocalColliders[i]) < 0) //sprawdza czy nie ma na liście. Jeżeli IndexOf < 0 czyli nie ma obiektów z tym indexem
                                         {
@@ -559,73 +560,61 @@ public static class SkillForge
                         {
                             float distanceToTarget = Vector3.Distance(skill._allLocalColliders[i].transform.position, skill.targetDynamicValues[targetTypeIndex]._targetColliders[0].transform.position); //dystans mierzony od [0] targetu na liście
 
-                            if (distanceToTarget <= skill.targetDynamicValues[targetTypeIndex]._currentRadius/2f) //currentRadius dzielony na 2 jako zasięg chaina
+                            if (distanceToTarget <= skill.targetDynamicValues[targetTypeIndex]._currentRadius / 2f) //currentRadius dzielony na 2 jako zasięg chaina
                             {
                                 skill.targetDynamicValues[targetTypeIndex]._targetInRange = true; //target jest w breath range
 
                                 Vector3 directionToTarget = (skill._allLocalColliders[i].transform.position - skill._casterGameobject.transform.position).normalized; //0-1(normalized) różnica pomiędzy targetem a characterem Vector3.normalized ==> vector (kierunek w którym od niego znajduje się target)
                                                                                                                                                                       //sprawdzanie aktualnie ostatniego elementu z listy
-                                if (Vector3.Angle(skill._casterGameobject.transform.forward, directionToTarget) < 360 / 2) // Po 180 w każdą stronę
-                                //sprawdzanie angle wektora forward charactera i direction to target
-                                //target może być na + albo - od charactera dlatego w każdą stronę angle / 2
+                                if (!Physics.Raycast(skill._casterGameobject.transform.position, directionToTarget, distanceToTarget, scrObj_Skill._targetTypes[targetTypeIndex]._obstaclesMask))    //dodatkowo sprawdza Raycastem czy nie ma przeszkody pomiędzy playerem a targetem //  
                                 {
-                                    if (!Physics.Raycast(skill._casterGameobject.transform.position, directionToTarget, distanceToTarget, scrObj_Skill._targetTypes[targetTypeIndex]._obstaclesMask))    //dodatkowo sprawdza Raycastem czy nie ma przeszkody pomiędzy playerem a targetem //  
-                                    {
-                                        skill.targetDynamicValues[targetTypeIndex]._targetInAngle = true;
+                                    //skill.targetDynamicValues[targetTypeIndex]._targetInAngle = true;
 
-                                        if (skill.targetDynamicValues[targetTypeIndex]._targetColliders.IndexOf(skill._allLocalColliders[i]) < 0) //sprawdza czy nie ma na liście. Jeżeli IndexOf < 0 czyli nie ma obiektów z tym indexem
-                                        {
-                                            skill.targetDynamicValues[targetTypeIndex]._targetColliders.Add(skill._allLocalColliders[i]); //przypisuje do listy colliders jeśli ma taga z listy enemies        
-                                        }
-                                        else
-                                        {
-                                            skill.targetDynamicValues[targetTypeIndex]._targetColliders.Remove(skill._allLocalColliders[i]);
-                                            if (skill.targetDynamicValues[targetTypeIndex]._targetColliders.Count <= 0) skill.targetDynamicValues[targetTypeIndex]._targetInAngle = false;  //jeśli nie ma żadnych targetów w Cone Angle
-                                        }
+                                    if (skill.targetDynamicValues[targetTypeIndex]._targetColliders.IndexOf(skill._allLocalColliders[i]) < 0) //sprawdza czy nie ma na liście. Jeżeli IndexOf < 0 czyli nie ma obiektów z tym indexem
+                                    {
+                                        skill.targetDynamicValues[targetTypeIndex]._targetColliders.Add(skill._allLocalColliders[i]); //przypisuje do listy colliders jeśli ma taga z listy enemies        
                                     }
                                     else
                                     {
                                         skill.targetDynamicValues[targetTypeIndex]._targetColliders.Remove(skill._allLocalColliders[i]);
-                                        if (skill.targetDynamicValues[targetTypeIndex]._targetColliders.Count <= 0) skill.targetDynamicValues[targetTypeIndex]._targetInAngle = false;  //jeśli nie ma żadnych targetów w Cone Angle
+                                        //if (skill.targetDynamicValues[targetTypeIndex]._targetColliders.Count <= 0) skill.targetDynamicValues[targetTypeIndex]._targetInAngle = false;  //jeśli nie ma żadnych targetów w Cone Angle
                                     }
                                 }
                                 else
                                 {
                                     skill.targetDynamicValues[targetTypeIndex]._targetColliders.Remove(skill._allLocalColliders[i]);
-                                    if (skill.targetDynamicValues[targetTypeIndex]._targetColliders.Count <= 0) skill.targetDynamicValues[targetTypeIndex]._targetInAngle = false;  //jeśli nie ma żadnych targetów w Cone Angle 
+                                   // if (skill.targetDynamicValues[targetTypeIndex]._targetColliders.Count <= 0) skill.targetDynamicValues[targetTypeIndex]._targetInAngle = false;  //jeśli nie ma żadnych targetów w Cone Angle
                                 }
                             }
                             else
                             {
                                 skill.targetDynamicValues[targetTypeIndex]._targetColliders.Remove(skill._allLocalColliders[i]);
-                                if (skill.targetDynamicValues[targetTypeIndex]._targetColliders.Count <= 0)
-                                {
-                                    skill.targetDynamicValues[targetTypeIndex]._targetInAngle = false;  //jeśli nie ma żadnych targetów w Cone Angle
-                                    skill.targetDynamicValues[targetTypeIndex]._targetInRange = false;  //jeśli nie ma żadnych targetów w Cone Radius
-                                }
+                               // if (skill.targetDynamicValues[targetTypeIndex]._targetColliders.Count <= 0)
+                                //{
+                                 //   skill.targetDynamicValues[targetTypeIndex]._targetInAngle = false;  //jeśli nie ma żadnych targetów w Cone Angle
+                                //    skill.targetDynamicValues[targetTypeIndex]._targetInRange = false;  //jeśli nie ma żadnych targetów w Cone Radius
+                               // }
                             }
                         }
-                        
                     }
+                    else if (skill._allLocalColliders[i].CompareTag("Corpse")) { skill.targetDynamicValues[targetTypeIndex]._targetColliders.Remove(skill._allLocalColliders[i]); }
                 }
             }
-            
-            
 
             if (skill.targetDynamicValues[targetTypeIndex]._targetColliders.Count > 0)
             {
                 if (skill._chainVisualEffect != null) ///VFX chainEffect
                 {
-                    skill._chainVisualEffect.SetVector3("_pos1", skill._chainVisualEffect.transform.position/* + Vector3.up * 0.5f*/); //caster
-                    skill._chainVisualEffect.SetVector3("_pos4", skill.targetDynamicValues[targetTypeIndex]._targetColliders[0].transform.position + Vector3.up * 0.5f); //pierwszy index na targetCollider List
-                    skill._chainVisualEffect.Play();
+                    skill._chainVisualEffect.SetVector3("_posCaster", skill._chainVisualEffect.transform.position); //caster
+                    skill._chainVisualEffect.SetVector3("_pos0", skill.targetDynamicValues[targetTypeIndex]._targetColliders[0].transform.position + Vector3.up * 0.5f); //pierwszy index na targetCollider List
+                    skill._chainVisualEffect.Play(); // za każdym razem dodatkowo odpala od castera do 1 targetu z listy
 
                     for (int k = 0; k < skill.targetDynamicValues[targetTypeIndex]._targetColliders.Count - 1; k++)  //do przedostatniego targetu
                     {
-                        skill._chainVisualEffect.SetVector3("_pos1", skill._chainVisualEffect.transform.position);
-                        skill._chainVisualEffect.SetVector3("_pos4", skill.targetDynamicValues[targetTypeIndex]._targetColliders[0].transform.position + Vector3.up * 0.5f);
+                        skill._chainVisualEffect.SetVector3("_posCaster", skill._chainVisualEffect.transform.position); //caster
+                        skill._chainVisualEffect.SetVector3("_pos0", skill.targetDynamicValues[targetTypeIndex]._targetColliders[0].transform.position + Vector3.up * 0.5f); //pierwszy index na targetCollider List
                         skill._chainVisualEffect.Play(); // za każdym razem dodatkowo odpala od castera do 1 targetu z listy
-                        
+
                         skill._chainVisualEffect.SetVector3("_pos1", skill.targetDynamicValues[targetTypeIndex]._targetColliders[k].transform.position + Vector3.up * 0.5f);
                         skill._chainVisualEffect.SetVector3("_pos4", skill.targetDynamicValues[targetTypeIndex]._targetColliders[k + 1].transform.position + Vector3.up * 0.5f);
                         skill._chainVisualEffect.Play();
