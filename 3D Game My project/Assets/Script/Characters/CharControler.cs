@@ -10,6 +10,9 @@ public class CharControler : MonoBehaviour
     public CharacterStatus live_charStats;
     public GameObject resourcePrefab;
 
+    private string localGameObjectTag;
+
+
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     private void OnValidate()
@@ -213,6 +216,8 @@ public class CharControler : MonoBehaviour
     {
         live_charStats.charStatus._isDead = true;
         SpawnResourceOrb();
+        localGameObjectTag = gameObject.tag;
+        gameObject.tag = "Corpse";
 
         if (live_charStats.charComponents._Animator != null)
         {
@@ -250,6 +255,7 @@ public class CharControler : MonoBehaviour
     void RespawnAction()
     {
         gameObject.SetActive(true);
+        gameObject.tag = localGameObjectTag;
 
         if (live_charStats != null)
         {
@@ -297,11 +303,11 @@ public class CharControler : MonoBehaviour
         live_charStats.charInput._running = false;
         live_charStats.charInput._jumping = false;
 
-        if (live_charStats.charSkillCombat._skillArray.Length >= 2 && live_charStats.charSkillCombat._skillArray != null && live_charStats.tag != "Destructibles")
+        /*if (live_charStats.charSkillCombat._skillArray.Length >= 2 && live_charStats.charSkillCombat._skillArray != null && live_charStats.tag != "Destructibles")
         {
             live_charStats.charSkillCombat._skillArray[0]._skillInput = false;
             live_charStats.charSkillCombat._skillArray[1]._skillInput = false;
-        }
+        }*/
 
         live_charStats.charStatus._isMoving = false;
         live_charStats.charStatus._isJumping = false;        
