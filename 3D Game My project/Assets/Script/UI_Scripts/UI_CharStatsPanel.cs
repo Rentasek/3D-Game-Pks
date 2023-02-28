@@ -92,7 +92,7 @@ public class UI_CharStatsPanel : MonoBehaviour, IPlayerUpdate
                     break;
 
                 case CharStat.CloseRangeAttCooldown:
-                    selectedStatCurrentFloat[i] = live_charStats.fov._closeRangeSkill.scrObj_Skill._baseCooldown;
+                    selectedStatCurrentFloat[i] = live_charStats.charSkillCombat._skillArray[0].scrObj_Skill._baseCooldown;
                     selectedStatCurrentName[i] = "Melee Attack Cooldown";
                     break;
 
@@ -102,7 +102,7 @@ public class UI_CharStatsPanel : MonoBehaviour, IPlayerUpdate
                     break;
 
                 case CharStat.CloseRangeAttResourceCost:
-                    selectedStatCurrentFloat[i] = live_charStats.fov._closeRangeSkill._resourceCost;
+                    selectedStatCurrentFloat[i] = live_charStats.charSkillCombat._skillArray[0]._resourceCost;
                     selectedStatCurrentName[i] = "Melee Attack Stamina Cost";
                     break;
 

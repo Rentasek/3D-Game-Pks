@@ -112,7 +112,7 @@ public class UI_SkillFrame : MonoBehaviour, IPlayerUpdate
                 break;
 
             case CharStat.CloseRangeAttDamage:
-                if (live_charStats.fov._closeRangeSkill != null)
+                if (live_charStats.charSkillCombat._skillArray[0] != null)
                 {
                     //SkillForge.Utils.Skill_EffectValuesUpdate(live_charStats.fov._closeRangeSkill.scrObj_Skill, live_charStats.fov._closeRangeSkill.skill, live_charStats, currentCharacterBonusStats);
                     skill_BonusFloat = currentCharacterBonusStats.bonus_CloseRangeDamage;
@@ -123,7 +123,7 @@ public class UI_SkillFrame : MonoBehaviour, IPlayerUpdate
                 break;
 
             case CharStat.SpellRangeAttDamage:
-                if (live_charStats.fov._spellRangeSkill != null)
+                if (live_charStats.charSkillCombat._skillArray[1] != null)
                 {
                     //SkillForge.Utils.Skill_EffectValuesUpdate(live_charStats.fov._spellRangeSkill.scrObj_Skill, live_charStats.fov._spellRangeSkill.skill, live_charStats, currentCharacterBonusStats);
                     skill_BonusFloat = currentCharacterBonusStats.bonus_SpellRangeDamage;
@@ -173,7 +173,7 @@ public class UI_SkillFrame : MonoBehaviour, IPlayerUpdate
                 break;
 
             case CharStat.CloseRangeAttDamage:
-                if (live_charStats.fov._closeRangeSkill != null)
+                if (live_charStats.charSkillCombat._skillArray[0] != null)
                 {
                     skill_BonusFloat = currentCharacterBonusStats.bonus_CloseRangeDamage;
                     skill_OutputFloat = currentCharacterBonusStats.bonus_CloseRangeDamage;
@@ -182,7 +182,7 @@ public class UI_SkillFrame : MonoBehaviour, IPlayerUpdate
                 break;
 
             case CharStat.SpellRangeAttDamage:
-                if(live_charStats.fov._spellRangeSkill != null)
+                if(live_charStats.charSkillCombat._skillArray[1] != null)
                 {
                     skill_BonusFloat = currentCharacterBonusStats.bonus_SpellRangeDamage;
                     skill_OutputFloat = currentCharacterBonusStats.bonus_SpellRangeDamage;

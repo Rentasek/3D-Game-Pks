@@ -323,7 +323,7 @@ public static class LiveCharStats_Base
         {
             live_charStats.charComponents._navMeshAgent.SetDestination(live_charStats.navMeshAge._walkPoint);
 
-            if (!live_charStats.charInput._mouseCurrentMoving && !live_charStats.fov._spellRangeSkill._skillInput)     //mouse input -> wyłącza CheckTagetInRange //dodatkowo input casting
+            if (!live_charStats.charInput._mouseCurrentMoving && !live_charStats.charSkillCombat._skillArray[1]._skillInput)     //mouse input -> wyłącza CheckTagetInRange //dodatkowo input casting
             {                
                 FieldOfViewTarget(live_charStats);
 
@@ -347,7 +347,7 @@ public static class LiveCharStats_Base
                     }*/
 
                     //AI_Chasing  //Jeśli target w dynamicRange
-                    if (live_charStats.fov._targetInDynamicSightRange && live_charStats.fov._targetAquired && !live_charStats.fov._spellRangeSkill._skillInput) { Chasing(live_charStats); } //!live_charStats.fov._spellRangeSkill.skill_input żeby nie przerywał casta
+                    if (live_charStats.fov._targetInDynamicSightRange && live_charStats.fov._targetAquired && !live_charStats.charSkillCombat._skillArray[1]._skillInput) { Chasing(live_charStats); } //!live_charStats.fov._spellRangeSkill.skill_input żeby nie przerywał casta
                     else //Jeśli !targetAquired lub !dynamicRange
                     {
                         //AI_Patrolling można włączyć na postaci gracza
@@ -374,7 +374,7 @@ public static class LiveCharStats_Base
             FieldOfViewTarget(live_charStats);
 
             //Ai_Attack CloseRange
-            if (live_charStats.fov._targetInAttackRange && !live_charStats.fov._spellRangeSkill._skillInput) { Attacking(live_charStats); }
+            if (live_charStats.fov._targetInAttackRange && !live_charStats.charSkillCombat._skillArray[1]._skillInput) { Attacking(live_charStats); }
             else //Jeśli target nie w AttackRange
             {
                 live_charStats.charSkillCombat._skillArray[0]._skillInput = false;
@@ -431,10 +431,10 @@ public static class LiveCharStats_Base
                     }*/
 
                     //AI_Chasing  //Jeśli target w dynamicRange
-                    if (live_charStats.fov._targetInDynamicSightRange && live_charStats.fov._targetAquired && !live_charStats.fov._spellRangeSkill._skillInput) { Chasing(live_charStats); } //!live_charStats.fov._spellRangeSkill.skill_input żeby nie przerywał casta
+                    if (live_charStats.fov._targetInDynamicSightRange && live_charStats.fov._targetAquired && !live_charStats.charSkillCombat._skillArray[1]._skillInput) { Chasing(live_charStats); } //!live_charStats.fov._spellRangeSkill.skill_input żeby nie przerywał casta
                     else //Jeśli !targetAquired lub !dynamicRange
                     {   //AI_Patrolling
-                        if (!live_charStats.fov._spellRangeSkill._skillInput) { Patrolling(live_charStats); }   //!live_charStats.fov._spellRangeSkill.skill_input żeby nie przerywał casta                        
+                        if (!live_charStats.charSkillCombat._skillArray[1]._skillInput) { Patrolling(live_charStats); }   //!live_charStats.fov._spellRangeSkill.skill_input żeby nie przerywał casta                        
                     }
                 }
 
@@ -506,9 +506,9 @@ public static class LiveCharStats_Base
     /// <param name="live_charStats"></param>   
     private static void AI_SpellCast(CharacterStatus live_charStats)   
     {
-        if (live_charStats.fov._spellRangeSkill != null && live_charStats.fov._targetAquired)
+        if (live_charStats.charSkillCombat._skillArray[1] != null && live_charStats.fov._targetAquired)
         {
-            if (!Physics.Raycast(live_charStats.gameObject.transform.position, live_charStats.gameObject.transform.forward, live_charStats.fov._spellRangeSkill.scrObj_Skill._skillMaxRadius * live_charStats.fov._AISpellRangeSkillRadiusFromMax, live_charStats.fov._obstaclesLayerMask)) //raycast żeby nie bił przez ściany
+            if (!Physics.Raycast(live_charStats.gameObject.transform.position, live_charStats.gameObject.transform.forward, live_charStats.charSkillCombat._skillArray[1].scrObj_Skill._skillMaxRadius * live_charStats.fov._AISpellRangeSkillRadiusFromMax, live_charStats.fov._obstaclesLayerMask)) //raycast żeby nie bił przez ściany
             {
                 live_charStats.charSkillCombat._skillArray[1]._skillInput = true;
 
@@ -632,8 +632,8 @@ public static class LiveCharStats_Base
             if (live_charStats.charStats._stam > 0) live_charStats.charStats._stam = Mathf.MoveTowards(live_charStats.charStats._stam, 0f, (10f + live_charStats.charInfo._charLevel) * Time.deltaTime); //zużywa f stamy / sekunde
 
             ////Running Speed 
-            if (live_charStats.charMove._moveInputDirection != Vector3.zero && !live_charStats.charStatus._isJumping && !live_charStats.fov._closeRangeSkill._skillInput && live_charStats.charStats._stam > 5f
-                && live_charStats.fov._targetAquired && !live_charStats.fov._spellRangeSkill._skillInput && live_charStats.charComponents._navMeshAgent.remainingDistance > live_charStats.charComponents._characterController.radius * 5)
+            if (live_charStats.charMove._moveInputDirection != Vector3.zero && !live_charStats.charStatus._isJumping && !live_charStats.charSkillCombat._skillArray[1]._skillInput && live_charStats.charStats._stam > 5f
+                && live_charStats.fov._targetAquired && !live_charStats.charSkillCombat._skillArray[1]._skillInput && live_charStats.charComponents._navMeshAgent.remainingDistance > live_charStats.charComponents._characterController.radius * 5)
             //dodatnkowy warunek ->biega tylko jak targetAquired=true, kolejny warnek jeśli nie castuje!!, Kolejny warunek jeśli agent.remainingDistance > _characterController.radius * 5
             {
                 //live_charStats.charComponents._Animator.ResetTrigger("MeeleAttack");
@@ -650,7 +650,7 @@ public static class LiveCharStats_Base
 
 
         }
-        else if (live_charStats.charMove._moveInputDirection == Vector3.zero && !live_charStats.charStatus._isJumping && !live_charStats.fov._closeRangeSkill._skillInput)
+        else if (live_charStats.charMove._moveInputDirection == Vector3.zero && !live_charStats.charStatus._isJumping && !live_charStats.charSkillCombat._skillArray[0]._skillInput)
         {   ///Idle Speed => speed = 0
             localSpeedIndex = 0;
             live_charStats.charMove._moveSpeed = 0f; //zmienna przekazywana do charStats a później do Animatora
@@ -679,7 +679,7 @@ public static class LiveCharStats_Base
             if (live_charStats.charStats._stam > 0) live_charStats.charStats._stam = Mathf.MoveTowards(live_charStats.charStats._stam, 0f, (10f + live_charStats.charInfo._charLevel) * Time.deltaTime); //MoveTowards na końcu podaje czas maxymalny na zmianę wartości
 
 
-            if (live_charStats.charMove._moveInputDirection != Vector3.zero && live_charStats.charMove._moveInputDirection != Vector3.back && !live_charStats.charStatus._isJumping && !live_charStats.fov._closeRangeSkill._skillInput && live_charStats.charStats._stam > 5f)
+            if (live_charStats.charMove._moveInputDirection != Vector3.zero && live_charStats.charMove._moveInputDirection != Vector3.back && !live_charStats.charStatus._isJumping && !live_charStats.charSkillCombat._skillArray[0]._skillInput && live_charStats.charStats._stam > 5f)
             {                                                               //jeśli nie sprintuje do tyłu
                 ////Running Speed 
                 //live_charStats.charComponents._Animator.ResetTrigger("MeeleAttack");
@@ -693,12 +693,12 @@ public static class LiveCharStats_Base
                 live_charStats.charMove._moveSpeed = live_charStats.charMove._walkSpeed; //Sprintowanie bez Staminy -> Walk
             }
         }
-        else if (live_charStats.charMove._moveInputDirection != Vector3.zero && !live_charStats.charInput._running && !live_charStats.charStatus._isJumping && !live_charStats.fov._closeRangeSkill._skillInput)
+        else if (live_charStats.charMove._moveInputDirection != Vector3.zero && !live_charStats.charInput._running && !live_charStats.charStatus._isJumping && !live_charStats.charSkillCombat._skillArray[0]._skillInput)
         {   ////Walking Speed
             localSpeedIndex = 1;
             live_charStats.charMove._moveSpeed = live_charStats.charMove._walkSpeed; //Walk
         }
-        else if (live_charStats.charMove._moveInputDirection == Vector3.zero && !live_charStats.charStatus._isJumping && !live_charStats.fov._closeRangeSkill._skillInput)
+        else if (live_charStats.charMove._moveInputDirection == Vector3.zero && !live_charStats.charStatus._isJumping && !live_charStats.charSkillCombat._skillArray[0]._skillInput)
         {   ///Idle Speed => speed = 0
             localSpeedIndex = 0;
             live_charStats.charMove._moveSpeed = 0; //Idle
@@ -736,7 +736,7 @@ public static class LiveCharStats_Base
         float jumpSpeed = live_charStats.charMove._jumpPower;    //jumpPower
         if (live_charStats.charMove._moveSpeed != 0) jumpSpeed = (live_charStats.charMove._jumpPower + live_charStats.charMove._moveSpeed);  //w przypadku gdzie jest move speed, dodaje siłę do jump power
 
-        if (live_charStats.charInput._jumping && live_charStats.charStatus._isGrounded && !live_charStats.fov._closeRangeSkill._skillInput && live_charStats.charStats._stam > 11f)
+        if (live_charStats.charInput._jumping && live_charStats.charStatus._isGrounded && !live_charStats.charSkillCombat._skillArray[0]._skillInput && live_charStats.charStats._stam > 11f)
         {
             //zmiana trybu skakania J key
             live_charStats.charMove._moveVector.y = jumpSpeed;
