@@ -50,9 +50,9 @@ public class Skill : MonoBehaviour
         [Tooltip("Aktualny Kąt skilla"), CanBeNull, SerializeField] public float _currentAngle;
         [Space]
         [Tooltip("(ref/refrence) Aktualny wektor(kierunek) w którum porusza się currentRadius skilla"), CanBeNull, SerializeField] public float _currentVectorRadius;
-        [Tooltip("(ref/refrence) Aktualny wektor(kierunek) w którum porusza się currentAngle skilla"), CanBeNull, SerializeField] public float _currentVectorAngle;
+        [Tooltip("(ref/refrence) Aktualny wektor(kierunek) w którum porusza się currentAngle skilla"), CanBeNull, SerializeField] public float _currentVectorAngle; 
 
-        [Space]
+        //[Space]
         [Tooltip("Zwracana lista colliderów zgodnych z parametrami(EnemyTag,InCurrentRadius,InCurrentAngle)"), CanBeNull, SerializeField] public List<Collider> _targetColliders;
 
         [Space]
@@ -76,7 +76,7 @@ public class Skill : MonoBehaviour
     {
         skill = this;
 
-        //QuickSetup(scrObj_Skill, skill, live_charStats);
+        //QuickSetup(scrObj_Skill, skill, live_charStats); 
 
         //DynamicTargetArraySetup(scrObj_Skill, skill);  //rozwala refrencowanie - nie używać        
     }
