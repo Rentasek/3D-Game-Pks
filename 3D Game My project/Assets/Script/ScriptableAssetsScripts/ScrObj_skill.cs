@@ -70,7 +70,7 @@ public class ScrObj_skill : ScriptableObject
         [Tooltip("Ile czasu potrzeba do Max/Min Angle")] public float _timeMaxAngle;
 
         [Header("SkillObstacles")]
-        [Tooltip("Layer Mask z przeszkodami przez które nie da się atakować(z klasy skill)")] public LayerMask _obstaclesMask; //Obstacles dla skilla           
+        [Tooltip("Layer Mask z przeszkodami przez które nie da się atakować(z klasy skill)")] public LayerMask _obstaclesMask; //Obstacles dla skilla
     }
 
     [Tooltip("Na jakie targety działa SkillEffect?")] public TargetTypes[] _targetTypes;
@@ -87,6 +87,7 @@ public class ScrObj_skill : ScriptableObject
     [Space]
     [CanBeNull, Tooltip("AudioVolume skilla -> Caster")] public float _casterAudioVolume;
     [CanBeNull, Tooltip("AudioVolume skilla -> Target")] public float _onTargetHitAudioVolume;
+    [CanBeNull, Tooltip("AudioDelay pomiędzy Audio Clipami (prevent Audio Spamming) -> Target")] public float _onTargetHitAudioDelay;
     [Space]
     [CanBeNull, Tooltip("Prefab z VisualEffectem pojawiający się na przeciwniku -> Target ")] public GameObject _onTargetHitVisualEffectPrefab;
     //Można tak zrobić że jak trafi przeciwnika to pojawia na nim (Instantiate) empty object(Prefab z Bazy) który ma na sobie VisualEffect ale może pojawiać się tylko raz
