@@ -328,11 +328,11 @@ public static class SkillForge
                                     {
                                         skill.targetDynamicValues[targetTypeIndex]._targetColliders.Add(skill._allLocalColliders[i]); //przypisuje do listy colliders jeśli ma taga z listy enemies                                    
                                     }
-                                    else
+                                    /*else
                                     {
                                         skill.targetDynamicValues[targetTypeIndex]._targetColliders.Remove(skill._allLocalColliders[i]);
                                         if (skill.targetDynamicValues[targetTypeIndex]._targetColliders.Count <= 0) skill.targetDynamicValues[targetTypeIndex]._targetInAngle = false;  //jeśli nie ma żadnych targetów w Cone Angle
-                                    }
+                                    }*/
                                 }
                                 else
                                 {
@@ -514,11 +514,11 @@ public static class SkillForge
                                 {
                                     skill.targetDynamicValues[targetTypeIndex]._targetColliders.Add(skill._allLocalColliders[i]); //przypisuje do listy colliders jeśli ma taga z listy enemies  
                                 }
-                                else
+                                /*else
                                 {
                                     skill.targetDynamicValues[targetTypeIndex]._targetColliders.Remove(skill._allLocalColliders[i]);
                                     if (skill.targetDynamicValues[targetTypeIndex]._targetColliders.Count <= 0) skill.targetDynamicValues[targetTypeIndex]._targetInAngle = false;  //jeśli nie ma żadnych targetów w Cone Angle
-                                }
+                                }*/
                             }
                             else { skill.targetDynamicValues[targetTypeIndex]._targetColliders.Remove(skill._allLocalColliders[i]); }
                         }
@@ -540,11 +540,11 @@ public static class SkillForge
                                         {
                                             skill.targetDynamicValues[targetTypeIndex]._targetColliders.Add(skill._allLocalColliders[i]); //przypisuje do listy colliders jeśli ma taga z listy enemies        
                                         }
-                                        else
+                                        /*else
                                         {
                                             skill.targetDynamicValues[targetTypeIndex]._targetColliders.Remove(skill._allLocalColliders[i]);
                                             //if (skill.targetDynamicValues[targetTypeIndex]._targetColliders.Count <= 0) skill.targetDynamicValues[targetTypeIndex]._targetInAngle = false;  //jeśli nie ma żadnych targetów w Cone Angle
-                                        }
+                                        }*/
                                     }
                                     else
                                     {
