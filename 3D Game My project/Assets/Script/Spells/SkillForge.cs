@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using TMPro;
 using Unity.VisualScripting;
 using Unity.VisualScripting.FullSerializer;
 using UnityEngine;
@@ -507,22 +508,33 @@ public static class SkillForge
                     {
                         if (skill.targetDynamicValues[targetTypeIndex]._targetColliders.Count < 1) // dodaje tylko do max 1 pozycji
                         {
-                            float distanceToTarget = Vector3.Distance(skill._allLocalColliders[i].transform.position, skill._casterGameobject.transform.position);
-
-                            if (distanceToTarget <= skill.targetDynamicValues[targetTypeIndex]._currentRadius)
+                            if (Utils.Skill_SelectedTargetCheck(scrObj_Skill, skill, targetTypeIndex, skill._allLocalColliders[i]))
                             {
-                                skill.targetDynamicValues[targetTypeIndex]._targetInRange = true; //target jest w breath range
-
-                                Vector3 directionToTarget = (skill._allLocalColliders[i].transform.position - skill._casterGameobject.transform.position).normalized; //0-1(normalized) różnica pomiędzy targetem a characterem Vector3.normalized ==> vector (kierunek w którym od niego znajduje się target)
-                                                                                                                                                                      //sprawdzanie aktualnie ostatniego elementu z listy
-                                if (Vector3.Angle(skill._casterGameobject.transform.forward, directionToTarget) < skill.targetDynamicValues[targetTypeIndex]._currentAngle / 2)
-                                //sprawdzanie angle wektora forward charactera i direction to target
-                                //target może być na + albo - od charactera dlatego w każdą stronę angle / 2
+                                if (skill.targetDynamicValues[targetTypeIndex]._targetColliders.IndexOf(skill._allLocalColliders[i]) < 0) //sprawdza czy nie ma na liście. Jeżeli IndexOf < 0 czyli nie ma obiektów z tym indexem
                                 {
+                                    skill.targetDynamicValues[targetTypeIndex]._targetColliders.Add(skill._allLocalColliders[i]); //przypisuje do listy colliders jeśli ma taga z listy enemies  
+                                }
+                                else
+                                {
+                                    skill.targetDynamicValues[targetTypeIndex]._targetColliders.Remove(skill._allLocalColliders[i]);
+                                    if (skill.targetDynamicValues[targetTypeIndex]._targetColliders.Count <= 0) skill.targetDynamicValues[targetTypeIndex]._targetInAngle = false;  //jeśli nie ma żadnych targetów w Cone Angle
+                                }
+                            }
+                            else { skill.targetDynamicValues[targetTypeIndex]._targetColliders.Remove(skill._allLocalColliders[i]); }
+                        }
+                        else  if(skill.targetDynamicValues[targetTypeIndex]._targetColliders.Count >= 1)  //Jeśli jest 1 lub więcej niż 1 target to zaczyna sprawdzać od targetColliders[0]
+                        { 
+                            if (Utils.Skill_SelectedTargetCheck(scrObj_Skill, skill, targetTypeIndex, skill.targetDynamicValues[targetTypeIndex]._targetColliders[0])) //za każdym razem robi checka [0] targetu
+                            {
+                                float distanceToTarget = Vector3.Distance(skill._allLocalColliders[i].transform.position, skill.targetDynamicValues[targetTypeIndex]._targetColliders[0].transform.position); //dystans mierzony od [0] targetu na liście
+
+                                if (distanceToTarget <= skill.targetDynamicValues[targetTypeIndex]._currentRadius / 2f) //currentRadius dzielony na 2 jako zasięg chaina
+                                {
+                                    Vector3 directionToTarget = (skill._allLocalColliders[i].transform.position - skill._casterGameobject.transform.position).normalized; //0-1(normalized) różnica pomiędzy targetem a characterem Vector3.normalized ==> vector (kierunek w którym od niego znajduje się target)
+                                                                                                                                                                          //sprawdzanie aktualnie ostatniego elementu z listy
                                     if (!Physics.Raycast(skill._casterGameobject.transform.position, directionToTarget, distanceToTarget, scrObj_Skill._targetTypes[targetTypeIndex]._obstaclesMask))    //dodatkowo sprawdza Raycastem czy nie ma przeszkody pomiędzy playerem a targetem //  
                                     {
-                                        skill.targetDynamicValues[targetTypeIndex]._targetInAngle = true;
-
+                                        //skill.targetDynamicValues[targetTypeIndex]._targetInAngle = true;
 
                                         if (skill.targetDynamicValues[targetTypeIndex]._targetColliders.IndexOf(skill._allLocalColliders[i]) < 0) //sprawdza czy nie ma na liście. Jeżeli IndexOf < 0 czyli nie ma obiektów z tym indexem
                                         {
@@ -531,104 +543,35 @@ public static class SkillForge
                                         else
                                         {
                                             skill.targetDynamicValues[targetTypeIndex]._targetColliders.Remove(skill._allLocalColliders[i]);
-                                            if (skill.targetDynamicValues[targetTypeIndex]._targetColliders.Count <= 0) skill.targetDynamicValues[targetTypeIndex]._targetInAngle = false;  //jeśli nie ma żadnych targetów w Cone Angle
+                                            //if (skill.targetDynamicValues[targetTypeIndex]._targetColliders.Count <= 0) skill.targetDynamicValues[targetTypeIndex]._targetInAngle = false;  //jeśli nie ma żadnych targetów w Cone Angle
                                         }
                                     }
                                     else
                                     {
                                         skill.targetDynamicValues[targetTypeIndex]._targetColliders.Remove(skill._allLocalColliders[i]);
-                                        if (skill.targetDynamicValues[targetTypeIndex]._targetColliders.Count <= 0) skill.targetDynamicValues[targetTypeIndex]._targetInAngle = false;  //jeśli nie ma żadnych targetów w Cone Angle
+                                        // if (skill.targetDynamicValues[targetTypeIndex]._targetColliders.Count <= 0) skill.targetDynamicValues[targetTypeIndex]._targetInAngle = false;  //jeśli nie ma żadnych targetów w Cone Angle
                                     }
                                 }
                                 else
                                 {
                                     skill.targetDynamicValues[targetTypeIndex]._targetColliders.Remove(skill._allLocalColliders[i]);
-                                    if (skill.targetDynamicValues[targetTypeIndex]._targetColliders.Count <= 0) skill.targetDynamicValues[targetTypeIndex]._targetInAngle = false;  //jeśli nie ma żadnych targetów w Cone Angle 
+                                    // if (skill.targetDynamicValues[targetTypeIndex]._targetColliders.Count <= 0)
+                                    //{
+                                    //   skill.targetDynamicValues[targetTypeIndex]._targetInAngle = false;  //jeśli nie ma żadnych targetów w Cone Angle
+                                    //    skill.targetDynamicValues[targetTypeIndex]._targetInRange = false;  //jeśli nie ma żadnych targetów w Cone Radius
+                                    // }
                                 }
                             }
-                            else
-                            {
-                                skill.targetDynamicValues[targetTypeIndex]._targetColliders.Remove(skill._allLocalColliders[i]);
-                                if (skill.targetDynamicValues[targetTypeIndex]._targetColliders.Count <= 0)
-                                {
-                                    skill.targetDynamicValues[targetTypeIndex]._targetInAngle = false;  //jeśli nie ma żadnych targetów w Cone Angle
-                                    skill.targetDynamicValues[targetTypeIndex]._targetInRange = false;  //jeśli nie ma żadnych targetów w Cone Radius
-                                }
-                            }
-                        }
-                        else
-                        {
-                            float distanceToTarget = Vector3.Distance(skill._allLocalColliders[i].transform.position, skill.targetDynamicValues[targetTypeIndex]._targetColliders[0].transform.position); //dystans mierzony od [0] targetu na liście
-
-                            if (distanceToTarget <= skill.targetDynamicValues[targetTypeIndex]._currentRadius / 2f) //currentRadius dzielony na 2 jako zasięg chaina
-                            {
-                                skill.targetDynamicValues[targetTypeIndex]._targetInRange = true; //target jest w breath range
-
-                                Vector3 directionToTarget = (skill._allLocalColliders[i].transform.position - skill._casterGameobject.transform.position).normalized; //0-1(normalized) różnica pomiędzy targetem a characterem Vector3.normalized ==> vector (kierunek w którym od niego znajduje się target)
-                                                                                                                                                                      //sprawdzanie aktualnie ostatniego elementu z listy
-                                if (!Physics.Raycast(skill._casterGameobject.transform.position, directionToTarget, distanceToTarget, scrObj_Skill._targetTypes[targetTypeIndex]._obstaclesMask))    //dodatkowo sprawdza Raycastem czy nie ma przeszkody pomiędzy playerem a targetem //  
-                                {
-                                    //skill.targetDynamicValues[targetTypeIndex]._targetInAngle = true;
-
-                                    if (skill.targetDynamicValues[targetTypeIndex]._targetColliders.IndexOf(skill._allLocalColliders[i]) < 0) //sprawdza czy nie ma na liście. Jeżeli IndexOf < 0 czyli nie ma obiektów z tym indexem
-                                    {
-                                        skill.targetDynamicValues[targetTypeIndex]._targetColliders.Add(skill._allLocalColliders[i]); //przypisuje do listy colliders jeśli ma taga z listy enemies        
-                                    }
-                                    else
-                                    {
-                                        skill.targetDynamicValues[targetTypeIndex]._targetColliders.Remove(skill._allLocalColliders[i]);
-                                        //if (skill.targetDynamicValues[targetTypeIndex]._targetColliders.Count <= 0) skill.targetDynamicValues[targetTypeIndex]._targetInAngle = false;  //jeśli nie ma żadnych targetów w Cone Angle
-                                    }
-                                }
-                                else
-                                {
-                                    skill.targetDynamicValues[targetTypeIndex]._targetColliders.Remove(skill._allLocalColliders[i]);
-                                   // if (skill.targetDynamicValues[targetTypeIndex]._targetColliders.Count <= 0) skill.targetDynamicValues[targetTypeIndex]._targetInAngle = false;  //jeśli nie ma żadnych targetów w Cone Angle
-                                }
-                            }
-                            else
-                            {
-                                skill.targetDynamicValues[targetTypeIndex]._targetColliders.Remove(skill._allLocalColliders[i]);
-                               // if (skill.targetDynamicValues[targetTypeIndex]._targetColliders.Count <= 0)
-                                //{
-                                 //   skill.targetDynamicValues[targetTypeIndex]._targetInAngle = false;  //jeśli nie ma żadnych targetów w Cone Angle
-                                //    skill.targetDynamicValues[targetTypeIndex]._targetInRange = false;  //jeśli nie ma żadnych targetów w Cone Radius
-                               // }
-                            }
-                        }
+                            else { skill.targetDynamicValues[targetTypeIndex]._targetColliders.Clear(); }   // Jeśli target[0] nie spełnia warunków to resetuje całą listę
+                        } 
                     }
                     else if (skill._allLocalColliders[i].CompareTag("Corpse")) { skill.targetDynamicValues[targetTypeIndex]._targetColliders.Remove(skill._allLocalColliders[i]); }
                 }
             }
 
             if (skill.targetDynamicValues[targetTypeIndex]._targetColliders.Count > 0)
-            {
-                if (skill._chainVisualEffect != null) ///VFX chainEffect
-                {
-                    skill._chainVisualEffect.SetVector3("_posCaster", skill._chainVisualEffect.transform.position); //caster
-                    skill._chainVisualEffect.SetVector3("_pos0", skill.targetDynamicValues[targetTypeIndex]._targetColliders[0].transform.position + Vector3.up * 0.5f); //pierwszy index na targetCollider List
-                    skill._chainVisualEffect.Play(); // za każdym razem dodatkowo odpala od castera do 1 targetu z listy
-                    
-
-                    for (int k = 0; k < skill.targetDynamicValues[targetTypeIndex]._targetColliders.Count - 1; k++)  //do przedostatniego targetu
-                    {
-                        skill._chainVisualEffect.SetVector3("_posCaster", skill._chainVisualEffect.transform.position); //caster
-                        skill._chainVisualEffect.SetVector3("_pos0", skill.targetDynamicValues[targetTypeIndex]._targetColliders[0].transform.position + Vector3.up * 0.5f); //pierwszy index na targetCollider List
-                        skill._chainVisualEffect.Play(); // za każdym razem dodatkowo odpala od castera do 1 targetu z listy
-
-                        skill._chainVisualEffect.SetVector3("_pos1", skill.targetDynamicValues[targetTypeIndex]._targetColliders[k].transform.position + Vector3.up * 0.5f);
-                        skill._chainVisualEffect.SetVector3("_pos4", skill.targetDynamicValues[targetTypeIndex]._targetColliders[k + 1].transform.position + Vector3.up * 0.5f);
-                        skill._chainVisualEffect.Play();
-
-                        if (skill.targetDynamicValues[targetTypeIndex]._targetColliders[k].GetComponent<AudioSource>()!=null) 
-                        {
-                            if (!skill.targetDynamicValues[targetTypeIndex]._targetColliders[k].GetComponent<AudioSource>().isPlaying/* || skill.targetDynamicValues[targetTypeIndex]._targetColliders[k].GetComponent<AudioSource>().time >= skill._chainVisualEffect.GetFloat("_lightningLifetime")*/)
-                            {                                
-                                skill.targetDynamicValues[targetTypeIndex]._targetColliders[k].GetComponent<AudioSource>().PlayOneShot(scrObj_Skill._onTargetHitAudioClip, scrObj_Skill._onTargetHitAudioVolume);   // PlayScheduled(skill._chainVisualEffect.GetFloat("_lightningTime")); 
-                            }
-                        }
-                    }
-                }
+            {   
+                Utils.Skill_ChainVFX(scrObj_Skill, skill, targetTypeIndex);
 
                 for (int effectTypeIndex = 0; effectTypeIndex < scrObj_Skill._targetTypes[targetTypeIndex]._effectTypes.Length; effectTypeIndex++)
                 {
@@ -924,25 +867,11 @@ public static class SkillForge
             if (skill == live_charStats.charSkillCombat._skillArray[1])
             {
                 skill.targetDynamicValues[targetTypeIndex].effectDynamicValues[effectTypeIndex]._currentDamage = scrObj_Skill._targetTypes[targetTypeIndex]._effectTypes[effectTypeIndex]._baseDamage + (scrObj_Skill._targetTypes[targetTypeIndex]._effectTypes[effectTypeIndex]._baseDamage * (live_charStats.charInfo._charLevel * scrObj_Skill._multiplier)) + (scrObj_Skill._targetTypes[targetTypeIndex]._effectTypes[effectTypeIndex]._baseDamage * (currentCharacterBonusStats.bonus_SpellRangeDamage * scrObj_Skill._multiplier)); //+bonus
-                //skill._resourceCost = scrObj_Skill._baseResourceCost + (scrObj_Skill._baseResourceCost * (live_charStats.charInfo._charLevel * scrObj_Skill._multiplier)) + (scrObj_Skill._baseResourceCost * (currentCharacterBonusStats.bonus_SpellRangeDamage * scrObj_Skill._multiplier)); // + cost za bonus
             }
             else if (skill == live_charStats.charSkillCombat._skillArray[0])
             {
                 skill.targetDynamicValues[targetTypeIndex].effectDynamicValues[effectTypeIndex]._currentDamage = scrObj_Skill._targetTypes[targetTypeIndex]._effectTypes[effectTypeIndex]._baseDamage + (scrObj_Skill._targetTypes[targetTypeIndex]._effectTypes[effectTypeIndex]._baseDamage * (live_charStats.charInfo._charLevel * scrObj_Skill._multiplier)) + (scrObj_Skill._targetTypes[targetTypeIndex]._effectTypes[effectTypeIndex]._baseDamage * (currentCharacterBonusStats.bonus_CloseRangeDamage * scrObj_Skill._multiplier)); //+bonus
-                //skill._resourceCost = scrObj_Skill._baseResourceCost + (scrObj_Skill._baseResourceCost * (live_charStats.charInfo._charLevel * scrObj_Skill._multiplier)) + (scrObj_Skill._baseResourceCost * (currentCharacterBonusStats.bonus_CloseRangeDamage * scrObj_Skill._multiplier)); // + cost za bonus;
-            }
-
-            /*if (live_charStats.charInfo._isPlayer)
-            {
-                Debug.Log("Bonus Close DMG : " + currentCharacterBonusStats.bonus_CloseRangeDamage);
-                
-                Debug.Log("Bonus Spell DMG : " + currentCharacterBonusStats.bonus_SpellRangeDamage);
-
-                Debug.Log("Aktualne Skill DMG : " + skill.targetDynamicValues[targetTypeIndex].effectDynamicValues[effectTypeIndex]._currentDamage);
-                
-                Debug.Log("Aktulane SkillPointsy : " + currentCharacterBonusStats.bonus_SkillPoints);
-            }*/
-
+            }           
 
         }
         #endregion
@@ -958,8 +887,6 @@ public static class SkillForge
         /// <param name="live_charStats">Live_charStats Castera</param>
         public static void Skill_EveryFrameValuesUpdate(ScrObj_skill scrObj_Skill, Skill skill, CharacterStatus live_charStats, CharacterBonusStats currentCharacterBonusStats)
         {
-            //Skill_InputSelector(scrObj_Skill, skill, live_charStats);
-
             skill._currentCooldownRemaining = Mathf.MoveTowards(skill._currentCooldownRemaining, 0f, Time.deltaTime / scrObj_Skill._baseCooldown); //cooldown remaining spada do zera w czasie (1sek * 1/basecooldown ) czyli 30f -> 0f w 10sek
             if (skill._currentCooldownRemaining <= 0.05f) skill._currentComboProgress = Mathf.MoveTowards(skill._currentComboProgress, 0f, Time.deltaTime / scrObj_Skill._baseCooldown);   //aktualny combo progress spada do zera w czasie (1sek * (1/basecooldown)) czyli 30f -> 0f w 30sek spada tylko jeśli nie jest na cooldownie
 
@@ -974,7 +901,6 @@ public static class SkillForge
             {
                 skill._resourceCost = scrObj_Skill._baseResourceCost + (scrObj_Skill._baseResourceCost * (live_charStats.charInfo._charLevel * scrObj_Skill._multiplier)) + (scrObj_Skill._baseResourceCost * (currentCharacterBonusStats.bonus_CloseRangeDamage * scrObj_Skill._multiplier)); // + cost za bonus;
             }
-
 
         }
         #endregion
@@ -1006,52 +932,7 @@ public static class SkillForge
                     break;
             }
         }
-        #endregion
-
-        /*#region Skill_DynamicCone_Update
-        /// <summary>
-        /// <br>Updatuje wszystkie rodzaje DynamicCone w zależności od tego czy isCasting == true/false</br>
-        /// <br>Do metody trzeba podać aktualny [targetTypeIndex] z targetType[]</br>
-        /// </summary>
-        /// <param name="scrObj_Skill">Scriptable Object Skilla</param>
-        /// <param name="skill">Ten GameObject skill</param>
-        /// <param name="live_charStats">Live_charStats Castera</param>
-        /// <param name="targetTypeIndex">Aktualny [targetTypeIndex] z targetType[]</param>
-        public static void Skill_DynamicCone_Update(ScrObj_skill scrObj_Skill, Skill skill, CharacterStatus live_charStats, int targetTypeIndex)
-        {
-            switch (scrObj_Skill._targetTypes[targetTypeIndex]._targetType) // Switch wybiera jaki jest oznaczony EnumTargetType w TargetType[targetTypeIndex]
-            {
-                case ScrObj_skill.TargetType.None:
-                    break;
-
-                case ScrObj_skill.TargetType.ConeOnCombo:
-                    Skill_OnCombo_DynamicCone(scrObj_Skill, skill, live_charStats, targetTypeIndex);
-                    break;
-
-                case ScrObj_skill.TargetType.ConeOnTime:
-                    Skill_OnTime_DynamicCone(scrObj_Skill, skill, live_charStats, targetTypeIndex);
-                    break;
-
-                case ScrObj_skill.TargetType.Projectile:
-                    break;
-
-                case ScrObj_skill.TargetType.AreaOfEffectMouse:
-                    break;
-
-                case ScrObj_skill.TargetType.Self:
-                    break;
-
-                case ScrObj_skill.TargetType.Pierce:
-                    break;
-
-                case ScrObj_skill.TargetType.Chain:
-                    break;
-
-                case ScrObj_skill.TargetType.Boom:
-                    break;
-            }
-        }
-        #endregion*/
+        #endregion        
 
         #region Skill_OnTime_DynamicCone 
         /// <summary>
@@ -1135,6 +1016,135 @@ public static class SkillForge
         }
         #endregion
 
+        #endregion
+
+        #region Skill_SelectedTargetCheck    
+        /// <summary>
+        /// <br>Sprawdza wskazany Collider warunkami Distance(InRange) / Angle(InAngle) / Raycast (ObstacleMask)</br>  
+        /// </summary>
+        /// <param name="scrObj_Skill">Scriptable Object Skilla</param>
+        /// <param name="skill">Ten GameObject skill</param>        
+        /// <param name="targetTypeIndex">Aktualny [targetTypeIndex] z targetType[]</param>    
+        /// <param name="targetCollider">Sprawdzany pojedynczy collider, można wrzucić dowolny.</param>
+        /// <returns><br>Boolean true / false</br>
+        /// <br>Oraz przypisuje wartości_targetInRange i _targetInAngle w bieżącym [targetTypeIndex]</br>
+        /// </returns>
+        public static bool Skill_SelectedTargetCheck(ScrObj_skill scrObj_Skill, Skill skill, int targetTypeIndex, Collider targetCollider)
+        {
+            float distanceToTarget = Vector3.Distance(targetCollider.transform.position, skill._casterGameobject.transform.position);
+
+            if (distanceToTarget <= skill.targetDynamicValues[targetTypeIndex]._currentRadius)
+            {
+                skill.targetDynamicValues[targetTypeIndex]._targetInRange = true; //target jest w breath range
+
+                Vector3 directionToTarget = (targetCollider.transform.position - skill._casterGameobject.transform.position).normalized; //0-1(normalized) różnica pomiędzy targetem a characterem Vector3.normalized ==> vector (kierunek w którym od niego znajduje się target)
+                                                                                                                                         //sprawdzanie aktualnie ostatniego elementu z listy
+                if (Vector3.Angle(skill._casterGameobject.transform.forward, directionToTarget) < skill.targetDynamicValues[targetTypeIndex]._currentAngle / 2)
+                //sprawdzanie angle wektora forward charactera i direction to target
+                //target może być na + albo - od charactera dlatego w każdą stronę angle / 2
+                {
+                    if (!Physics.Raycast(skill._casterGameobject.transform.position, directionToTarget, distanceToTarget, scrObj_Skill._targetTypes[targetTypeIndex]._obstaclesMask))    //dodatkowo sprawdza Raycastem czy nie ma przeszkody pomiędzy playerem a targetem //  
+                    {
+                        skill.targetDynamicValues[targetTypeIndex]._targetInAngle = true;
+                        return true;
+                    }
+                    else 
+                    {
+                        skill.targetDynamicValues[targetTypeIndex]._targetInAngle = false;
+                        return false; 
+                    }
+                }
+                else
+                {
+                    skill.targetDynamicValues[targetTypeIndex]._targetInAngle = false;
+                    return false;
+                }
+            }
+            else
+            {
+                skill.targetDynamicValues[targetTypeIndex]._targetInAngle = false;
+                skill.targetDynamicValues[targetTypeIndex]._targetInRange = false;
+                return false;
+            }
+        }
+        #endregion
+
+        #region Skill_ChainVFX  
+        /// <summary>
+        /// <br>Odpala VFX i PlayOneShot(scrObj_Skill._onTargetHitAudioClip)</br>
+        /// <br>Dla _targetColliders.Count =/--1 pozycje do VFX są ustawiane na target[0]</br>
+        /// <br>Dla _targetColliders.Count ++1 pozycje do VFX są ustawiane przez for na każdy następny target[k]</br>
+        /// </summary>
+        /// <param name="scrObj_Skill">Scriptable Object Skilla</param>
+        /// <param name="skill">Ten GameObject skill</param>        
+        /// <param name="targetTypeIndex">Aktualny [targetTypeIndex] z targetType[]</param> 
+        public static void Skill_ChainVFX(ScrObj_skill scrObj_Skill, Skill skill, int targetTypeIndex)
+        {
+            if (skill._chainVisualEffect != null ) ///VFX chainEffect 
+            {
+                if (skill.targetDynamicValues[targetTypeIndex]._targetColliders.Count <= 1) // Jeśli jest tylko 1 target na _targetColliders
+                {
+                    skill._chainVisualEffect.SetVector3("_posCaster", skill._chainVisualEffect.transform.position); //caster
+                    skill._chainVisualEffect.SetVector3("_pos0", skill.targetDynamicValues[targetTypeIndex]._targetColliders[0].transform.position + Vector3.up * 0.5f); //pierwszy index na targetCollider List
+
+                    skill._chainVisualEffect.SetVector3("_pos1", skill.targetDynamicValues[targetTypeIndex]._targetColliders[0].transform.position + Vector3.up * 0.5f);
+                    skill._chainVisualEffect.SetVector3("_pos4", skill.targetDynamicValues[targetTypeIndex]._targetColliders[0].transform.position + Vector3.up * 0.5f);
+
+                    skill._chainVisualEffect.Play(); // za każdym razem dodatkowo odpala od castera do 1 targetu z listy
+
+                    if (skill.targetDynamicValues[targetTypeIndex]._targetColliders[0].TryGetComponent<AudioSource>(out var targetAudioSource)) 
+                    {                       
+                        if (!targetAudioSource.isPlaying)
+                        {
+                            //targetAudioSource.PlayOneShot(scrObj_Skill._onTargetHitAudioClip, scrObj_Skill._onTargetHitAudioVolume);
+                            targetAudioSource.clip = scrObj_Skill._onTargetHitAudioClip;
+                            targetAudioSource.volume = scrObj_Skill._onTargetHitAudioVolume;
+                            targetAudioSource.PlayScheduled(scrObj_Skill._onTargetHitAudioDelay); 
+                        }
+                    }
+                }
+                else // Jeśli jest więcej niż 1 target na _targetColliders
+                {
+                    for (int k = 0; k < skill.targetDynamicValues[targetTypeIndex]._targetColliders.Count - 1; k++)  //do przedostatniego targetu
+                    {
+                        skill._chainVisualEffect.SetVector3("_posCaster", skill._chainVisualEffect.transform.position); //caster
+                        skill._chainVisualEffect.SetVector3("_pos0", skill.targetDynamicValues[targetTypeIndex]._targetColliders[0].transform.position + Vector3.up * 0.5f); //pierwszy index na targetCollider List
+                                                                                                                                                                             //skill._chainVisualEffect.Play(); // za każdym razem dodatkowo odpala od castera do 1 targetu z listy
+
+                        skill._chainVisualEffect.SetVector3("_pos1", skill.targetDynamicValues[targetTypeIndex]._targetColliders[k].transform.position + Vector3.up * 0.5f);
+                        skill._chainVisualEffect.SetVector3("_pos4", skill.targetDynamicValues[targetTypeIndex]._targetColliders[k + 1].transform.position + Vector3.up * 0.5f);
+                        skill._chainVisualEffect.Play();
+
+                        
+                        if (skill.targetDynamicValues[targetTypeIndex]._targetColliders[k].TryGetComponent<AudioSource>(out var targetAudioSource))
+                        {
+                            if (!targetAudioSource.isPlaying || skill.targetDynamicValues[targetTypeIndex]._targetColliders[k].GetComponent<AudioSource>().time >= skill._chainVisualEffect.GetFloat("_lightningLifetime"))
+                            {
+                                //targetAudioSource.PlayOneShot(scrObj_Skill._onTargetHitAudioClip, scrObj_Skill._onTargetHitAudioVolume);
+                                targetAudioSource.clip = scrObj_Skill._onTargetHitAudioClip;
+                                targetAudioSource.volume = scrObj_Skill._onTargetHitAudioVolume;
+                                targetAudioSource.PlayScheduled(scrObj_Skill._onTargetHitAudioDelay);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        #endregion
+
+        #region FakeRoutine
+        /// <summary>
+        /// Lokalna FakeRoutine do opóźnienia Update/FixedUpdate itd
+        /// </summary>
+        /// <param name="_routineProgress">Aktualny progress (ref float)</param>
+        /// <param name="_routineTime">czas trwania całej routine / Delay (ref float)</param>
+        /// <returns>Bool Tru jeśli skończył FakeRoutine / False jeśli nie skończył</returns>
+        public static bool FakeRoutine(ref float _routineProgress,ref float _routineTime)
+        {
+            _routineProgress = Mathf.MoveTowards(_routineProgress, 0, Time.deltaTime / _routineTime); //progress 1-> 0 w (coroutineTime * 1sek)
+            if (_routineProgress <= 0.05f) { return true; }
+            else { return false; }
+        }
         #endregion
 
         #region Resets_Audio / VFX / Casting / Animator
