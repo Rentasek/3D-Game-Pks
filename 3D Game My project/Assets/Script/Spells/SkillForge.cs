@@ -140,8 +140,8 @@ public static class SkillForge
                         #endregion
                     }
                     live_charStats.charStatus._isCasting = true;
-                }                
-
+                }
+                
                 for (int targetTypeIndex = 0; targetTypeIndex < scrObj_Skill._targetTypes.Length; targetTypeIndex++)
                 {
                     switch (scrObj_Skill._targetTypes[targetTypeIndex]._targetType)
@@ -608,6 +608,7 @@ public static class SkillForge
                     skill._chainVisualEffect.SetVector3("_posCaster", skill._chainVisualEffect.transform.position); //caster
                     skill._chainVisualEffect.SetVector3("_pos0", skill.targetDynamicValues[targetTypeIndex]._targetColliders[0].transform.position + Vector3.up * 0.5f); //pierwszy index na targetCollider List
                     skill._chainVisualEffect.Play(); // za każdym razem dodatkowo odpala od castera do 1 targetu z listy
+                    
 
                     for (int k = 0; k < skill.targetDynamicValues[targetTypeIndex]._targetColliders.Count - 1; k++)  //do przedostatniego targetu
                     {
@@ -618,6 +619,14 @@ public static class SkillForge
                         skill._chainVisualEffect.SetVector3("_pos1", skill.targetDynamicValues[targetTypeIndex]._targetColliders[k].transform.position + Vector3.up * 0.5f);
                         skill._chainVisualEffect.SetVector3("_pos4", skill.targetDynamicValues[targetTypeIndex]._targetColliders[k + 1].transform.position + Vector3.up * 0.5f);
                         skill._chainVisualEffect.Play();
+
+                        if (skill.targetDynamicValues[targetTypeIndex]._targetColliders[k].GetComponent<AudioSource>()!=null) 
+                        {
+                            if (!skill.targetDynamicValues[targetTypeIndex]._targetColliders[k].GetComponent<AudioSource>().isPlaying/* || skill.targetDynamicValues[targetTypeIndex]._targetColliders[k].GetComponent<AudioSource>().time >= skill._chainVisualEffect.GetFloat("_lightningLifetime")*/)
+                            {                                
+                                skill.targetDynamicValues[targetTypeIndex]._targetColliders[k].GetComponent<AudioSource>().PlayOneShot(scrObj_Skill._onTargetHitAudioClip, scrObj_Skill._onTargetHitAudioVolume);   // PlayScheduled(skill._chainVisualEffect.GetFloat("_lightningTime")); 
+                            }
+                        }
                     }
                 }
 
@@ -912,12 +921,12 @@ public static class SkillForge
         /// <param name="live_charStats">Live_charStats Castera</param>
         public static void Skill_EffectValuesUpdate(ScrObj_skill scrObj_Skill, Skill skill, CharacterStatus live_charStats, CharacterBonusStats currentCharacterBonusStats, int targetTypeIndex, int effectTypeIndex)
         {
-            if (skill == live_charStats.fov._spellRangeSkill)
+            if (skill == live_charStats.charSkillCombat._skillArray[1])
             {
                 skill.targetDynamicValues[targetTypeIndex].effectDynamicValues[effectTypeIndex]._currentDamage = scrObj_Skill._targetTypes[targetTypeIndex]._effectTypes[effectTypeIndex]._baseDamage + (scrObj_Skill._targetTypes[targetTypeIndex]._effectTypes[effectTypeIndex]._baseDamage * (live_charStats.charInfo._charLevel * scrObj_Skill._multiplier)) + (scrObj_Skill._targetTypes[targetTypeIndex]._effectTypes[effectTypeIndex]._baseDamage * (currentCharacterBonusStats.bonus_SpellRangeDamage * scrObj_Skill._multiplier)); //+bonus
                 //skill._resourceCost = scrObj_Skill._baseResourceCost + (scrObj_Skill._baseResourceCost * (live_charStats.charInfo._charLevel * scrObj_Skill._multiplier)) + (scrObj_Skill._baseResourceCost * (currentCharacterBonusStats.bonus_SpellRangeDamage * scrObj_Skill._multiplier)); // + cost za bonus
             }
-            else if (skill == live_charStats.fov._closeRangeSkill)
+            else if (skill == live_charStats.charSkillCombat._skillArray[0])
             {
                 skill.targetDynamicValues[targetTypeIndex].effectDynamicValues[effectTypeIndex]._currentDamage = scrObj_Skill._targetTypes[targetTypeIndex]._effectTypes[effectTypeIndex]._baseDamage + (scrObj_Skill._targetTypes[targetTypeIndex]._effectTypes[effectTypeIndex]._baseDamage * (live_charStats.charInfo._charLevel * scrObj_Skill._multiplier)) + (scrObj_Skill._targetTypes[targetTypeIndex]._effectTypes[effectTypeIndex]._baseDamage * (currentCharacterBonusStats.bonus_CloseRangeDamage * scrObj_Skill._multiplier)); //+bonus
                 //skill._resourceCost = scrObj_Skill._baseResourceCost + (scrObj_Skill._baseResourceCost * (live_charStats.charInfo._charLevel * scrObj_Skill._multiplier)) + (scrObj_Skill._baseResourceCost * (currentCharacterBonusStats.bonus_CloseRangeDamage * scrObj_Skill._multiplier)); // + cost za bonus;
@@ -957,11 +966,11 @@ public static class SkillForge
             if (skill._currentCooldownRemaining >= 0.06f) { live_charStats.charStatus._isCasting = false; } //Reset Instanta na początku każdej klatki jeśli jest na cooldown
 
             //Update ResourceCost 
-            if (skill == live_charStats.fov._spellRangeSkill)
+            if (skill == live_charStats.charSkillCombat._skillArray[1])
             {
                 skill._resourceCost = scrObj_Skill._baseResourceCost + (scrObj_Skill._baseResourceCost * (live_charStats.charInfo._charLevel * scrObj_Skill._multiplier)) + (scrObj_Skill._baseResourceCost * (currentCharacterBonusStats.bonus_SpellRangeDamage * scrObj_Skill._multiplier)); // + cost za bonus
             }
-            else if (skill == live_charStats.fov._closeRangeSkill)
+            else if (skill == live_charStats.charSkillCombat._skillArray[0])
             {
                 skill._resourceCost = scrObj_Skill._baseResourceCost + (scrObj_Skill._baseResourceCost * (live_charStats.charInfo._charLevel * scrObj_Skill._multiplier)) + (scrObj_Skill._baseResourceCost * (currentCharacterBonusStats.bonus_CloseRangeDamage * scrObj_Skill._multiplier)); // + cost za bonus;
             }
@@ -1194,10 +1203,12 @@ public static class SkillForge
                 skill._audioSourceCaster.volume = Mathf.MoveTowards(skill._audioSourceCaster.volume, 0, Time.deltaTime / 2); //obniza volume 1-> 0 w 2sek
                 if (skill._audioSourceCaster.volume <= 0.05f)
                 {
-                    Skill_ResetAnimator(scrObj_Skill, skill, live_charStats);
+                    
                     skill._audioSourceCaster.Stop();
                 }
             }
+
+            if (live_charStats.charComponents._Animator != null) { Skill_ResetAnimator(scrObj_Skill, skill, live_charStats); }
 
             live_charStats.charStatus._isCasting = false;
 
@@ -1207,100 +1218,44 @@ public static class SkillForge
 
         #region Skill_ResetAnimator
         /// <summary>
-        /// Resetuje zmienne Animatora, switchem sprawdza czy przypadkiem zmienne animatora w other_Skillu nie są takie same, jeśli są to nie resetuje ich jeśli 2 other_Skill jest castowany
-        /// <br><i>Może wymysli się coś lepszego od switcha</i></br>
+        /// Resetuje zmienne Animatora:
+        /// <br>1. Sprawdza czy field w ScrObj_Skill nie jest puste</br>
+        /// <br>2. Sprawdza czy nazwa Float/Bool/Trigger jest taka sama w _skillArray[0] i [1], jeśli nie -> Reset</br>
+        /// <br>3. Jeśli tak to sprawdza czy skillInput i skillOtherInput nie są aktywne</br>
+        /// <br>4. Jeśli żaden nie jest aktywny to resetuje Float/Bool/Trigger</br>
         /// </summary>
         /// <param name="scrObj_Skill">Scriptable Object Skilla</param>
         /// <param name="skill">Ten GameObject skill</param>
         /// <param name="live_charStats">Live_charStats Castera</param> 
         public static void Skill_ResetAnimator(ScrObj_skill scrObj_Skill, Skill skill, CharacterStatus live_charStats)
         {
-            switch (Array.IndexOf(live_charStats.charSkillCombat._skillArray, skill)) //Index jaki ma ten skill w _skillArray
+            if (!string.IsNullOrWhiteSpace(scrObj_Skill._animatorFloatName))
             {
-                case 0:
-                    if (!string.IsNullOrWhiteSpace(scrObj_Skill._animatorFloatName))
-                    {
-                        if (live_charStats.charSkillCombat._skillArray[1].scrObj_Skill._animatorFloatName != scrObj_Skill._animatorFloatName)
-                        {   // jeśli drugi skill nie ma takiej samej nazwy float do animatora
-                            live_charStats.charComponents._Animator.SetFloat(scrObj_Skill._animatorFloatName, 0f); //reset float
-                        }
-                        else if (!live_charStats.charSkillCombat._skillArray[1]._skillInput)
-                        {   // i nie castuje
-                            live_charStats.charComponents._Animator.SetFloat(scrObj_Skill._animatorFloatName, 0f); //reset float
-                        }
-                    }
-
-                    if (!string.IsNullOrWhiteSpace(scrObj_Skill._animatorBoolName))
-                    {
-                        if (live_charStats.charSkillCombat._skillArray[1].scrObj_Skill._animatorBoolName != scrObj_Skill._animatorBoolName)
-                        {
-                            // jeśli drugi skill nie ma takiej samej nazwy Bool do animatora
-                            live_charStats.charComponents._Animator.SetBool(scrObj_Skill._animatorBoolName, false); //reset bool
-                        }
-                        else if (!live_charStats.charSkillCombat._skillArray[1]._skillInput)
-                        {
-                            //  i nie castuje
-                            live_charStats.charComponents._Animator.SetBool(scrObj_Skill._animatorBoolName, false); //reset bool
-                        }
-                    }
-
-                    if (!string.IsNullOrWhiteSpace(scrObj_Skill._animatorTriggerName))
-                    {
-                        if (live_charStats.charSkillCombat._skillArray[1].scrObj_Skill._animatorTriggerName != scrObj_Skill._animatorTriggerName)
-                        {
-                            // jeśli drugi skill nie ma takiej samej nazwy trigger do animatora
-                            live_charStats.charComponents._Animator.ResetTrigger(scrObj_Skill._animatorTriggerName);    //reset trigger
-                        }
-                        else if (!live_charStats.charSkillCombat._skillArray[1]._skillInput)
-                        {
-                            //  i nie castuje
-                            live_charStats.charComponents._Animator.ResetTrigger(scrObj_Skill._animatorTriggerName);    //reset trigger
-                        }
-                    }
-                    break;
-
-                case 1:
-                    if (!string.IsNullOrWhiteSpace(scrObj_Skill._animatorFloatName))
-                    {
-                        if (live_charStats.charSkillCombat._skillArray[0].scrObj_Skill._animatorFloatName != scrObj_Skill._animatorFloatName)
-                        {   // jeśli drugi skill nie ma takiej samej nazwy float do animatora
-                            live_charStats.charComponents._Animator.SetFloat(scrObj_Skill._animatorFloatName, 0f); //reset float
-                        }
-                        else if (!live_charStats.charSkillCombat._skillArray[0]._skillInput)
-                        {   // i nie castuje
-                            live_charStats.charComponents._Animator.SetFloat(scrObj_Skill._animatorFloatName, 0f); //reset float
-                        }
-                    }
-
-                    if (!string.IsNullOrWhiteSpace(scrObj_Skill._animatorBoolName))
-                    {
-                        if (live_charStats.charSkillCombat._skillArray[0].scrObj_Skill._animatorBoolName != scrObj_Skill._animatorBoolName)
-                        {
-                            // jeśli drugi skill nie ma takiej samej nazwy Bool do animatora
-                            live_charStats.charComponents._Animator.SetBool(scrObj_Skill._animatorBoolName, false); //reset bool
-                        }
-                        else if (!live_charStats.charSkillCombat._skillArray[0]._skillInput)
-                        {
-                            //  i nie castuje
-                            live_charStats.charComponents._Animator.SetBool(scrObj_Skill._animatorBoolName, false); //reset bool
-                        }
-                    }
-
-                    if (!string.IsNullOrWhiteSpace(scrObj_Skill._animatorTriggerName))
-                    {
-                        if (live_charStats.charSkillCombat._skillArray[0].scrObj_Skill._animatorTriggerName != scrObj_Skill._animatorTriggerName)
-                        {
-                            // jeśli drugi skill nie ma takiej samej nazwy trigger do animatora
-                            live_charStats.charComponents._Animator.ResetTrigger(scrObj_Skill._animatorTriggerName);    //reset trigger
-                        }
-                        else if (!live_charStats.charSkillCombat._skillArray[0]._skillInput)
-                        {
-                            //  i nie castuje
-                            live_charStats.charComponents._Animator.ResetTrigger(scrObj_Skill._animatorTriggerName);    //reset trigger
-                        }
-                    }
-                    break;
+                if (live_charStats.charSkillCombat._skillArray[0].scrObj_Skill._animatorFloatName == live_charStats.charSkillCombat._skillArray[1].scrObj_Skill._animatorFloatName)
+                {
+                    if (!skill._skillInput && !skill._skillOtherInput) { live_charStats.charComponents._Animator.SetFloat(scrObj_Skill._animatorFloatName, 0f); }   //reset float
+                }
+                else { live_charStats.charComponents._Animator.SetFloat(scrObj_Skill._animatorFloatName, 0f); } //reset float
             }
+
+            if (!string.IsNullOrWhiteSpace(scrObj_Skill._animatorBoolName))
+            {
+                if (live_charStats.charSkillCombat._skillArray[0].scrObj_Skill._animatorBoolName == live_charStats.charSkillCombat._skillArray[1].scrObj_Skill._animatorBoolName)
+                {
+                    if (!skill._skillInput && !skill._skillOtherInput) { live_charStats.charComponents._Animator.SetBool(scrObj_Skill._animatorBoolName, false); }   //reset bool
+                }
+                else { live_charStats.charComponents._Animator.SetBool(scrObj_Skill._animatorBoolName, false); }   //reset bool
+            }
+
+            if (!string.IsNullOrWhiteSpace(scrObj_Skill._animatorTriggerName))
+            {
+                if (live_charStats.charSkillCombat._skillArray[0].scrObj_Skill._animatorTriggerName == live_charStats.charSkillCombat._skillArray[1].scrObj_Skill._animatorTriggerName)
+                {
+                    if (!skill._skillInput && !skill._skillOtherInput) { live_charStats.charComponents._Animator.ResetTrigger(scrObj_Skill._animatorTriggerName); } //reset trigger
+                }
+                else { live_charStats.charComponents._Animator.ResetTrigger(scrObj_Skill._animatorTriggerName); } //reset trigger
+            } 
+            
         }
         #endregion
 
