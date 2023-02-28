@@ -234,24 +234,8 @@ public class CharacterStatus : MonoBehaviour
         if (GetComponent<NavMeshAgent>() != null)
         {
             charComponents._navMeshAgent = GetComponent<NavMeshAgent>();
-            //Skills Select By MaxRange
-
             charComponents._navMeshAgent.stoppingDistance = 0f;
-           /* if (charSkillCombat._skillArray != null)
-            {
-                if (charSkillCombat._primarySkill.scrObj_Skill._skillMaxRadius < charSkillCombat._secondarySkill.scrObj_Skill._skillMaxRadius)
-                {
-                    fov._closeRangeSkill = charSkillCombat._primarySkill;
-                    fov._spellRangeSkill = charSkillCombat._secondarySkill;
-                    fov._spellRangeSkillMaxRadius = charSkillCombat._secondarySkill.scrObj_Skill._skillMaxRadius;
-                }
-                else
-                {
-                    fov._closeRangeSkill = charSkillCombat._secondarySkill;
-                    fov._spellRangeSkill = charSkillCombat._primarySkill;
-                    fov._spellRangeSkillMaxRadius = charSkillCombat._primarySkill.scrObj_Skill._skillMaxRadius;
-                }
-            }*/
+           
 
 
         }  
@@ -544,7 +528,7 @@ public class CharacterStatus : MonoBehaviour
     {
         charSkillCombat._skillArray = GetComponentsInChildren<Skill>();  //za³adowanie wszystkich Skill do arraya
 
-        if (!charInfo._isPlayer)
+        if (!charInfo._isPlayer)    //Skills Select By MaxRange
         {                                                                                                                            
             charSkillCombat._skillArray = charSkillCombat._skillArray.OrderBy(x => x.scrObj_Skill._skillMaxRadius).ToArray();   //ustawianie _skill Array w kolejnoœci od najwiêkszego bazowego SkillRange dla non-Playera
         }
@@ -563,8 +547,14 @@ public class CharacterStatus : MonoBehaviour
             }
             charSkillCombat._skillArray = temporaryskillArray;
         }
+        fov._spellRangeSkillMaxRadius = charSkillCombat._skillArray[1].scrObj_Skill._skillMaxRadius;
 
-        fov._spellRangeSkillMaxRadius = charSkillCombat._skillArray[0].scrObj_Skill._skillMaxRadius;        
+        for (int s = 0; s < charSkillCombat._skillArray.Length; s++) //Usawiania live_charStats w skillach 
+        {
+            charSkillCombat._skillArray[s].live_charStats = this;
+        }
+        
+
     } 
     #endregion
 }
