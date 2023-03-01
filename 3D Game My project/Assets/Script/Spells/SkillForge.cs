@@ -537,8 +537,6 @@ public static class SkillForge
                                                                                                                                                                           //sprawdzanie aktualnie ostatniego elementu z listy
                                     if (!Physics.Raycast(skill._casterGameobject.transform.position, directionToTarget, distanceToTarget, scrObj_Skill._targetTypes[targetTypeIndex]._obstaclesMask))    //dodatkowo sprawdza Raycastem czy nie ma przeszkody pomiędzy playerem a targetem //  
                                     {
-                                        //skill.targetDynamicValues[targetTypeIndex]._targetInAngle = true;
-
                                         if (skill.targetDynamicValues[targetTypeIndex]._targetColliders.IndexOf(skill._allLocalColliders[i]) < 0) //sprawdza czy nie ma na liście. Jeżeli IndexOf < 0 czyli nie ma obiektów z tym indexem
                                         {
                                             skill.targetDynamicValues[targetTypeIndex]._targetColliders.Add(skill._allLocalColliders[i]); //przypisuje do listy colliders jeśli ma taga z listy enemies        
@@ -546,23 +544,16 @@ public static class SkillForge
                                         /*else
                                         {
                                             skill.targetDynamicValues[targetTypeIndex]._targetColliders.Remove(skill._allLocalColliders[i]);
-                                            //if (skill.targetDynamicValues[targetTypeIndex]._targetColliders.Count <= 0) skill.targetDynamicValues[targetTypeIndex]._targetInAngle = false;  //jeśli nie ma żadnych targetów w Cone Angle
                                         }*/
                                     }
                                     else
                                     {
                                         skill.targetDynamicValues[targetTypeIndex]._targetColliders.Remove(skill._allLocalColliders[i]);
-                                        // if (skill.targetDynamicValues[targetTypeIndex]._targetColliders.Count <= 0) skill.targetDynamicValues[targetTypeIndex]._targetInAngle = false;  //jeśli nie ma żadnych targetów w Cone Angle
                                     }
                                 }
                                 else
                                 {
-                                    skill.targetDynamicValues[targetTypeIndex]._targetColliders.Remove(skill._allLocalColliders[i]);
-                                    // if (skill.targetDynamicValues[targetTypeIndex]._targetColliders.Count <= 0)
-                                    //{
-                                    //   skill.targetDynamicValues[targetTypeIndex]._targetInAngle = false;  //jeśli nie ma żadnych targetów w Cone Angle
-                                    //    skill.targetDynamicValues[targetTypeIndex]._targetInRange = false;  //jeśli nie ma żadnych targetów w Cone Radius
-                                    // }
+                                    skill.targetDynamicValues[targetTypeIndex]._targetColliders.Remove(skill._allLocalColliders[i]);                                    
                                 }
                             }
                             else { skill.targetDynamicValues[targetTypeIndex]._targetColliders.Clear(); }   // Jeśli target[0] nie spełnia warunków to resetuje całą listę
