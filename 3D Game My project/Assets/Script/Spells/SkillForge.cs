@@ -1134,22 +1134,7 @@ public static class SkillForge
             }
         }
         #endregion
-
-        #region FakeRoutine
-        /// <summary>
-        /// Lokalna FakeRoutine do opóźnienia Update/FixedUpdate itd
-        /// </summary>
-        /// <param name="_routineProgress">Aktualny progress (ref float)</param>
-        /// <param name="_routineTime">czas trwania całej routine / Delay (ref float)</param>
-        /// <returns>Bool Tru jeśli skończył FakeRoutine / False jeśli nie skończył</returns>
-        public static bool FakeRoutine(ref float _routineProgress,ref float _routineTime)
-        {
-            _routineProgress = Mathf.MoveTowards(_routineProgress, 0, Time.deltaTime / _routineTime); //progress 1-> 0 w (coroutineTime * 1sek)
-            if (_routineProgress <= 0.05f) { return true; }
-            else { return false; }
-        }
-        #endregion
-
+               
         #region Resets_Audio / VFX / Casting / Animator
         #region Skill_ResetTargetList 
         /// <summary>
@@ -1287,6 +1272,21 @@ public static class SkillForge
 
         }
         #endregion 
+        #endregion
+
+        #region FakeRoutine
+        /// <summary>
+        /// Lokalna FakeRoutine do opóźnienia Update/FixedUpdate itd
+        /// </summary>
+        /// <param name="_routineProgress">Aktualny progress (ref float)</param>
+        /// <param name="_routineTime">czas trwania całej routine / Delay (ref float)</param>
+        /// <returns>Bool Tru jeśli skończył FakeRoutine / False jeśli nie skończył</returns>
+        public static bool FakeRoutine(ref float _routineProgress, ref float _routineTime)
+        {
+            _routineProgress = Mathf.MoveTowards(_routineProgress, 0, Time.deltaTime / _routineTime); //progress 1-> 0 w (coroutineTime * 1sek)
+            if (_routineProgress <= 0.05f) { return true; }
+            else { return false; }
+        }
         #endregion
 
         public static IEnumerator WaitForTime(Skill skill)
