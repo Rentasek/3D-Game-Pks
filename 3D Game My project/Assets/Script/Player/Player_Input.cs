@@ -91,8 +91,8 @@ public class Player_Input : MonoBehaviour
             live_charStats.charStatus._isRunning= false;
             //live_charStats.charSkillCombat._secondarySkill._canCast = live_charStats.charInput._secondary;  //tylko dla gracza w isometric -> Mo¿na canCastowaæ przerywaj¹c wszystko inne
             live_charStats.charSkillCombat._skillArray[1]._canCast = live_charStats.charSkillCombat._skillArray[1]._skillInput;  //tylko dla gracza w isometric -> Mo¿na canCastowaæ przerywaj¹c wszystko inne
-            live_charStats.charComponents._navMeshAgent.isStopped = true;
-
+            live_charStats.navMeshAge._walkPoint = transform.position;
+            live_charStats.navMeshAge._mouseWalkPoint = transform.position;
         }
     }
    
@@ -131,7 +131,8 @@ public class Player_Input : MonoBehaviour
 
                 if (!live_charStats.charInfo._playerInputEnable)
                 {
-                    { Cursor.lockState = CursorLockMode.None; Cursor.visible = true; }
+                    Cursor.lockState = CursorLockMode.None; Cursor.visible = true;
+                    live_charStats.navMeshAge._walkPoint = transform.position; // ¿eby po w³¹czeniu isometric nie szed³ do punktu (0,0,0)
                 }
                 else
                 {

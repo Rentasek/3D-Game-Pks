@@ -324,47 +324,24 @@ public static class LiveCharStats_Base
             live_charStats.charComponents._navMeshAgent.SetDestination(live_charStats.navMeshAge._walkPoint);
 
             if (!live_charStats.charInput._mouseCurrentMoving && !live_charStats.charSkillCombat._skillArray[1]._skillInput)     //mouse input -> wyłącza CheckTagetInRange //dodatkowo input casting
-            {                
+            {
                 FieldOfViewTarget(live_charStats);
 
-                if (live_charStats.fov._targetInAttackRange)
-                {
-                    Attacking(live_charStats);
-                }
-                else
+                //Ai_Attack CloseRange
+                if (live_charStats.fov._targetInAttackRange && !live_charStats.charSkillCombat._skillArray[1]._skillInput) { Attacking(live_charStats); }
+                else //Jeśli target nie w AttackRange
                 {
                     live_charStats.charSkillCombat._skillArray[0]._skillInput = false;
-
-                    /*live_charStats.fov._closeRangeSkill._skillInput = false;
-                    switch (live_charStats.fov._closeRangeSkill.scrObj_Skill._inputType)
-                    {
-                        case ScrObj_skill.InputType.primary:
-                            live_charStats.charInput._primary = false;
-                            break;
-                        case ScrObj_skill.InputType.secondary:
-                            live_charStats.charInput._secondary = false;
-                            break;
-                    }*/
-
+                    
                     //AI_Chasing  //Jeśli target w dynamicRange
                     if (live_charStats.fov._targetInDynamicSightRange && live_charStats.fov._targetAquired && !live_charStats.charSkillCombat._skillArray[1]._skillInput) { Chasing(live_charStats); } //!live_charStats.fov._spellRangeSkill.skill_input żeby nie przerywał casta
-                    else //Jeśli !targetAquired lub !dynamicRange
-                    {
-                        //AI_Patrolling można włączyć na postaci gracza
-                        //if (!live_charStats.fov._spellRangeSkill.skill_input) { Patrolling(live_charStats); }   //!live_charStats.fov._spellRangeSkill.skill_input żeby nie przerywał casta
-
-                        //AI_Stopping -> Jeśli dystans do walkPoint jest mniejszy niż charController.radius*2 resetuje walkPointSet (wykorzystanie live_charStats.currentNavMeshAgent.*)            
-                        if (live_charStats.charComponents._navMeshAgent.remainingDistance <= live_charStats.charComponents._characterController.radius * 4)
-                        {
-                            StopMovementNavMeshAgent(live_charStats);
-                        }
-                    }
-                }
+                   
+                }               
             }
             else
             {
                 live_charStats.navMeshAge._walkPoint = live_charStats.navMeshAge._mouseWalkPoint; //mouse input -> ovveriride walkPointSet z CheckRange
-            }            
+            }
         }
 
         else
@@ -379,34 +356,12 @@ public static class LiveCharStats_Base
             {
                 live_charStats.charSkillCombat._skillArray[0]._skillInput = false;
 
-                /*live_charStats.fov._closeRangeSkill._skillInput = false;
-                switch (live_charStats.fov._closeRangeSkill.scrObj_Skill._inputType)
-                {
-                    case ScrObj_skill.InputType.primary:
-                        live_charStats.charInput._primary = false;
-                        break;
-                    case ScrObj_skill.InputType.secondary:
-                        live_charStats.charInput._secondary = false;
-                        break;
-                }*/
-
                 //AI_Castowanie Spelli
                 if (live_charStats.fov._targetInSpellRange)
                 {
                     if (live_charStats.charStats._mp <= 10f)    //jeśli zejdzie do 10 many to nie castuje
                     {
                         live_charStats.charSkillCombat._skillArray[0]._skillInput = false;
-
-                        /*//live_charStats.fov._spellRangeSkill.skill_input = false;
-                        switch (live_charStats.fov._spellRangeSkill.scrObj_Skill._inputType)
-                        {
-                            case ScrObj_skill.InputType.primary:
-                                live_charStats.charInput._primary = false;
-                                break;
-                            case ScrObj_skill.InputType.secondary:
-                                live_charStats.charInput._secondary = false;
-                                break;
-                        }*/
 
                         //AI_Chasing kiedy nie castuje w SpellRange
                         Chasing(live_charStats);                 
@@ -419,16 +374,6 @@ public static class LiveCharStats_Base
                 else //Jeśli target nie w SpellRange
                 {
                     live_charStats.charSkillCombat._skillArray[1]._skillInput = false;
-
-                    /*switch (live_charStats.fov._spellRangeSkill.scrObj_Skill._inputType)
-                    {
-                        case ScrObj_skill.InputType.primary:
-                            live_charStats.charInput._primary = false;
-                            break;
-                        case ScrObj_skill.InputType.secondary:
-                            live_charStats.charInput._secondary = false;
-                            break;
-                    }*/
 
                     //AI_Chasing  //Jeśli target w dynamicRange
                     if (live_charStats.fov._targetInDynamicSightRange && live_charStats.fov._targetAquired && !live_charStats.charSkillCombat._skillArray[1]._skillInput) { Chasing(live_charStats); } //!live_charStats.fov._spellRangeSkill.skill_input żeby nie przerywał casta
