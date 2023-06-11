@@ -45,6 +45,8 @@ public class Skill : MonoBehaviour
         [Header("Skill Cone Settings")]
         [Tooltip("Bool zwracający czy w Range jest przeciwnik"), CanBeNull, SerializeField] public bool _targetInRange;
         [Tooltip("Bool zwracający czy w Angle(i Range) jest przeciwnik"), CanBeNull, SerializeField] public bool _targetInAngle;
+        [Header("Skill Collider Settings")]
+        [Tooltip("GameObject z Colliderem do skilla"), CanBeNull, SerializeField] public GameObject _skillColliderGameObject;
         [Space]
         [Tooltip("Aktualny Radius skilla"), CanBeNull, SerializeField] public float _currentRadius;
         [Tooltip("Aktualny Kąt skilla"), CanBeNull, SerializeField] public float _currentAngle;
@@ -62,7 +64,7 @@ public class Skill : MonoBehaviour
     #endregion
     [Tooltip("Zmienne do tablicy SkillTarget"), CanBeNull, SerializeField] public TargetDynamicValues[] targetDynamicValues = new TargetDynamicValues[3];
     [Tooltip("Zwracana lista wszystkich colliderów w zasięgu skilla"), CanBeNull, SerializeField] public Collider[] _allLocalColliders = new Collider[30];
-    [Tooltip("Zwracana lista colliderów zgodnych z parametrami(EnemyTag,InCurrentRadius,InCurrentAngle)"), CanBeNull, SerializeField] public List<Collider> skill_targetColliders;
+    [Tooltip("//UNUSED// Zwracana lista colliderów zgodnych z parametrami(EnemyTag,InCurrentRadius,InCurrentAngle)"), CanBeNull, SerializeField] public List<Collider> skill_targetColliders;
 
     [Tooltip("GameObject skilla (castera) -> potrzebny do transform"), SerializeField] public GameObject _casterGameobject;   
     [Header("Utils")]

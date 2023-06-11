@@ -422,6 +422,44 @@ public static class SkillForge
             /// dla castable -> prefab odpali na CastingFinished
             /// można też zrobić alternatywne booleany tylko do wypuszczania prefaba ale po co?
             /// 
+
+            skill.targetDynamicValues[targetTypeIndex]._targetColliders.Clear();  ///czyszczenie przed kazdym atakiem
+
+            if (skill._currentCastingProgress < 0.05f)   ///zabezpieczenie żeby nie dodawał następnych invoke
+            {
+                skill.targetDynamicValues[targetTypeIndex]._skillColliderGameObject.SetActive(true);  ///aktywacja gameobjectu Collidera            
+            }
+
+            if (skill.targetDynamicValues[targetTypeIndex]._targetColliders.Count > 0)
+            {
+                for (int effectTypeIndex = 0; effectTypeIndex < scrObj_Skill._targetTypes[targetTypeIndex]._effectTypes.Length; effectTypeIndex++)
+                {
+                    switch (scrObj_Skill._targetTypes[targetTypeIndex]._effectTypes[effectTypeIndex]._effectType)
+                    {
+                        case ScrObj_skill.EffectType.None:
+                            break;
+
+                        case ScrObj_skill.EffectType.Hit:
+                            EffectType.Skill_Hit(scrObj_Skill, skill, live_charStats, targetTypeIndex, effectTypeIndex);
+                            break;
+
+                        case ScrObj_skill.EffectType.DamageOverTime:
+                            EffectType.Skill_DamageOverTime(scrObj_Skill, skill, live_charStats, targetTypeIndex, effectTypeIndex);
+                            break;
+
+                        case ScrObj_skill.EffectType.Heal:
+                            EffectType.Skill_Heal(scrObj_Skill, skill, live_charStats, targetTypeIndex, effectTypeIndex);
+                            break;
+
+                        case ScrObj_skill.EffectType.HealOverTime:
+                            EffectType.Skill_HealOverTime(scrObj_Skill, skill, live_charStats, targetTypeIndex, effectTypeIndex);
+                            break;
+
+                        case ScrObj_skill.EffectType.Summon:
+                            break;
+                    }
+                }
+            }
         }
         #endregion
 
