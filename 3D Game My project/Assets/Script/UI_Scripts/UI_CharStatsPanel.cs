@@ -43,7 +43,8 @@ public class UI_CharStatsPanel : MonoBehaviour, IPlayerUpdate
     }*/
     public void PlayerUpdate()
     {
-        live_charStats = Camera.main.GetComponent<CameraController>().player.GetComponent<CharacterStatus>();        
+        live_charStats = Camera.main.GetComponent<CameraController>().player.GetComponent<CharacterStatus>();
+        //StatsFillIn();
     }
     void OnEnable()
     {
