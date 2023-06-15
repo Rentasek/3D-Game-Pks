@@ -63,8 +63,12 @@ public static class SkillForge
                                     TargetType.Skill_Chain_Target(scrObj_Skill, skill, live_charStats, targetTypeIndex);
                                     break;
                                 case ScrObj_skill.TargetType.Boom:
-                                    break;                                    
-                            }                            
+                                    break;
+                                case ScrObj_skill.TargetType.Melee:
+                                    TargetType.Skill_Collider_Target(scrObj_Skill, skill, live_charStats, targetTypeIndex);
+                                    break;
+
+                            }
                         }
 
                         if (!string.IsNullOrWhiteSpace(scrObj_Skill._animatorBoolName)) live_charStats.charComponents._Animator.SetBool(scrObj_Skill._animatorBoolName, true);
@@ -142,7 +146,7 @@ public static class SkillForge
                     }
                     live_charStats.charStatus._isCasting = true;
                 }
-                
+
                 for (int targetTypeIndex = 0; targetTypeIndex < scrObj_Skill._targetTypes.Length; targetTypeIndex++)
                 {
                     switch (scrObj_Skill._targetTypes[targetTypeIndex]._targetType)
@@ -151,7 +155,7 @@ public static class SkillForge
                             break;
                         case ScrObj_skill.TargetType.DynamicCone:
                             TargetType.Skill_Cone_Target(scrObj_Skill, skill, live_charStats, targetTypeIndex);
-                            break;                       
+                            break;
                         case ScrObj_skill.TargetType.Projectile:
                             break;
                         case ScrObj_skill.TargetType.AreaOfEffectMouse:
@@ -165,6 +169,9 @@ public static class SkillForge
                             TargetType.Skill_Chain_Target(scrObj_Skill, skill, live_charStats, targetTypeIndex);
                             break;
                         case ScrObj_skill.TargetType.Boom:
+                            break;
+                        case ScrObj_skill.TargetType.Melee:
+                            TargetType.Skill_Collider_Target(scrObj_Skill, skill, live_charStats, targetTypeIndex);
                             break;
                     }
                 }
@@ -248,6 +255,9 @@ public static class SkillForge
                                 TargetType.Skill_Chain_Target(scrObj_Skill, skill, live_charStats, targetTypeIndex);
                                 break;
                             case ScrObj_skill.TargetType.Boom:
+                                break;
+                            case ScrObj_skill.TargetType.Melee:
+                                TargetType.Skill_Collider_Target(scrObj_Skill, skill, live_charStats, targetTypeIndex);
                                 break;
                         }
                     }
@@ -421,45 +431,48 @@ public static class SkillForge
             /// dla instant -> poleci 1 partical prefab i odpali instantCasting jak trafi
             /// dla castable -> prefab odpali na CastingFinished
             /// można też zrobić alternatywne booleany tylko do wypuszczania prefaba ale po co?
-            /// 
+            ///             
 
-            skill.targetDynamicValues[targetTypeIndex]._targetColliders.Clear();  ///czyszczenie przed kazdym atakiem
-
-            if (skill._currentCastingProgress < 0.05f)   ///zabezpieczenie żeby nie dodawał następnych invoke
+            if (skill._currentCooldownRemaining < 0.05f)   ///zabezpieczenie żeby nie dodawał następnych invoke
             {
                 skill.targetDynamicValues[targetTypeIndex]._skillColliderGameObject.SetActive(true);  ///aktywacja gameobjectu Collidera            
-            }
 
-            if (skill.targetDynamicValues[targetTypeIndex]._targetColliders.Count > 0)
-            {
-                for (int effectTypeIndex = 0; effectTypeIndex < scrObj_Skill._targetTypes[targetTypeIndex]._effectTypes.Length; effectTypeIndex++)
-                {
-                    switch (scrObj_Skill._targetTypes[targetTypeIndex]._effectTypes[effectTypeIndex]._effectType)
+                Debug.Log("Target Count : " + skill.targetDynamicValues[targetTypeIndex]._targetColliders.Count);
+
+                if (skill.targetDynamicValues[targetTypeIndex]._targetColliders.Count > 0)
+                {                    
+                    Debug.Log("Effect Activate !!!");
+                    /*for (int effectTypeIndex = 0; effectTypeIndex < scrObj_Skill._targetTypes[targetTypeIndex]._effectTypes.Length; effectTypeIndex++)
                     {
-                        case ScrObj_skill.EffectType.None:
-                            break;
+                        switch (scrObj_Skill._targetTypes[targetTypeIndex]._effectTypes[effectTypeIndex]._effectType)
+                        {
+                            case ScrObj_skill.EffectType.None:
+                                break;
 
-                        case ScrObj_skill.EffectType.Hit:
-                            EffectType.Skill_Hit(scrObj_Skill, skill, live_charStats, targetTypeIndex, effectTypeIndex);
-                            break;
+                            case ScrObj_skill.EffectType.Hit:
+                                EffectType.Skill_Hit(scrObj_Skill, skill, live_charStats, targetTypeIndex, effectTypeIndex);
+                                break;
 
-                        case ScrObj_skill.EffectType.DamageOverTime:
-                            EffectType.Skill_DamageOverTime(scrObj_Skill, skill, live_charStats, targetTypeIndex, effectTypeIndex);
-                            break;
+                            case ScrObj_skill.EffectType.DamageOverTime:
+                                EffectType.Skill_DamageOverTime(scrObj_Skill, skill, live_charStats, targetTypeIndex, effectTypeIndex);
+                                break;
 
-                        case ScrObj_skill.EffectType.Heal:
-                            EffectType.Skill_Heal(scrObj_Skill, skill, live_charStats, targetTypeIndex, effectTypeIndex);
-                            break;
+                            case ScrObj_skill.EffectType.Heal:
+                                EffectType.Skill_Heal(scrObj_Skill, skill, live_charStats, targetTypeIndex, effectTypeIndex);
+                                break;
 
-                        case ScrObj_skill.EffectType.HealOverTime:
-                            EffectType.Skill_HealOverTime(scrObj_Skill, skill, live_charStats, targetTypeIndex, effectTypeIndex);
-                            break;
+                            case ScrObj_skill.EffectType.HealOverTime:
+                                EffectType.Skill_HealOverTime(scrObj_Skill, skill, live_charStats, targetTypeIndex, effectTypeIndex);
+                                break;
 
-                        case ScrObj_skill.EffectType.Summon:
-                            break;
-                    }
+                            case ScrObj_skill.EffectType.Summon:
+                                break;
+                        }
+                    }*/
                 }
             }
+
+            skill.targetDynamicValues[targetTypeIndex]._targetColliders.Clear();  ///czyszczenie przed kazdym atakiem
         }
         #endregion
 
