@@ -46,7 +46,7 @@ public class Skill : MonoBehaviour
         [Tooltip("Bool zwracający czy w Range jest przeciwnik"), CanBeNull, SerializeField] public bool _targetInRange;
         [Tooltip("Bool zwracający czy w Angle(i Range) jest przeciwnik"), CanBeNull, SerializeField] public bool _targetInAngle;
         [Header("Skill Collider Settings")]
-        [Tooltip("GameObject z Colliderem do skilla"), CanBeNull, SerializeField] public GameObject _skillColliderGameObject;
+        [Tooltip("GameObjecty z Colliderami do skilla"), CanBeNull, SerializeField] public GameObject[] _skillColliderGameObject = new GameObject[3];
         [Space]
         [Tooltip("Aktualny Radius skilla"), CanBeNull, SerializeField] public float _currentRadius;
         [Tooltip("Aktualny Kąt skilla"), CanBeNull, SerializeField] public float _currentAngle;

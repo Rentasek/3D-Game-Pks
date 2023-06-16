@@ -26,7 +26,7 @@ public class Skill_Collider : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
-        if(skill._enemiesArray.Contains(other.tag))
+        if(skill._enemiesArray.Contains(other.tag)&& skill._skillInput)
         {
             //Debug.Log("Contains target tag!!!");
             for (int targetTypeIndex = 0; targetTypeIndex < skill.targetDynamicValues.Length; targetTypeIndex++)
