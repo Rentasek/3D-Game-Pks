@@ -465,6 +465,7 @@ public class CharacterStatus : MonoBehaviour
     public void TakeDamageInstant(float damageValue, CharacterStatus attacker)
     {
         charStats._hp -= damageValue;
+        charComponents._audioSource.PlayOneShot(charComponents._scrObj_CharStats.damagedEnemy);
         if (charStats._hp <= 0f && !charStatus._isDead) //zadzia³a tylko raz
         {
             attacker.charStats._xp += charStats._xp_GainedFromKill;

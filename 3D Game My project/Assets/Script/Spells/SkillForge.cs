@@ -435,7 +435,20 @@ public static class SkillForge
 
             if (skill._currentCooldownRemaining < 0.05f)   ///zabezpieczenie żeby nie dodawał następnych invoke
             {
-                skill.targetDynamicValues[targetTypeIndex]._skillColliderGameObject.SetActive(true);  ///aktywacja gameobjectu Collidera            
+                switch (skill._currentComboProgress)
+                {
+                    case 0:
+                        skill.targetDynamicValues[targetTypeIndex]._skillColliderGameObject[0].SetActive(true);  ///aktywacja gameobjectu Collidera dla combo 0     
+                        break;
+                    case <= 0.5f and > 0f:
+                        skill.targetDynamicValues[targetTypeIndex]._skillColliderGameObject[1].SetActive(true);  ///aktywacja gameobjectu Collidera dla combo 0.5     
+                        break;
+                    case > 0.5f:
+                        skill.targetDynamicValues[targetTypeIndex]._skillColliderGameObject[2].SetActive(true);  ///aktywacja gameobjectu Collidera dla combo 1
+                        break;
+                }
+
+                //skill.targetDynamicValues[targetTypeIndex]._skillColliderGameObject[0].SetActive(true);  ///aktywacja gameobjectu Collidera            
 
                 Debug.Log("Target Count : " + skill.targetDynamicValues[targetTypeIndex]._targetColliders.Count);
 
