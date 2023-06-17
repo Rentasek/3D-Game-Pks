@@ -578,8 +578,8 @@ public static class LiveCharStats_Base
 
             ////Running Speed 
             if (live_charStats.charMove._moveInputDirection != Vector3.zero && !live_charStats.charStatus._isJumping && !live_charStats.charSkillCombat._skillArray[1]._skillInput && live_charStats.charStats._stam > 5f
-                && live_charStats.fov._targetAquired && !live_charStats.charSkillCombat._skillArray[1]._skillInput && live_charStats.charComponents._navMeshAgent.remainingDistance > live_charStats.charComponents._characterController.radius * 5)
-            //dodatnkowy warunek ->biega tylko jak targetAquired=true, kolejny warnek jeśli nie castuje!!, Kolejny warunek jeśli agent.remainingDistance > _characterController.radius * 5
+                && live_charStats.fov._targetAquired && !live_charStats.charSkillCombat._skillArray[0]._skillInput && live_charStats.charComponents._navMeshAgent.remainingDistance > live_charStats.charComponents._characterController.radius * 5)
+            //dodatkowy warunek ->biega tylko jak targetAquired=true, kolejny warnek jeśli nie castuje!!, Kolejny warunek jeśli agent.remainingDistance > _characterController.radius * 5
             {
                 //live_charStats.charComponents._Animator.ResetTrigger("MeeleAttack");
                 localSpeedIndex = 2;
@@ -624,7 +624,8 @@ public static class LiveCharStats_Base
             if (live_charStats.charStats._stam > 0) live_charStats.charStats._stam = Mathf.MoveTowards(live_charStats.charStats._stam, 0f, (10f + live_charStats.charInfo._charLevel) * Time.deltaTime); //MoveTowards na końcu podaje czas maxymalny na zmianę wartości
 
 
-            if (live_charStats.charMove._moveInputDirection != Vector3.zero && live_charStats.charMove._moveInputDirection != Vector3.back && !live_charStats.charStatus._isJumping && !live_charStats.charSkillCombat._skillArray[0]._skillInput && live_charStats.charStats._stam > 5f)
+            if (live_charStats.charMove._moveInputDirection != Vector3.zero && live_charStats.charMove._moveInputDirection != Vector3.back && !live_charStats.charStatus._isJumping &&
+                !live_charStats.charSkillCombat._skillArray[0]._skillInput && !live_charStats.charSkillCombat._skillArray[1]._skillInput && live_charStats.charStats._stam > 5f)
             {                                                               //jeśli nie sprintuje do tyłu
                 ////Running Speed 
                 //live_charStats.charComponents._Animator.ResetTrigger("MeeleAttack");
@@ -638,12 +639,12 @@ public static class LiveCharStats_Base
                 live_charStats.charMove._moveSpeed = live_charStats.charMove._walkSpeed; //Sprintowanie bez Staminy -> Walk
             }
         }
-        else if (live_charStats.charMove._moveInputDirection != Vector3.zero && !live_charStats.charInput._running && !live_charStats.charStatus._isJumping && !live_charStats.charSkillCombat._skillArray[0]._skillInput)
+        else if (live_charStats.charMove._moveInputDirection != Vector3.zero && !live_charStats.charInput._running && !live_charStats.charStatus._isJumping /*&& !live_charStats.charSkillCombat._skillArray[0]._skillInput*/)
         {   ////Walking Speed
             localSpeedIndex = 1;
             live_charStats.charMove._moveSpeed = live_charStats.charMove._walkSpeed; //Walk
         }
-        else if (live_charStats.charMove._moveInputDirection == Vector3.zero && !live_charStats.charStatus._isJumping && !live_charStats.charSkillCombat._skillArray[0]._skillInput)
+        else if (live_charStats.charMove._moveInputDirection == Vector3.zero && !live_charStats.charStatus._isJumping && !live_charStats.charSkillCombat._skillArray[0]._skillInput && !live_charStats.charSkillCombat._skillArray[1]._skillInput)
         {   ///Idle Speed => speed = 0
             localSpeedIndex = 0;
             live_charStats.charMove._moveSpeed = 0; //Idle
