@@ -272,12 +272,10 @@ public static class SkillForge
                 }
                 if (skill._currentCastingProgress >= 1f)
                 {
+                    Debug.Log("Skill wycastowany!!");
                     skill._currentCastingProgress = 0f;    //reset progressu po wycastowaniu Skilla             
-                    skill._currentCooldownRemaining = 1f;  //Ustawia cooldown po wycastowaniu żeby nie castował znów zbyt szybko, przydatnie jeśli mamy animację po wystrzeleniu }
-
+                    skill._currentCooldownRemaining = 1f;  //Ustawia cooldown po wycastowaniu żeby nie castował znów zbyt szybko, przydatnie jeśli mamy animację po wystrzeleniu 
                 }
-
-
             }
             else
             {
@@ -446,42 +444,6 @@ public static class SkillForge
                     case > 0.5f:
                         skill.targetDynamicValues[targetTypeIndex]._skillColliderGameObject[2].SetActive(true);  ///aktywacja gameobjectu Collidera dla combo 1
                         break;
-                }
-
-                //skill.targetDynamicValues[targetTypeIndex]._skillColliderGameObject[0].SetActive(true);  ///aktywacja gameobjectu Collidera            
-
-                Debug.Log("Target Count : " + skill.targetDynamicValues[targetTypeIndex]._targetColliders.Count);
-
-                if (skill.targetDynamicValues[targetTypeIndex]._targetColliders.Count > 0)
-                {                    
-                    Debug.Log("Effect Activate !!!");
-                    /*for (int effectTypeIndex = 0; effectTypeIndex < scrObj_Skill._targetTypes[targetTypeIndex]._effectTypes.Length; effectTypeIndex++)
-                    {
-                        switch (scrObj_Skill._targetTypes[targetTypeIndex]._effectTypes[effectTypeIndex]._effectType)
-                        {
-                            case ScrObj_skill.EffectType.None:
-                                break;
-
-                            case ScrObj_skill.EffectType.Hit:
-                                EffectType.Skill_Hit(scrObj_Skill, skill, live_charStats, targetTypeIndex, effectTypeIndex);
-                                break;
-
-                            case ScrObj_skill.EffectType.DamageOverTime:
-                                EffectType.Skill_DamageOverTime(scrObj_Skill, skill, live_charStats, targetTypeIndex, effectTypeIndex);
-                                break;
-
-                            case ScrObj_skill.EffectType.Heal:
-                                EffectType.Skill_Heal(scrObj_Skill, skill, live_charStats, targetTypeIndex, effectTypeIndex);
-                                break;
-
-                            case ScrObj_skill.EffectType.HealOverTime:
-                                EffectType.Skill_HealOverTime(scrObj_Skill, skill, live_charStats, targetTypeIndex, effectTypeIndex);
-                                break;
-
-                            case ScrObj_skill.EffectType.Summon:
-                                break;
-                        }
-                    }*/
                 }
             }
 
