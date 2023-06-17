@@ -9,10 +9,6 @@ public class Skill_Collider : MonoBehaviour
     [Tooltip("Live_charStats Castera"), SerializeField] public CharacterStatus live_charStats;    
     [Tooltip("Skill powi¹zany z Colliderem"), SerializeField] public Skill skill;
 
-    [Space]
-    [Header("Testing")]
-    [Tooltip("targetList")] Collider[] _targets;
-
     private void OnEnable()
     {
         Invoke(nameof(DisableColliderObject), skill.scrObj_Skill._timeCast);

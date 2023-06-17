@@ -271,11 +271,11 @@ public class CharControler : MonoBehaviour
 
         live_charStats.charStatus._isDead = false;
 
-        if (live_charStats.GetComponent<Animator>() != null)
+        if (live_charStats.charComponents._Animator != null)
         {
             live_charStats.charComponents._Animator.SetBool("ISDead", live_charStats.charStatus._isDead);
         }
-        if (live_charStats.charComponents._navMeshAgent.enabled)
+        if (live_charStats.charComponents._navMeshAgent != null && live_charStats.charComponents._navMeshAgent.enabled)
         {    
             live_charStats.navMeshAge._walkPoint = transform.position;
             if (live_charStats.charInfo._isPlayer) { live_charStats.navMeshAge._mouseWalkPoint = transform.position; } // dla playera ddatkowo musi byæ mouse position reset
