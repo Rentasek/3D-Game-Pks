@@ -34,7 +34,10 @@ public class ScrObj_GameSettings : ScriptableObject
     [Serializable]
     public class GameplaySettings
     {
-        [Tooltip("OpóŸnienie _AIRoutine w Sekndach - im wiêcej tym ³atwiej dla kompa"), Range(0f, 0.3f)] public float _AIRoutineDelay;
+        [Tooltip("OpóŸnienie _AIRoutine w Sek - im wiêcej tym ³atwiej dla kompa"), Range(0f, 0.3f)] public float _AIRoutineDelay;
+
+        [Tooltip("Grawitacja ON/Off")] public bool _gravityEnabled = true;
+        [Tooltip("Aktualna si³a grawitacji")] public float _gravity;
     }
     [Tooltip("Gameplay Settings")] public GameplaySettings _gameplaySettings;
     #endregion
@@ -46,8 +49,7 @@ public class ScrObj_GameSettings : ScriptableObject
       //  [Tooltip("Dostêpne postacie dla gracza")] public GameObject[] _playerChars;
       // nie mo¿na sharowac gameobj pomiedzy scenami  [Tooltip("Aktualna postaæ gracza")] public GameObject _currentPlayerChar;
 
-        [Tooltip("Grawitacja ON/Off")] public bool _gravityEnabled = true;
-        [Tooltip("Aktualna si³a grawitacji")] public float _gravity;
+        
         [Tooltip("Backupowa pozycja gracza")] public Vector3 _backupPlayerPosition;
         [Tooltip("Backupowa rotacja gracza")] public Quaternion _backupPlayerRotation;
     }
@@ -58,7 +60,7 @@ public class ScrObj_GameSettings : ScriptableObject
     [Serializable]
     public class GraphicSettings
     {
-        [Tooltip("Aktualny ustawiony FPS gry")] public float _framerate;
+        [Tooltip("Aktualny ustawiony FPS gry")] public int _framerate;
     }
     [Tooltip("Graphic settings")] public GraphicSettings _graphicSettings;
     #endregion
@@ -82,7 +84,7 @@ public class ScrObj_GameSettings : ScriptableObject
     {
         [Tooltip("FoV Settings")] public FoVSettings _fovSettings;
         [Space]
-        [Tooltip("Skill Settings")] public SkillSettings skillSettings;
+        [Tooltip("Skill Settings")] public SkillSettings _skillSettings;
     }
     [Tooltip("Editor Settings")] public EditorSettings _editorSettings;    
 
@@ -99,6 +101,7 @@ public class ScrObj_GameSettings : ScriptableObject
         [Tooltip("Kolor  Gizmos - Raycast"), ColorUsageAttribute(true, true)] public Color _editorRaycastColor;
     }
     #endregion
+
     #region Skill Settings
     [Serializable]
     public class SkillSettings
