@@ -14,8 +14,6 @@ using Cursor = UnityEngine.Cursor;
 public partial class CameraController : MonoBehaviour
 {
 
-    [SerializeField] private float mouseSensivity;
-
     private Transform playerTransform;
     [SerializeField] public GameObject player;    
     [SerializeField] public CharacterStatus live_charStats;
@@ -60,7 +58,7 @@ public partial class CameraController : MonoBehaviour
 
     private void MouseRotate()
     {
-        float mouseX = Input.GetAxis("Mouse X") * mouseSensivity * Time.deltaTime;
+        float mouseX = Input.GetAxis("Mouse X") * live_charStats.charComponents._scrObj_GameSettings._inputSettings._rotateSensivity * Time.deltaTime;
 
         playerTransform.Rotate(Vector3.up, mouseX);
     }
