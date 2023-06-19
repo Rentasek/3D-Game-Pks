@@ -85,8 +85,8 @@ public class ScrObj_skill : ScriptableObject
     [Space]
     [CanBeNull, Tooltip("AudioClip skilla -> Target")] public AudioClip _onTargetHitAudioClip;
     [Space]
-    [CanBeNull, Tooltip("AudioVolume skilla -> Caster")] public float _casterAudioVolume;
-    [CanBeNull, Tooltip("AudioVolume skilla -> Target")] public float _onTargetHitAudioVolume;
+   // [CanBeNull, Tooltip("AudioVolume skilla -> Caster")] public float _casterAudioVolume;
+   // [CanBeNull, Tooltip("AudioVolume skilla -> Target")] public float _onTargetHitAudioVolume;
     [CanBeNull, Tooltip("AudioDelay pomiędzy Audio Clipami (prevent Audio Spamming) -> Target")] public float _onTargetHitAudioDelay;
     [Space]
     [CanBeNull, Tooltip("Prefab z VisualEffectem pojawiający się na przeciwniku -> Target ")] public GameObject _onTargetHitVisualEffectPrefab;
