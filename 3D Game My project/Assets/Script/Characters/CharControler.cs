@@ -171,7 +171,7 @@ public class CharControler : MonoBehaviour
         {
             live_charStats.navMeshAge._isCheckingAIRoutine = true;
 
-            yield return new WaitForSeconds(live_charStats.navMeshAge._AIRoutineDelay);
+            yield return new WaitForSeconds(live_charStats.charComponents._scrObj_GameSettings._gameplaySettings._AIRoutineDelay);
 
             LiveCharStats_Base.AIControllerCheck(live_charStats);
             live_charStats.navMeshAge._isCheckingAIRoutine = false;
@@ -384,34 +384,34 @@ public class CharControler : MonoBehaviour
 
     private void GizmosDrawer()
     {
-        Handles.color = live_charStats.fov._editorMaxRadiusColor;
+        Handles.color = live_charStats.charComponents._scrObj_GameSettings._editorSettings._fovSettings._editorMaxRadiusColor;
         //Handles.DrawWireArc(transform.position, Vector3.up, Vector3.forward, 360, live_charStats.fov_coneRadius, live_charStats.fov_editorLineThickness); //rysowanie lini po okrêgu
         Handles.DrawSolidArc(transform.position, Vector3.up, Vector3.forward, 360, live_charStats.fov._maxSightRadius);  //rysowanie solid okrêgu
 
-        Handles.color = live_charStats.fov._editorDynamicRadiusColor; //closeSightRadius      
+        Handles.color = live_charStats.charComponents._scrObj_GameSettings._editorSettings._fovSettings._editorDynamicRadiusColor; //closeSightRadius      
         Handles.DrawSolidArc(transform.position, Vector3.up, Vector3.forward, 360, live_charStats.fov._currentDynamicSightRadius);  //rysowanie solid okrêgu
 
-        Handles.color = live_charStats.charSkillCombat._editorAISpellRadiusColor; //SpellAIRange      
+        Handles.color = live_charStats.charComponents._scrObj_GameSettings._editorSettings._skillSettings._editorAISpellRadiusColor; //SpellAIRange      
         Handles.DrawSolidArc(transform.position, Vector3.up, Vector3.forward, 360, live_charStats.fov._spellRangeSkillMaxRadius * live_charStats.fov._AISpellRangeSkillRadiusFromMax);  //rysowanie solid okrêgu
 
-        Handles.color = live_charStats.fov._editorAngleLineColor;
-        Handles.DrawLine(transform.position, transform.position + Quaternion.AngleAxis(-(live_charStats.fov._currentDynamicSightAngle / 2), Vector3.up) * transform.forward * live_charStats.fov._maxSightRadius, live_charStats.fov._editorLineThickness);//rysowanie lini left
-        Handles.DrawLine(transform.position, transform.position + Quaternion.AngleAxis((live_charStats.fov._currentDynamicSightAngle / 2), Vector3.up) * transform.forward * live_charStats.fov._maxSightRadius, live_charStats.fov._editorLineThickness);//rysowanie lini right
+        Handles.color = live_charStats.charComponents._scrObj_GameSettings._editorSettings._fovSettings._editorAngleLineColor;
+        Handles.DrawLine(transform.position, transform.position + Quaternion.AngleAxis(-(live_charStats.fov._currentDynamicSightAngle / 2), Vector3.up) * transform.forward * live_charStats.fov._maxSightRadius, live_charStats.charComponents._scrObj_GameSettings._editorSettings._fovSettings._editorLineThickness);//rysowanie lini left
+        Handles.DrawLine(transform.position, transform.position + Quaternion.AngleAxis((live_charStats.fov._currentDynamicSightAngle / 2), Vector3.up) * transform.forward * live_charStats.fov._maxSightRadius, live_charStats.charComponents._scrObj_GameSettings._editorSettings._fovSettings._editorLineThickness);//rysowanie lini right
 
-        Handles.color = live_charStats.fov._editorAngleColor;
+        Handles.color = live_charStats.charComponents._scrObj_GameSettings._editorSettings._fovSettings._editorAngleColor;
         Handles.DrawSolidArc(transform.position, Vector3.up, /*viewAngleLeft*/Quaternion.AngleAxis(-(live_charStats.fov._currentDynamicSightAngle / 2), Vector3.up) * transform.forward, live_charStats.fov._currentDynamicSightAngle, live_charStats.fov._currentDynamicSightRadius); //rysuje coneAngle view               
                                                                                                                                                                                                                                                                                                           //Quaternion.AngleAxis korzysta z lokalnego transforma zamiast skomplikowanego Mathf.sin/cos
 
         if (live_charStats.navMeshAge._walkPointSet)
         {
-            Handles.color = live_charStats.fov._editorRaycastColor;
-            Handles.DrawLine(transform.position, live_charStats.navMeshAge._walkPoint, live_charStats.fov._editorLineThickness);
+            Handles.color = live_charStats.charComponents._scrObj_GameSettings._editorSettings._fovSettings._editorRaycastColor;
+            Handles.DrawLine(transform.position, live_charStats.navMeshAge._walkPoint, live_charStats.charComponents._scrObj_GameSettings._editorSettings._fovSettings._editorLineThickness);
         }
 
         if (live_charStats.fov._targetAquired && live_charStats.fov._aquiredTargetGameObject != null)
         {
-            Handles.color = live_charStats.fov._editorRaycastColor;
-            Handles.DrawLine(transform.position, live_charStats.fov._aquiredTargetGameObject.transform.position, live_charStats.fov._editorLineThickness); //rysowanie lini w kierunku playera jeœli nie zas³ania go obstacle Layer
+            Handles.color = live_charStats.charComponents._scrObj_GameSettings._editorSettings._fovSettings._editorRaycastColor;
+            Handles.DrawLine(transform.position, live_charStats.fov._aquiredTargetGameObject.transform.position, live_charStats.charComponents._scrObj_GameSettings._editorSettings._fovSettings._editorLineThickness); //rysowanie lini w kierunku playera jeœli nie zas³ania go obstacle Layer
         }
     }
 #endif
