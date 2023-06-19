@@ -38,7 +38,7 @@ public class Player_Input : MonoBehaviour
 
         live_charStats.charMove._moveInputDirection = new Vector3(Input.GetAxis("Horizontal")/*0*/, 0, Input.GetAxis("Vertical")); //input ruchu
 
-        live_charStats.charInput._rotateHorizontal = Input.GetAxis("Horizontal") * live_charStats.charInput._rotateSensivity * Time.deltaTime;
+        live_charStats.charInput._rotateHorizontal = Input.GetAxis("Horizontal") * live_charStats.charComponents._scrObj_GameSettings._inputSettings._rotateSensivity * Time.deltaTime;
 
         //PimaryAttack
         live_charStats.charSkillCombat._skillArray[0]._skillInput = Input.GetKey(KeyCode.Mouse0);

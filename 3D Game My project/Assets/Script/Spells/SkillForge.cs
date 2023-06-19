@@ -76,8 +76,8 @@ public static class SkillForge
 
                         if (scrObj_Skill._casterAudioClip != null)
                         {
-                            skill._audioSourceCaster.volume = scrObj_Skill._casterAudioVolume;
-                            skill._audioSourceCaster.PlayOneShot(scrObj_Skill._casterAudioClip, scrObj_Skill._casterAudioVolume);
+                            skill._audioSourceCaster.volume = live_charStats.charComponents._scrObj_GameSettings._audioSettings._casterAudioVolume;
+                            skill._audioSourceCaster.PlayOneShot(scrObj_Skill._casterAudioClip, live_charStats.charComponents._scrObj_GameSettings._audioSettings._casterAudioVolume);
                         }
 
                         if (!string.IsNullOrWhiteSpace(scrObj_Skill._animatorFloatName)) live_charStats.charComponents._Animator.SetFloat(scrObj_Skill._animatorFloatName, skill._currentComboProgress); //przed updatem comboProgress
@@ -138,7 +138,7 @@ public static class SkillForge
                         #region AudioClipy //Specjalnie puszczane przy instant ale po animatorze
                         if (scrObj_Skill._casterAudioClip != null && !skill._audioSourceCaster.isPlaying)
                         {
-                            skill._audioSourceCaster.volume = scrObj_Skill._casterAudioVolume;
+                            skill._audioSourceCaster.volume = live_charStats.charComponents._scrObj_GameSettings._audioSettings._casterAudioVolume;
                             skill._audioSourceCaster.clip = scrObj_Skill._casterAudioClip;
                             skill._audioSourceCaster.PlayScheduled(scrObj_Skill._timeCast);                            
                         }
@@ -218,8 +218,8 @@ public static class SkillForge
                         #region AudioClipy //Specjalnie puszczane przy instant ale po animatorze
                         if (scrObj_Skill._casterAudioClip != null)
                         {
-                            skill._audioSourceCaster.volume = scrObj_Skill._casterAudioVolume;
-                            skill._audioSourceCaster.PlayOneShot(scrObj_Skill._casterAudioClip, scrObj_Skill._casterAudioVolume);
+                            skill._audioSourceCaster.volume = live_charStats.charComponents._scrObj_GameSettings._audioSettings._casterAudioVolume;
+                            skill._audioSourceCaster.PlayOneShot(scrObj_Skill._casterAudioClip, live_charStats.charComponents._scrObj_GameSettings._audioSettings._casterAudioVolume);
                         }
                         #endregion
                     }
@@ -266,8 +266,8 @@ public static class SkillForge
                     
                     if (scrObj_Skill._casterAudioClip != null)
                     {
-                        skill._audioSourceCaster.volume = scrObj_Skill._casterAudioVolume;
-                        skill._audioSourceCaster.PlayOneShot(scrObj_Skill._onFinishCastingAudioClip, scrObj_Skill._casterAudioVolume);
+                        skill._audioSourceCaster.volume = live_charStats.charComponents._scrObj_GameSettings._audioSettings._casterAudioVolume;
+                        skill._audioSourceCaster.PlayOneShot(scrObj_Skill._onFinishCastingAudioClip, live_charStats.charComponents._scrObj_GameSettings._audioSettings._casterAudioVolume);
                     } 
                 }
                 if (skill._currentCastingProgress >= 1f)
@@ -591,7 +591,7 @@ public static class SkillForge
 
             if (skill.targetDynamicValues[targetTypeIndex]._targetColliders.Count > 0)
             {   
-                Utils.Skill_ChainVFX(scrObj_Skill, skill, targetTypeIndex);
+                Utils.Skill_ChainVFX(scrObj_Skill, skill, live_charStats, targetTypeIndex);
 
                 for (int effectTypeIndex = 0; effectTypeIndex < scrObj_Skill._targetTypes[targetTypeIndex]._effectTypes.Length; effectTypeIndex++)
                 {
@@ -1098,7 +1098,7 @@ public static class SkillForge
         /// <param name="scrObj_Skill">Scriptable Object Skilla</param>
         /// <param name="skill">Ten GameObject skill</param>        
         /// <param name="targetTypeIndex">Aktualny [targetTypeIndex] z targetType[]</param> 
-        public static void Skill_ChainVFX(ScrObj_skill scrObj_Skill, Skill skill, int targetTypeIndex)
+        public static void Skill_ChainVFX(ScrObj_skill scrObj_Skill, Skill skill, CharacterStatus live_charStats, int targetTypeIndex)
         {
             if (skill._chainVisualEffect != null ) ///VFX chainEffect 
             {
@@ -1116,9 +1116,9 @@ public static class SkillForge
                     {                       
                         if (!targetAudioSource.isPlaying)
                         {
-                            //targetAudioSource.PlayOneShot(scrObj_Skill._onTargetHitAudioClip, scrObj_Skill._onTargetHitAudioVolume);
+                            //targetAudioSource.PlayOneShot(scrObj_Skill._onTargetHitAudioClip, live_charStats.charComponents._scrObj_GameSettings._audioSettings._onTargetHitAudioVolume);
                             targetAudioSource.clip = scrObj_Skill._onTargetHitAudioClip;
-                            targetAudioSource.volume = scrObj_Skill._onTargetHitAudioVolume;
+                            targetAudioSource.volume = live_charStats.charComponents._scrObj_GameSettings._audioSettings._onTargetHitAudioVolume;
                             targetAudioSource.PlayScheduled(scrObj_Skill._onTargetHitAudioDelay); 
                         }
                     }
@@ -1140,9 +1140,9 @@ public static class SkillForge
                         {
                             if (!targetAudioSource.isPlaying || skill.targetDynamicValues[targetTypeIndex]._targetColliders[k].GetComponent<AudioSource>().time >= skill._chainVisualEffect.GetFloat("_lightningLifetime"))
                             {
-                                //targetAudioSource.PlayOneShot(scrObj_Skill._onTargetHitAudioClip, scrObj_Skill._onTargetHitAudioVolume);
+                                //targetAudioSource.PlayOneShot(scrObj_Skill._onTargetHitAudioClip, live_charStats.charComponents._scrObj_GameSettings._audioSettings._onTargetHitAudioVolume);
                                 targetAudioSource.clip = scrObj_Skill._onTargetHitAudioClip;
-                                targetAudioSource.volume = scrObj_Skill._onTargetHitAudioVolume;
+                                targetAudioSource.volume = live_charStats.charComponents._scrObj_GameSettings._audioSettings._onTargetHitAudioVolume;
                                 targetAudioSource.PlayScheduled(scrObj_Skill._onTargetHitAudioDelay);
                             }
                         }

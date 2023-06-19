@@ -7,11 +7,12 @@ using UnityEngine.SceneManagement;
 public class UI_MainMenu : MonoBehaviour
 {
     [SerializeField] public int sceneNumber = 1;
+    [SerializeField] public ScrObj_GameSettings _scrObj_GameSettings;
 
     private void Awake()
     {
-        Application.targetFrameRate = 60;
-        sceneNumber = 1;
+        Application.targetFrameRate = _scrObj_GameSettings._graphicSettings._framerate;
+        sceneNumber = 1;        
     }
 
     public void PlayGame()

@@ -51,7 +51,7 @@ public class CharacterStatus : MonoBehaviour
         public bool _jumping;
         //[Tooltip("LMB / LPM")] public bool _primary;
         //[Tooltip("RMB / PPM")] public bool _secondary;
-        [Tooltip("Sensitivity myszki")] public float _rotateSensivity;
+        //[Tooltip("Sensitivity myszki")] public float _rotateSensivity;
         [Tooltip("Czy mo¿na obracaæ myszk¹? - Player (X)")] public bool _enableMouseRotate;
         [Tooltip("Poruszanie siê we wskazany _walkPoint - nadpisanie dzia³ania AIControllera - Player (MiddleMouse)")] public bool _mouseCurrentMoving;     
 
@@ -79,7 +79,7 @@ public class CharacterStatus : MonoBehaviour
         [Tooltip("LayerMask do Raycasta - Co traktuje jako pod³o¿e?")] public LayerMask _whatIsGround;
         [Tooltip("Mechanizm ochronny jeœli wyjdzie poza _wanderingRange, resetuje walkPointSet do spawnPoint (max.10 i reset)")] public int _failsafeCounter;
         [Tooltip("Nie ustawione (Mia³ byæ delay - jeœli nie dojdzie do _walkPoint w okreœlonym czasie to reset")] public float _patrollingDelay;
-        [Tooltip("OpóŸnienie _AIRoutine w Sekndach - im wiêcej tym ³atwiej dla kompa"), Range(0f,0.3f)] public float _AIRoutineDelay;
+        //[Tooltip("OpóŸnienie _AIRoutine w Sekndach - im wiêcej tym ³atwiej dla kompa"), Range(0f,0.3f)] public float _AIRoutineDelay;
         [Tooltip("Aktualny status - Czy jest w trakcie _AIRoutine? Jeœli jest nie odpali nowej")] public bool _isCheckingAIRoutine;
     }
     [Tooltip("Zmienne z NavMeshAgenta")] public NavMeshAge navMeshAge;
@@ -109,10 +109,8 @@ public class CharacterStatus : MonoBehaviour
         [Tooltip("Podaje true jeœli target jest Aquired i znajduje siê w zasiêgu (MaxRadius) spellRangeSkilla (zmodyfikowanieg przez multiplier _AISpellRangeFromMax)")] public bool _targetInSpellRange;
         [Tooltip("Multiplier do (MaxRadius) spellRangeSkilla"), Range(0.1f, 1f)] public float _AISpellRangeSkillRadiusFromMax;
         [Tooltip("Aktualny spellRange pobrany z closeRangeSkill")] public float _spellRangeSkillMaxRadius;
-        //[CanBeNull, Tooltip("SpellRangeSkill przekazany z klasy Skill")] public Skill _spellRangeSkill;
         [Space]
         [Tooltip("Podaje true jeœli target jest Aquired i znajduje siê w zasiêgu (MaxRadius) closeRangeSkilla")] public bool _targetInAttackRange;
-        //[CanBeNull, Tooltip("CloseRangeSkill przekazany z klasy Skill")] public Skill _closeRangeSkill;
         [Space]
         [Tooltip("Podaje true jeœli target znajduje siê w dynamic SightRange && Angle && !Raycast(obstaclesLayerMask)")] public bool _targetAquired;
         [CanBeNull, Tooltip("Aktualnie znaleziony (DynamicSightRange) && goniony (Chasing) aquiredTargetGameObject")] public GameObject _aquiredTargetGameObject;
@@ -125,14 +123,15 @@ public class CharacterStatus : MonoBehaviour
         [Space]
         [Tooltip("OpóŸnienie _FoVRoutine w Sekndach - im wiêcej tym ³atwiej dla kompa (Wy³¹czone przy AIController)"), Range(0f, 0.3f)] public float _routineDelay;
         [Tooltip("Aktualny status - Czy jest w trakcie _FoVRoutine? Jeœli jest nie odpali nowej")] public bool _isSearchingForTarget;
-        [Space]
+      /*  [Space]
         [Header("GizmosColor")]
-        [Tooltip("Gruboœæ lini Gizmos"), Range(0, 10)] public float _editorLineThickness;
-        [Tooltip("Kolor Gizmos - AngleLineColor (kolor HDR picker)"), ColorUsageAttribute(true, true)] public Color _editorAngleLineColor; 
-        [Tooltip("Kolor Gizmos - AngleColor (kolor HDR picker)"), ColorUsageAttribute(true, true)] public Color _editorAngleColor;
-        [Tooltip("Kolor  Gizmos - MaxRadius"), ColorUsageAttribute(true, true)] public Color _editorMaxRadiusColor;
-        [Tooltip("Kolor  Gizmos - DynamicRadius"), ColorUsageAttribute(true, true)] public Color _editorDynamicRadiusColor;
-        [Tooltip("Kolor  Gizmos - Raycast"), ColorUsageAttribute(true, true)] public Color _editorRaycastColor;
+        //[Tooltip("Gruboœæ lini Gizmos"), Range(0, 10)] public float _editorLineThickness;
+        //[Tooltip("Kolor Gizmos - AngleLineColor (kolor HDR picker)"), ColorUsageAttribute(true, true)] public Color _editorAngleLineColor; 
+        //[Tooltip("Kolor Gizmos - AngleColor (kolor HDR picker)"), ColorUsageAttribute(true, true)] public Color _editorAngleColor;
+        //[Tooltip("Kolor  Gizmos - MaxRadius"), ColorUsageAttribute(true, true)] public Color _editorMaxRadiusColor;
+        //[Tooltip("Kolor  Gizmos - DynamicRadius"), ColorUsageAttribute(true, true)] public Color _editorDynamicRadiusColor;
+        //[Tooltip("Kolor  Gizmos - Raycast"), ColorUsageAttribute(true, true)] public Color _editorRaycastColor;
+*/
     }
     [Tooltip("Field of View")] public FoV fov;
     #endregion
@@ -149,7 +148,7 @@ public class CharacterStatus : MonoBehaviour
         public float _jumpStamCost;
         public float _jumpDeltaTime;
         [Tooltip("Grawitacja ON/Off, mo¿na mechanikê gravity guna zrobiæ :D")]public bool _gravityEnabled = true;
-        public float _gravity;
+        //public float _gravity;
         public Vector3 _backupPosition;
         public Quaternion _backupRotation;
         public Vector3 _moveVector;
@@ -166,17 +165,11 @@ public class CharacterStatus : MonoBehaviour
     [Serializable]
     public class CharSkillCombat
     {
-        /*[Header("Character Primary/Melee Combat")]
-        [Tooltip("Skill pod LMB"), CanBeNull] public Skill _primarySkill;        
-
-        [Header("Character Secondary/Magic Combat")]
-        [Tooltip("Skill pod RMB"), CanBeNull] public Skill _secondarySkill;*/
-
         [Tooltip("Tablica Skillów podpiêtych pod postaæ\n [0] -> CloseRange / Primary (Player)\n [1] -> SpellRange / Secondary (Player)"), CanBeNull] public Skill[] _skillArray;
 
-        [Tooltip("Kolor Gizmos - AISpellRadius (kolor HDR picker)"), ColorUsageAttribute(true, true)] public Color _editorAISpellRadiusColor;
-        [Tooltip("Kolor Gizmos - SkillAngle (kolor HDR picker)"), ColorUsageAttribute(true, true)] public Color _skillAngleColor;
-        [Tooltip("Kolor Gizmos - SkillRaycast (kolor HDR picker)"), ColorUsageAttribute(true, true)] public Color _skillRaycastColor;          
+        //[Tooltip("Kolor Gizmos - AISpellRadius (kolor HDR picker)"), ColorUsageAttribute(true, true)] public Color _editorAISpellRadiusColor;
+        //[Tooltip("Kolor Gizmos - SkillAngle (kolor HDR picker)"), ColorUsageAttribute(true, true)] public Color _skillAngleColor;
+        //[Tooltip("Kolor Gizmos - SkillRaycast (kolor HDR picker)"), ColorUsageAttribute(true, true)] public Color _skillRaycastColor;          
     }
     [Tooltip("Character Primary/Secondary Combat")] public CharSkillCombat charSkillCombat;
     #endregion
@@ -220,6 +213,7 @@ public class CharacterStatus : MonoBehaviour
         [CanBeNull] public AudioSource _audioSource;
         public ScrObj_charStats _scrObj_CharStats;
         public CharacterBonusStats _characterBonusStats;
+        public ScrObj_GameSettings _scrObj_GameSettings;
     }
     [Tooltip("Komponenty podpiête pod live_charStats")]public CharComponents charComponents;
     #endregion
@@ -258,17 +252,17 @@ public class CharacterStatus : MonoBehaviour
         charMove._jumpPower = charComponents._scrObj_CharStats.jumpPower;
         charMove._jumpStamCost = charComponents._scrObj_CharStats.jumpStamCost;
         charMove._jumpDeltaTime = charComponents._scrObj_CharStats.JumpDeltaTime;
-        charMove._gravity = charComponents._scrObj_CharStats.gravity;
+        //charMove._gravity = charComponents._scrObj_CharStats.gravity;
 
         //Input
-        charInput._rotateSensivity = charComponents._scrObj_CharStats.inputRotateSensivity;
+        //charInput._rotateSensivity = charComponents._scrObj_CharStats.inputRotateSensivity;
 
         //NavMesh        
         navMeshAge._wanderingRange = charComponents._scrObj_CharStats.navMeAge_wanderingRange;
         navMeshAge._walkPointRange = charComponents._scrObj_CharStats.navMeAge_walkPointRange;
         navMeshAge._whatIsGround = charComponents._scrObj_CharStats.navMeAge_whatIsGround;
         navMeshAge._patrollingDelay = charComponents._scrObj_CharStats.navMeAge_patrollingDelay;
-        navMeshAge._AIRoutineDelay = charComponents._scrObj_CharStats.navMeAge_AIRoutineDelay;
+        //navMeshAge._AIRoutineDelay = charComponents._scrObj_CharStats.navMeAge_AIRoutineDelay;
 
         //FoV NavMesh
         fov._maxSightAngle = charComponents._scrObj_CharStats.fov_MaxSightAngle;
@@ -281,12 +275,12 @@ public class CharacterStatus : MonoBehaviour
         fov._routineDelay = charComponents._scrObj_CharStats.fov_coneRoutineDelay;
         fov._obstaclesLayerMask = charComponents._scrObj_CharStats.fov_obstaclesLayerMask;
 
-        fov._editorLineThickness = charComponents._scrObj_CharStats.fov_editorLineThickness;
+       /* fov._editorLineThickness = charComponents._scrObj_CharStats.fov_editorLineThickness;
         fov._editorAngleLineColor = charComponents._scrObj_CharStats.fov_editorAngleLineColor;
         fov._editorAngleColor = charComponents._scrObj_CharStats.fov_editorAngleColor;
         fov._editorMaxRadiusColor = charComponents._scrObj_CharStats.fov_editorRadiusColor;
         fov._editorDynamicRadiusColor = charComponents._scrObj_CharStats.fov_editorDynamicRadiusColor;
-        fov._editorRaycastColor = charComponents._scrObj_CharStats.fov_editorRaycastColor;
+        fov._editorRaycastColor = charComponents._scrObj_CharStats.fov_editorRaycastColor;*/
 
         //Mask
         charMove.currentGroundMask = charComponents._scrObj_CharStats.groundMask;
@@ -308,10 +302,11 @@ public class CharacterStatus : MonoBehaviour
         charSkillCombat.currentAttackStamCost = scrObj_CharStats.attackStamCost + (scrObj_CharStats.attackStamCost * (charInfo.currentCharLevel /2f * scrObj_CharStats.MultiplierDamageCombo));
         charSkillCombat.currentSpell_Damage =seSpell_Damage + (scrObj_CharStats.baseSpell_Damage * (charInfo.currentCharLevel * scrObj_CharStats.MultiplierSpell_Damage)) + (scrObj_CharStats.baseSpell_Damage * (currentCharacterBonusStats.bonus_Skill_Damage * scrObj_CharStats.MultiplierSpell_Damage)); //+bonus
         charSkillCombat.currentSpell_MPCost = scrObj_CharStats.baseSpell_MPCost + (scrObj_CharStats.baseSpell_Damage * (charInfo.currentCharLevel * scrObj_CharStats.MultiplierSpell_Damage));
-        */
+        
         charSkillCombat._editorAISpellRadiusColor = charComponents._scrObj_CharStats.spell_editorAISpellRadiusColor;
         charSkillCombat._skillAngleColor = charComponents._scrObj_CharStats.spell_breathAngleColor;
         charSkillCombat._skillRaycastColor = charComponents._scrObj_CharStats.spell_breathRaycastColor;
+        */
     }
 
     public void UpdateBonusStats()
@@ -465,7 +460,7 @@ public class CharacterStatus : MonoBehaviour
     public void TakeDamageInstant(float damageValue, CharacterStatus attacker)
     {
         charStats._hp -= damageValue;
-        charComponents._audioSource.PlayOneShot(charComponents._scrObj_CharStats.damagedEnemy);
+        charComponents._audioSource.PlayOneShot(charComponents._scrObj_CharStats.damagedEnemy, charComponents._scrObj_GameSettings._audioSettings._onTargetHitAudioVolume);
         if (charStats._hp <= 0f && !charStatus._isDead) //zadzia³a tylko raz
         {
             attacker.charStats._xp += charStats._xp_GainedFromKill;

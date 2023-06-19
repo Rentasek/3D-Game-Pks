@@ -216,16 +216,16 @@ public class Skill : MonoBehaviour
     {
         for (int i = 0; i < targetDynamicValues.Length; i++)
         {
-            Handles.color = live_charStats.charSkillCombat._skillAngleColor;
+            Handles.color = live_charStats.charComponents._scrObj_GameSettings._editorSettings._skillSettings._skillAngleColor;
             Handles.DrawSolidArc(transform.position, Vector3.up, Quaternion.AngleAxis(-(targetDynamicValues[i]._currentAngle / 2), Vector3.up) * transform.forward, targetDynamicValues[i]._currentAngle, targetDynamicValues[i]._currentRadius); //rysuje coneAngle view               
 
 
             if (targetDynamicValues[i]._targetInRange && targetDynamicValues[i]._targetInAngle)
             {
-                Handles.color = live_charStats.charSkillCombat._skillRaycastColor;
+                Handles.color = live_charStats.charComponents._scrObj_GameSettings._editorSettings._skillSettings._skillRaycastColor;
                 for (int j = 0; j < targetDynamicValues[i]._targetColliders.Count; j++)
                 {
-                    Handles.DrawLine(_casterGameobject.transform.position, targetDynamicValues[i]._targetColliders[i].transform.position, live_charStats.fov._editorLineThickness); //rysowanie lini w kierunku targetów breatha jeśli nie zasłania go obstacle Layer
+                    Handles.DrawLine(_casterGameobject.transform.position, targetDynamicValues[i]._targetColliders[i].transform.position, live_charStats.charComponents._scrObj_GameSettings._editorSettings._fovSettings._editorLineThickness); //rysowanie lini w kierunku targetów breatha jeśli nie zasłania go obstacle Layer
                     /*Gizmos.matrix = Matrix4x4.TRS(transform.position, transform.rotation, new Vector3(Camera.main.aspect, 1f, 1f));
                     Gizmos.DrawFrustum(transform.position, skill_currentAngle,skill_currentRadius,0f,1);*/
                 }

@@ -11,7 +11,7 @@ public class UI_PauseMenu : MonoBehaviour, IPlayerUpdate
     public CharacterStatus live_charStats;
     public Player_Input player_Input;
     [SerializeField]private bool mouseLocked;
-    [SerializeField]private GameObject pauseOptionsPanel, pauseMainPanel;
+    [SerializeField]private GameObject pauseCharSelection, pauseOptionsMenu, pauseMainPanel;
 
     private void OnEnable() 
     {
@@ -62,7 +62,8 @@ public class UI_PauseMenu : MonoBehaviour, IPlayerUpdate
             //mouseLocked = live_charStats.charInput._enableMouseRotate; //private var do przetrzymania mouse inputa, zapamiêtuje aktualny stan
             //live_charStats.charInput._enableMouseRotate = false;    //unlock mouse
             
-            pauseOptionsPanel.SetActive(false); //resetowanie aktywnego panelu menu
+            pauseCharSelection.SetActive(false); //resetowanie aktywnego panelu menu
+            pauseOptionsMenu.SetActive(false); //resetowanie aktywnego panelu menu
             pauseMainPanel.SetActive(true);    //resetowanie aktywnego panelu menu
 
 
