@@ -705,7 +705,7 @@ public static class LiveCharStats_Base
     {
         if (!live_charStats.charStatus._isGrounded)
         {
-            live_charStats.charMove._moveVector.y = Mathf.MoveTowards(live_charStats.charMove._moveVector.y, -live_charStats.charMove._gravity, 1f); //move towards działa lepiej, większy przyrost na początku   
+            live_charStats.charMove._moveVector.y = Mathf.MoveTowards(live_charStats.charMove._moveVector.y, -live_charStats.charComponents._scrObj_GameSettings._gameplaySettings._gravity, 1f); //move towards działa lepiej, większy przyrost na początku   
         }
 
         if (live_charStats.charStatus._isGrounded && live_charStats.charMove._moveVector.y < 0)
