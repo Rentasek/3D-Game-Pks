@@ -109,10 +109,8 @@ public class CharacterStatus : MonoBehaviour
         [Tooltip("Podaje true jeœli target jest Aquired i znajduje siê w zasiêgu (MaxRadius) spellRangeSkilla (zmodyfikowanieg przez multiplier _AISpellRangeFromMax)")] public bool _targetInSpellRange;
         [Tooltip("Multiplier do (MaxRadius) spellRangeSkilla"), Range(0.1f, 1f)] public float _AISpellRangeSkillRadiusFromMax;
         [Tooltip("Aktualny spellRange pobrany z closeRangeSkill")] public float _spellRangeSkillMaxRadius;
-        //[CanBeNull, Tooltip("SpellRangeSkill przekazany z klasy Skill")] public Skill _spellRangeSkill;
         [Space]
         [Tooltip("Podaje true jeœli target jest Aquired i znajduje siê w zasiêgu (MaxRadius) closeRangeSkilla")] public bool _targetInAttackRange;
-        //[CanBeNull, Tooltip("CloseRangeSkill przekazany z klasy Skill")] public Skill _closeRangeSkill;
         [Space]
         [Tooltip("Podaje true jeœli target znajduje siê w dynamic SightRange && Angle && !Raycast(obstaclesLayerMask)")] public bool _targetAquired;
         [CanBeNull, Tooltip("Aktualnie znaleziony (DynamicSightRange) && goniony (Chasing) aquiredTargetGameObject")] public GameObject _aquiredTargetGameObject;
@@ -166,12 +164,6 @@ public class CharacterStatus : MonoBehaviour
     [Serializable]
     public class CharSkillCombat
     {
-        /*[Header("Character Primary/Melee Combat")]
-        [Tooltip("Skill pod LMB"), CanBeNull] public Skill _primarySkill;        
-
-        [Header("Character Secondary/Magic Combat")]
-        [Tooltip("Skill pod RMB"), CanBeNull] public Skill _secondarySkill;*/
-
         [Tooltip("Tablica Skillów podpiêtych pod postaæ\n [0] -> CloseRange / Primary (Player)\n [1] -> SpellRange / Secondary (Player)"), CanBeNull] public Skill[] _skillArray;
 
         [Tooltip("Kolor Gizmos - AISpellRadius (kolor HDR picker)"), ColorUsageAttribute(true, true)] public Color _editorAISpellRadiusColor;
